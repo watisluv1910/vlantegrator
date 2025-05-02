@@ -3,9 +3,7 @@ package com.wladischlau.vlt.core.intergator.config;
 import com.wladischlau.vlt.core.intergator.model.Branch;
 import com.wladischlau.vlt.core.intergator.model.Node;
 import com.wladischlau.vlt.core.intergator.model.Route;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

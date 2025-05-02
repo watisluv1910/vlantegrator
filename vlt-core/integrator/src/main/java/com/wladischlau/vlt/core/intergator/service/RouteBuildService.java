@@ -4,7 +4,6 @@ import com.wladischlau.vlt.core.intergator.IntegrationFlowGenerator;
 import com.wladischlau.vlt.core.intergator.model.Route;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SystemProperties;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 

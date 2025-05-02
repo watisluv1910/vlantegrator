@@ -1,40 +1,5 @@
 services:
-  vlt-core-builder:
-    image: docker.io/watisluv/vlt-builder:1.0.0
-    container_name: vlt-core-builder
-    env_file:
-      - ./builder/.env
-    ports:
-      - "8081:8081"
-    volumes:
-      - ${HOME}/.vlt/cache/routes:/app/.vlt/cache/routes
-    restart: on-failure
-    networks:
-      vlt:
 
-  vlt-core-deployer:
-    image: docker.io/watisluv/vlt-deployer:1.0.0
-    container_name: vlt-core-deployer
-    env_file:
-      - ./deployer/.env
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-    networks:
-      vlt:
-
-  vlt-core-integrator:
-    image: docker.io/watisluv/vlt-integrator:1.0.0
-    container_name: vlt-core-integrator
-    env_file:
-      - ./integrator/.env
-    volumes:
-      - ${HOME}/.vlt/cache/routes:/app/.vlt/cache/routes
-    ports:
-      - "8082:8082"
-    restart: on-failure
-    networks:
-      vlt:
 
   vlt-core-db:
     container_name: vlt-core-db
