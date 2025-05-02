@@ -1,7 +1,6 @@
 package com.wladischlau.vlt.core.intergator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wladischlau.vlt.core.intergator.config.BranchExtractor;
 import com.wladischlau.vlt.core.intergator.model.FlowDefinition;
 import com.wladischlau.vlt.core.intergator.model.Node;
@@ -29,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.wladischlau.vlt.adapters.common.AdapterUtils.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,6 @@ public class IntegrationFlowGenerator {
 
     private static final String ADAPTERS_PACKAGE = "com.wladischlau.vlt.adapters";
 
-    private final ObjectMapper objectMapper;
     private final BranchExtractor branchExtractor;
 
     public void generateFlowConfig(Route route, Path outputDir) {
@@ -85,21 +85,21 @@ public class IntegrationFlowGenerator {
             for (var node : flow.getNodes()) {
                 ++stepCounter;
                 var adapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapterClassName());
-                var configJson = objectMapper.writeValueAsString(node.adapterConfig());
+                var configJson = configMapper.writeValueAsString(node.adapterConfig());
                 flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
                 flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
             }
         } else {
             var start = flow.getNodes().getFirst();
             var adapterClass = ClassName.get(ADAPTERS_PACKAGE, start.adapterClassName());
-            var configJson = objectMapper.writeValueAsString(start.adapterConfig());
+            var configJson = configMapper.writeValueAsString(start.adapterConfig());
             flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
             flowBuilder.addStatement("var step$1L = step$1LAdapter.start()", stepCounter);
 
             for (var node : flow.getNodes().subList(1, flow.getNodes().size())) {
                 ++stepCounter;
                 var currAdapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapterClassName());
-                var currAdapterConfigJson = objectMapper.writeValueAsString(node.adapterConfig());
+                var currAdapterConfigJson = configMapper.writeValueAsString(node.adapterConfig());
                 flowBuilder.addStatement("var step$LAdapter = new $T($S)",
                                          stepCounter, currAdapterClass, currAdapterConfigJson);
                 flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
@@ -109,7 +109,7 @@ public class IntegrationFlowGenerator {
         if (!flow.getSubflowChannels().isEmpty()) {
             ++stepCounter;
             var adapterClass = ClassName.get(ADAPTERS_PACKAGE, "DividerAdapter");
-            var configJson = objectMapper.writeValueAsString(Map.of("subFlowChannels", flow.getSubflowChannels()));
+            var configJson = configMapper.writeValueAsString(Map.of("subFlowChannels", flow.getSubflowChannels()));
             flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
             flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
         }
