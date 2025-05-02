@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.wladischlau.vlt.adapters.common.AdapterUtils.*;
+import static com.wladischlau.vlt.adapters.common.AdapterUtils.configMapper;
 
 @Slf4j
 @Service
