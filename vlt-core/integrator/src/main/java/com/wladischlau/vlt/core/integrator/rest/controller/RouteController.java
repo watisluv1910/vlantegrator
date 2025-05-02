@@ -1,8 +1,8 @@
-package com.wladischlau.vlt.core.intergator.rest.controller;
+package com.wladischlau.vlt.core.integrator.rest.controller;
 
-import com.wladischlau.vlt.core.intergator.model.Route;
-import com.wladischlau.vlt.core.intergator.rest.dto.BuildRouteRequestDto;
-import com.wladischlau.vlt.core.intergator.service.RouteBuildService;
+import com.wladischlau.vlt.core.integrator.model.Route;
+import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

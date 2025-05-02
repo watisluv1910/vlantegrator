@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator.config;
+package com.wladischlau.vlt.core.integrator.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;

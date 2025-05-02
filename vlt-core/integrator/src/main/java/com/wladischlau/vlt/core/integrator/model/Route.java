@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator.model;
+package com.wladischlau.vlt.core.integrator.model;
 
 import lombok.Data;
 import org.jgrapht.Graph;

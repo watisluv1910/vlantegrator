@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator.config;
+package com.wladischlau.vlt.core.integrator.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

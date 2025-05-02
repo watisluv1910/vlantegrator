@@ -1,7 +1,7 @@
-package com.wladischlau.vlt.core.intergator.service;
+package com.wladischlau.vlt.core.integrator.service;
 
-import com.wladischlau.vlt.core.intergator.IntegrationFlowGenerator;
-import com.wladischlau.vlt.core.intergator.model.Route;
+import com.wladischlau.vlt.core.integrator.IntegrationFlowGenerator;
+import com.wladischlau.vlt.core.integrator.model.Route;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

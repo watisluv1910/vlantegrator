@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator.rest.controller;
+package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

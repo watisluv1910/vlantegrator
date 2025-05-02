@@ -1,10 +1,10 @@
-package com.wladischlau.vlt.core.intergator;
+package com.wladischlau.vlt.core.integrator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.wladischlau.vlt.core.intergator.service.BranchExtractor;
-import com.wladischlau.vlt.core.intergator.model.FlowDefinition;
-import com.wladischlau.vlt.core.intergator.model.Node;
-import com.wladischlau.vlt.core.intergator.model.Route;
+import com.wladischlau.vlt.core.integrator.service.BranchExtractor;
+import com.wladischlau.vlt.core.integrator.model.FlowDefinition;
+import com.wladischlau.vlt.core.integrator.model.Node;
+import com.wladischlau.vlt.core.integrator.model.Route;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

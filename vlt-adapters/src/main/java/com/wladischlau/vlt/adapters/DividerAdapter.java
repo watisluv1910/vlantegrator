@@ -1,18 +1,14 @@
 package com.wladischlau.vlt.adapters;
 
 import com.wladischlau.vlt.adapters.common.AbstractAdapter;
-import com.wladischlau.vlt.adapters.common.AdapterConfig;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.adapters.common.OutboundAdapter;
-import jakarta.validation.constraints.Size;
+import com.wladischlau.vlt.adapters.config.DividerAdapterConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
 
-import java.util.List;
 import java.util.concurrent.Executors;
-
-import static com.wladischlau.vlt.adapters.DividerAdapter.DividerAdapterConfig;
 
 @Slf4j
 @Getter
@@ -41,6 +37,4 @@ public class DividerAdapter extends AbstractAdapter<DividerAdapterConfig> implem
     public AdapterType getType() {
         return AdapterType.DIVIDER;
     }
-
-    public record DividerAdapterConfig(@Size(min = 2) List<String> subFlowChannels) implements AdapterConfig {}
 }

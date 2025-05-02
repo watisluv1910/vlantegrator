@@ -216,6 +216,37 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <packageNames>com.wladischlau.vlt.adapters.config</packageNames>
+                    <skipAbstractTypes>true</skipAbstractTypes>
+                    <skipInterfaces>true</skipInterfaces>
+                    <schemaVersion>DRAFT_2020_12</schemaVersion>
+                    <schemaFileName>{0}-schema.json</schemaFileName>
+                    <schemaFilePath>target/generated-sources/adapters/config/schemas</schemaFilePath>
+                    <failIfNoClassesMatch>false</failIfNoClassesMatch>
+                    <options>
+                        <preset>PLAIN_JSON</preset>
+                        <enabled>
+                            <option>EXTRA_OPEN_API_FORMAT_VALUES</option>
+                            <option>FLATTENED_ENUMS_FROM_TOSTRING</option>
+                        </enabled>
+                    </options>
+                    <modules>
+                        <module>
+                            <name>Jackson</name>
+                        </module>
+                        <module>
+                            <name>JakartaValidation</name>
+                            <options>
+                                <option>NOT_NULLABLE_FIELD_IS_REQUIRED</option>
+                                <option>INCLUDE_PATTERN_EXPRESSIONS</option>
+                            </options>
+                        </module>
+                        <module>
+                            <className>com.wladischlau.vlt.core.integrator.config.jsonschema.SpringHttpMethodSchemaModule</className>
+                        </module>
+                    </modules>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

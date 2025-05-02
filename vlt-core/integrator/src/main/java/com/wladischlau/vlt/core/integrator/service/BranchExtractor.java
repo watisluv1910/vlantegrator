@@ -1,8 +1,8 @@
-package com.wladischlau.vlt.core.intergator.service;
+package com.wladischlau.vlt.core.integrator.service;
 
-import com.wladischlau.vlt.core.intergator.model.Branch;
-import com.wladischlau.vlt.core.intergator.model.Node;
-import com.wladischlau.vlt.core.intergator.model.Route;
+import com.wladischlau.vlt.core.integrator.model.Branch;
+import com.wladischlau.vlt.core.integrator.model.Node;
+import com.wladischlau.vlt.core.integrator.model.Route;
 import org.jgrapht.Graph;
 import org.springframework.stereotype.Service;
 

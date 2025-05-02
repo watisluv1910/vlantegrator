@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator;
+package com.wladischlau.vlt.core.integrator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

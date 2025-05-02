@@ -1,17 +1,13 @@
 package com.wladischlau.vlt.adapters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wladischlau.vlt.adapters.common.AbstractAdapter;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.adapters.common.OutboundAdapter;
-import com.wladischlau.vlt.adapters.common.AdapterConfig;
-import jakarta.validation.constraints.NotBlank;
+import com.wladischlau.vlt.adapters.config.SpELTransformerAdapterConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
-
-import static com.wladischlau.vlt.adapters.SpELTransformerAdapter.SpELTransformerAdapterConfig;
 
 @Slf4j
 @Getter
@@ -33,6 +29,4 @@ public class SpELTransformerAdapter extends AbstractAdapter<SpELTransformerAdapt
     public AdapterType getType() {
         return AdapterType.SPEL_TRANSFORMER;
     }
-
-    public record SpELTransformerAdapterConfig(@NotBlank String expression) implements AdapterConfig {}
 }
