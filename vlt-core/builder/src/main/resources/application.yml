@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: builder
+  profiles:
+    active: default
+  freemarker:
+    template-loader-path: classpath:/route/templates/
+
+server:
+  port: 8081
+
+repo: # TODO: Rename
+  id: ${REPO_ID}
+  name: ${REPO_NAME}
+  url: ${REPO_URL}
+
+route:
+  builder: ${ROUTE_BUILDER}
+
+docker:
+  username: ${DOCKER_USERNAME}
+  password: ${DOCKER_PASSWORD}
+  image-registry: ${DOCKER_IMAGE_REGISTRY}

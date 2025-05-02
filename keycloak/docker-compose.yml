@@ -1,0 +1,72 @@
+services:
+  keycloak-db:
+    container_name: vlt-keycloak.db
+    image: postgres:17.4
+    restart: on-failure
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${KC_DB_USERNAME}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${KC_DB_USERNAME} -h localhost -p ${KC_DB_PORT} -d keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - keycloak-network
+
+  keycloak:
+    container_name: vlt-keycloak
+    image: quay.io/keycloak/keycloak:26.1
+    command:
+      - start-dev
+      - --import-realm
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: on-failure
+    ports:
+      - "${KC_PORT}:8080"
+    environment:
+      # Временный админ
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KEYCLOAK_BOOTSTRAP_ADMIN_EXPIRATION: ${KC_BOOTSTRAP_ADMIN_EXPIRATION}
+      # База данных
+      KC_DB: postgres
+      KC_DB_HOST: ${KC_DB_HOST}
+      KC_DB_PORT: ${KC_DB_PORT}
+      KC_DB_DATABASE: keycloak
+      KC_DB_URL: jdbc:postgresql://${KC_DB_HOST}:${KC_DB_PORT}/keycloak
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      # HTTP и мониторинг
+      KC_HTTP_RELATIVE_PATH: /
+      KC_HTTP_ENABLED: "true"
+      KC_HTTPS_ENABLED: "false"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    volumes:
+      - ./init/:/opt/keycloak/data/import/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - keycloak-network
+      - vlt
+
+networks:
+  keycloak-network:
+    driver: bridge
+  vlt:
+    external: true
+
+volumes:
+  keycloak_db_data:
+    driver: local

@@ -1,0 +1,102 @@
+services:
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: vlt-grafana
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_started
+    ports:
+      - "${GF_EXTERNAL_PORT}:${GF_SERVER_HTTP_PORT}"
+    environment:
+      - GF_SERVER_HTTP_PORT=${GF_SERVER_HTTP_PORT}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD} # TODO: Docker secrets
+    volumes:
+      - vlt_grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - monitoring
+
+  loki:
+    image: grafana/loki:2.9.14
+    container_name: vlt-loki
+    privileged: true
+    user: "0"
+    depends_on:
+      promtail:
+        condition: service_started
+    ports:
+      - "${LK_EXTERNAL_PORT}:3100"
+    volumes:
+      - vlt_loki_data:/loki
+      - ./config/loki.yml:/etc/loki/loki-config.yml
+    command: -config.file=/etc/loki/loki-config.yml
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:2.9.14
+    container_name: vlt-promtail
+    privileged: true
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ${HOST_DOCKER_SOCK_PATH}:/var/run/docker.sock
+      - ./config/promtail.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: vlt-prometheus
+    restart: unless-stopped
+    depends_on:
+      docker-api-socat:
+        condition: service_healthy
+    ports:
+      - "${PM_EXTERNAL_PORT}:9090"
+    volumes:
+      - vlt_prometheus_data:/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+      - socat
+
+  docker-api-socat:
+    image: tecnativa/docker-socket-proxy:0.3
+    container_name: vlt-prometheus-docker-proxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+      PING: 1
+      SOCKET_PATH: ${HOST_DOCKER_SOCK_PATH}
+      LOG_LEVEL: notice
+    healthcheck:
+      test: "wget --spider --tries=1 http://localhost:2375/_ping || exit 1"
+      interval: "29s"
+      timeout: "5s"
+      retries: 3
+      start_period: "21s"
+    security_opt:
+      - label=disable
+    volumes:
+      - ${HOST_DOCKER_SOCK_PATH}:/var/run/docker.sock:ro
+    networks:
+      - socat
+
+volumes:
+  vlt_prometheus_data:
+  vlt_grafana_data:
+  vlt_loki_data:
+
+networks:
+  monitoring:
+  socat:

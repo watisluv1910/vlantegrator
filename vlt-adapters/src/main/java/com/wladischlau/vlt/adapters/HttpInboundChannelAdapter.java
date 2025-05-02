@@ -1,0 +1,63 @@
+package com.wladischlau.vlt.adapters;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wladischlau.vlt.adapters.common.AbstractAdapter;
+import com.wladischlau.vlt.adapters.common.AdapterConfig;
+import com.wladischlau.vlt.adapters.common.AdapterType;
+import com.wladischlau.vlt.adapters.common.InboundAdapter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlowBuilder;
+import org.springframework.integration.http.dsl.Http;
+
+import java.util.List;
+
+import static com.wladischlau.vlt.adapters.HttpInboundChannelAdapter.HttpInboundAdapterConfig;
+
+@Slf4j
+@Getter
+public class HttpInboundChannelAdapter extends AbstractAdapter<HttpInboundAdapterConfig> implements InboundAdapter {
+
+    public HttpInboundChannelAdapter(String configJson) {
+        super(configJson, HttpInboundAdapterConfig.class);
+    }
+
+    @SneakyThrows
+    @Override
+    public IntegrationFlowBuilder start() {
+        // Полное имя класса
+        var payloadType = Class.forName(config.requestPayloadType());
+        log.info("Создание HTTP inbound endpoint с path={}", config.path());
+        return IntegrationFlow.from(Http.inboundChannelAdapter(config.path())
+                                            .requestMapping(r -> r.methods(
+                                                    config.supportedMethods().toArray(HttpMethod[]::new))
+                                            )
+                                            .requestPayloadType(payloadType)
+                                            .mergeWithDefaultConverters(true)
+                                            .autoStartup(true)
+        );
+    }
+
+    @Override
+    public AdapterType getType() {
+        return AdapterType.HTTP_INBOUND;
+    }
+
+    /**
+     * Запись конфигурации для HttpInboundAdapter.
+     *
+     * @param path               обязательное поле.
+     * @param requestPayloadType тип данных тела запроса, ex. {@code java.lang.String}.
+     * @param supportedMethods   список допустимых HTTP-методов.
+     */
+    public record HttpInboundAdapterConfig(
+            @NotBlank String path,
+            @NotBlank String requestPayloadType,
+            @NotEmpty List<HttpMethod> supportedMethods
+    ) implements AdapterConfig {}
+}

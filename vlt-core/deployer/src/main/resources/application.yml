@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: deployer
+  kafka:
+    bootstrap-servers: localhost:9091,localhost:9092
+    consumer:
+      group-id: "deployer-group"
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.wladischlau.vlt.*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    listener:
+      concurrency: ${KAFKA_LISTENER_CONCURRENCY} # До KAFKA_LISTENER_CONCURRENCY потоков на топик
+
+server:
+  port: 8082
+
+docker:
+  username: ${DOCKER_USERNAME}
+  password: ${DOCKER_PASSWORD}
+  image-registry: ${DOCKER_IMAGE_REGISTRY}

@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: tcp://docker-api-socat:2375
+        refresh_interval: 10s
+    relabel_configs:
+      - source_labels: [__meta_docker_container_label_metrics]
+        regex: 'true'
+        action: keep
+      - source_labels: [__meta_docker_container_label_metrics_path]
+        regex: '(.+)'
+        target_label: __metrics_path__
+        action: replace
+      - target_label: __metrics_path__
+        regex: ''
+        replacement: /actuator/prometheus   # default
+        action: replace
+      - source_labels: [__address__, __meta_docker_container_label_metrics_port]
+        #    $1 = container DNS name (given by __address__)
+        #    $2 = override port if label present
+        regex: '([^:]+)(?::\d*)?;(.*)'
+        replacement: $1:$2
+        target_label: __address__
+        action: replace

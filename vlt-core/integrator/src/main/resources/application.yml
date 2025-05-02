@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: integrator
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KC_HOST}:8180/realms/vlt # TODO: Move host and port to .env when inside Docker
+
+server:
+  port: 8080
+
+springdoc:
+  show-actuator: true
+
+api:
+  version: 1.0.0
+  description: API платформы Vlantegrator
