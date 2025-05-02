@@ -81,6 +81,16 @@
             <artifactId>jsonschema-generator</artifactId>
             <version>${jsonschema-generator.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jackson</artifactId>
+            <version>${jsonschema-generator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jakarta-validation</artifactId>
+            <version>${jsonschema-generator.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jgrapht</groupId>
@@ -192,6 +202,18 @@
                                 <file>${project.basedir}/src/main/resources/application.yml</file>
                             </files>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-maven-plugin</artifactId>
+                <version>${jsonschema-generator.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

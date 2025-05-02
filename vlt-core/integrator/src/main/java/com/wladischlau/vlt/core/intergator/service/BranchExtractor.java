@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.intergator.config;
+package com.wladischlau.vlt.core.intergator.service;
 
 import com.wladischlau.vlt.core.intergator.model.Branch;
 import com.wladischlau.vlt.core.intergator.model.Node;
@@ -6,7 +6,9 @@ import com.wladischlau.vlt.core.intergator.model.Route;
 import org.jgrapht.Graph;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service

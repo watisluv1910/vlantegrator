@@ -1,7 +1,7 @@
 package com.wladischlau.vlt.core.intergator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.wladischlau.vlt.core.intergator.config.BranchExtractor;
+import com.wladischlau.vlt.core.intergator.service.BranchExtractor;
 import com.wladischlau.vlt.core.intergator.model.FlowDefinition;
 import com.wladischlau.vlt.core.intergator.model.Node;
 import com.wladischlau.vlt.core.intergator.model.Route;
