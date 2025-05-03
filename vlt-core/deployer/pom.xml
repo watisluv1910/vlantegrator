@@ -8,7 +8,7 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>deployer</artifactId>
-    <version>${vlt.version}</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>deployer</name>
     <description>Модуль "Деплоер" платформы для построения межсервисных интеграций Vlantegrator</description>

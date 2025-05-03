@@ -8,13 +8,14 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>integrator</artifactId>
-    <version>${vlt.version}</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>integrator</name>
     <description>Модуль "Интегратор" платформы для построения межсервисных интеграций Vlantegrator</description>
 
     <properties>
         <jgrapht.version>1.5.2</jgrapht.version>
+        <jooq.generated.sources.directory>target/generated-sources/jooq</jooq.generated.sources.directory>
         <project.mainClass>com.wladischlau.vlt.core.integrator.IntegratorApplication</project.mainClass>
     </properties>
 
@@ -69,6 +70,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>${jooq.version}</version>
         </dependency>
 
         <dependency>
@@ -192,6 +199,7 @@
                 <version>${maven-properties-plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>read-env</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
@@ -199,9 +207,29 @@
                         <configuration>
                             <useDefaultValues>true</useDefaultValues>
                             <files>
+                                <file>${project.basedir}/../.env</file>
                                 <file>${project.basedir}/.env</file>
                                 <file>${project.basedir}/src/main/resources/application.yml</file>
                             </files>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>set-jooq-properties</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>set-system-properties</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>org.jooq.no-tips</name>
+                                    <value>true</value>
+                                </property>
+                                <property>
+                                    <name>org.jooq.no-logo</name>
+                                    <value>true</value>
+                                </property>
+                            </properties>
                         </configuration>
                     </execution>
                 </executions>
@@ -248,6 +276,87 @@
                         </module>
                     </modules>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>jooq-codegen</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-codegen</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-meta-extensions</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
+                </dependencies>
+
+                <configuration>
+                    <jdbc>
+                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <url>jdbc:mysql://${VLT_CORE_DB_HOST}:${VLT_CORE_DB_PORT}/vlt_repo</url>
+                        <user>${VLT_CORE_DB_USER}</user>
+                        <password>${VLT_CORE_DB_PASSWORD}</password>
+                    </jdbc>
+
+                    <generator>
+                        <database>
+                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
+                            <includes>
+                                vlt_repo\..*
+                            </includes>
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
+                            <forcedTypes>
+                                <forcedType>
+                                    <name>INSTANT</name>
+                                    <includeTypes>TIMESTAMP.*</includeTypes>
+                                </forcedType>
+                            </forcedTypes>
+                        </database>
+                        <generate>
+                            <springAnnotations>true</springAnnotations>
+                            <pojos>true</pojos>
+                            <pojosAsJavaRecordClasses>true</pojosAsJavaRecordClasses>
+                            <daos>true</daos>
+                        </generate>
+                        <target>
+                            <packageName>com.wladischlau.vlt.core.jooq</packageName>
+                            <directory>${jooq.generated.sources.directory}</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven-build-helper-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${jooq.generated.sources.directory}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

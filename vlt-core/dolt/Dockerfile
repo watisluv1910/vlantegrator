@@ -1,8 +1,8 @@
 FROM alpine AS build
 
-ARG DB_SCHEMA=vlt_repo
-ARG DB_USER=admin
-ARG DB_PASSWORD=admin
+ARG DB_SCHEMA
+ARG DB_USER
+ARG DB_PASSWORD
 
 COPY schema.sql .
 COPY user.sql .
