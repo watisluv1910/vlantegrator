@@ -20,9 +20,9 @@
 
     <repositories>
         <repository>
-            <id>${REPO_ID}</id>
-            <name>${REPO_NAME}</name>
-            <url>${REPO_URL}</url>
+            <id>${env.REPO_ID}</id>
+            <name>${env.REPO_NAME}</name>
+            <url>${env.REPO_URL}</url>
         </repository>
     </repositories>
 
