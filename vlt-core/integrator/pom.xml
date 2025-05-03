@@ -37,6 +37,7 @@
             <groupId>com.wladischlau.vlt</groupId>
             <artifactId>vlt-adapters</artifactId>
             <version>${vlt.version}</version>
+            <classifier>light</classifier>
         </dependency>
 
         <dependency>
