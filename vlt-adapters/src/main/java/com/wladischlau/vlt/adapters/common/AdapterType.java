@@ -31,7 +31,8 @@ public enum AdapterType {
     }
 
     public String toAdapterClassName() {
-        return Constants.ADAPTERS_BASE_PACKAGE + "." + formName(type, direction, channelKind) + "Adapter";
+        return Constants.ADAPTERS_BASE_PACKAGE + "."
+                + StringUtils.capitalize(formName(type, direction, channelKind)) + "Adapter";
     }
 
     public static Optional<AdapterType> fromName(String name) {
