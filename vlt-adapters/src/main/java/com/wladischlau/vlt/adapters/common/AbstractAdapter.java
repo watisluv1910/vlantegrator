@@ -10,7 +10,7 @@ import static com.wladischlau.vlt.adapters.common.AdapterUtils.VALIDATOR;
 @Getter
 public abstract non-sealed class AbstractAdapter<T> implements Adapter {
 
-    protected final T config;
+    public final T config;
 
     private final Class<T> configClass;
 
@@ -20,11 +20,6 @@ public abstract non-sealed class AbstractAdapter<T> implements Adapter {
         validateConfig();
 
         this.configClass = configClass;
-    }
-
-    @Override
-    public JsonNode getConfigSchema() {
-        return null;
     }
 
     private void validateConfig() {

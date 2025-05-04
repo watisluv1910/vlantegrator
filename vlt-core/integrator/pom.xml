@@ -77,6 +77,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
             <version>${spring-dotenv.version}</version>
@@ -168,6 +178,16 @@
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${spring-boot.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
@@ -206,7 +226,6 @@
                             <useDefaultValues>true</useDefaultValues>
                             <files>
                                 <file>${project.basedir}/../.env</file>
-                                <file>${project.basedir}/.env</file>
                                 <file>${project.basedir}/src/main/resources/application.yml</file>
                             </files>
                         </configuration>
@@ -301,19 +320,24 @@
                         <artifactId>jooq-meta-extensions</artifactId>
                         <version>${jooq.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-postgres-extensions</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
                 </dependencies>
 
                 <configuration>
                     <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://${VLT_CORE_DB_HOST}:${VLT_CORE_DB_PORT}/vlt_repo</url>
+                        <driver>org.postgresql.Driver</driver>
+                        <url>jdbc:postgresql://${VLT_CORE_DB_HOST}:${VLT_CORE_DB_PORT}/vlt_repo</url>
                         <user>${VLT_CORE_DB_USER}</user>
                         <password>${VLT_CORE_DB_PASSWORD}</password>
                     </jdbc>
 
                     <generator>
                         <database>
-                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
+                            <name>org.jooq.meta.postgres.PostgresDatabase</name>
                             <includes>
                                 vlt_repo\..*
                             </includes>

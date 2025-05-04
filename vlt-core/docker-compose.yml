@@ -10,34 +10,32 @@ services:
   vlt-core-db:
     container_name: vlt-core-db
     build:
-      context: dolt
+      context: db
       dockerfile: Dockerfile
       args:
         DB_SCHEMA: vlt_repo
-        DB_USER: ${VLT_CORE_DB_USER:-admin}
-        DB_PASSWORD: ${VLT_CORE_DB_PASSWORD:-admin}
     image: watisluv/vlt-core-db:1.0.0
     restart: on-failure
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - dolt_data:/var/lib/dolt
+      - vlt_db_data:/var/lib/postgresql/data
     <<: *defaults
     environment:
-      DOLT_DISABLE_UPGRADE_WARNING: "1"
-      MYSQL_RANDOM_ROOT_PASSWORD: true
-      MYSQL_ONETIME_PASSWORD: true
-      MYSQL_INITDB_SKIP_TZINFO: true
+      VLT_CORE_DB_USER: ${VLT_CORE_DB_USER:-admin}
+      POSTGRES_DB: vlt_repo
+      POSTGRES_USER: ${VLT_CORE_DB_USER:-admin}
+      POSTGRES_PASSWORD: ${VLT_CORE_DB_PASSWORD:-admin}
     healthcheck:
-      test: [ "CMD", "dolt", "sql", "-q", "select current_timestamp();" ]
-      interval: 5s
+      test: [ "CMD-SHELL", "pg_isready -U ${VLT_CORE_DB_USER} -h localhost -p 5432 -d vlt_repo" ]
+      interval: 10s
       timeout: 5s
       retries: 5
     networks:
       vlt:
 
 volumes:
-  dolt_data:
+  vlt_db_data:
 
 networks:
   vlt:

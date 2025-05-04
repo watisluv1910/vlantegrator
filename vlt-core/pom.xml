@@ -23,6 +23,8 @@
         <docker-java.version>3.5.0</docker-java.version>
 
         <jooq.version>3.20.3</jooq.version>
+        <postgres-driver.version>42.7.5</postgres-driver.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <jsonschema-generator.version>4.38.0</jsonschema-generator.version>
         <jackson.version>2.18.3</jackson.version>
         <lombok.version>1.18.38</lombok.version>
@@ -56,6 +58,16 @@
                 <groupId>com.wladischlau.vlt.core</groupId>
                 <artifactId>commons</artifactId>
                 <version>${vlt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgres-driver.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

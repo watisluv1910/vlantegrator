@@ -13,5 +13,5 @@ import org.springframework.context.annotation.Configuration;
                 description = "${api.description}",
                 contact = @Contact(name = "Support", email = "vlantegrator-support@gmail.com")
         )
-) // TODO: Configure security later
+) // TODO: Configure security
 public class OpenApiConfig {}

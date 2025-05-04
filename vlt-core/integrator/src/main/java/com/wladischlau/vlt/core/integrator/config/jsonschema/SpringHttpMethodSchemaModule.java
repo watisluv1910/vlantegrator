@@ -3,7 +3,6 @@ package com.wladischlau.vlt.core.integrator.config.jsonschema;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.victools.jsonschema.generator.CustomDefinition;
-import com.github.victools.jsonschema.generator.CustomDefinitionProvider;
 import com.github.victools.jsonschema.generator.Module;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import org.springframework.http.HttpMethod;
@@ -25,7 +24,7 @@ public class SpringHttpMethodSchemaModule implements Module {
                                 .forEach(enumNode::add);
                         return new CustomDefinition(def);
                     }
-                    return null;      // остальные типы по-умолчанию
+                    return null; // Остальные типы по-умолчанию
                 });
     }
 }

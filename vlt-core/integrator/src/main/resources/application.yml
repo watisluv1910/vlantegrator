@@ -1,11 +1,18 @@
 spring:
   application:
     name: integrator
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${VLT_CORE_DB_HOST:localhost}:${VLT_CORE_DB_PORT:5433}/vlt_repo
+    username: ${VLT_CORE_DB_USER:admin}
+    password: ${VLT_CORE_DB_PASSWORD:admin}
+  jooq:
+    sql-dialect: postgres
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${KC_HOST}:8180/realms/vlt # TODO: Move host and port to .env when inside Docker
+          issuer-uri: http://${KC_HOST}:8180/realms/vlt
 
 server:
   port: 8080
