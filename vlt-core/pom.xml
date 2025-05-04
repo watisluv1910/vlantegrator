@@ -50,6 +50,16 @@
         <module>deployer</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wladischlau.vlt.core</groupId>
+                <artifactId>commons</artifactId>
+                <version>${vlt.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>

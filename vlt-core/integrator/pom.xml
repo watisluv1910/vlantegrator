@@ -8,7 +8,6 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>integrator</artifactId>
-    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>integrator</name>
     <description>Модуль "Интегратор" платформы для построения межсервисных интеграций Vlantegrator</description>
@@ -31,7 +30,6 @@
         <dependency>
             <groupId>com.wladischlau.vlt.core</groupId>
             <artifactId>commons</artifactId>
-            <version>${vlt.version}</version>
         </dependency>
 
         <dependency>

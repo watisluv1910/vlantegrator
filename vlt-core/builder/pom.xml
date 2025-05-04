@@ -7,7 +7,6 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>builder</artifactId>
-    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>builder</name>
@@ -17,7 +16,6 @@
         <dependency>
             <groupId>com.wladischlau.vlt.core</groupId>
             <artifactId>commons</artifactId>
-            <version>${vlt.version}</version>
         </dependency>
 
         <dependency>
