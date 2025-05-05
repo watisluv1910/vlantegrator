@@ -3,7 +3,7 @@ package com.wladischlau.vlt.adapters;
 import com.wladischlau.vlt.adapters.common.AbstractAdapter;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.adapters.common.InboundAdapter;
-import com.wladischlau.vlt.adapters.config.HttpInboundAdapterConfig;
+import com.wladischlau.vlt.adapters.config.HttpInboundChannelAdapterConfig;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +14,10 @@ import org.springframework.integration.http.dsl.Http;
 
 @Slf4j
 @Getter
-public class HttpInboundChannelAdapter extends AbstractAdapter<HttpInboundAdapterConfig> implements InboundAdapter {
+public class HttpInboundChannelAdapter extends AbstractAdapter<HttpInboundChannelAdapterConfig> implements InboundAdapter {
 
     public HttpInboundChannelAdapter(String configJson) {
-        super(configJson, HttpInboundAdapterConfig.class);
+        super(configJson, HttpInboundChannelAdapterConfig.class);
     }
 
     @SneakyThrows

@@ -3,7 +3,7 @@ package com.wladischlau.vlt.adapters.config;
 import com.wladischlau.vlt.adapters.common.AdapterConfig;
 import jakarta.validation.constraints.NotBlank;
 
-public record JdbcOutboundAdapterConfig(
+public record JdbcOutboundGatewayAdapterConfig(
         @NotBlank String query,
         @NotBlank String jdbcUrl,
         @NotBlank String jdbcUsername,

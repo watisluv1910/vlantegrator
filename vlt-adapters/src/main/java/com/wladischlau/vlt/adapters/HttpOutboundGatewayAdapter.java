@@ -3,7 +3,7 @@ package com.wladischlau.vlt.adapters;
 import com.wladischlau.vlt.adapters.common.AbstractAdapter;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.adapters.common.OutboundAdapter;
-import com.wladischlau.vlt.adapters.config.HttpOutboundAdapterConfig;
+import com.wladischlau.vlt.adapters.config.HttpOutboundGatewayAdapterConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
@@ -12,10 +12,10 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Getter
-public class HttpOutboundGatewayAdapter extends AbstractAdapter<HttpOutboundAdapterConfig> implements OutboundAdapter {
+public class HttpOutboundGatewayAdapter extends AbstractAdapter<HttpOutboundGatewayAdapterConfig> implements OutboundAdapter {
 
     public HttpOutboundGatewayAdapter(String configJson) {
-        super(configJson, HttpOutboundAdapterConfig.class);
+        super(configJson, HttpOutboundGatewayAdapterConfig.class);
     }
 
     @Override

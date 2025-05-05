@@ -3,7 +3,7 @@ package com.wladischlau.vlt.adapters;
 import com.wladischlau.vlt.adapters.common.AbstractAdapter;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.adapters.common.OutboundAdapter;
-import com.wladischlau.vlt.adapters.config.JdbcOutboundAdapterConfig;
+import com.wladischlau.vlt.adapters.config.JdbcOutboundGatewayAdapterConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
@@ -15,12 +15,12 @@ import javax.sql.DataSource;
 
 @Slf4j
 @Getter
-public class JdbcOutboundGatewayAdapter extends AbstractAdapter<JdbcOutboundAdapterConfig> implements OutboundAdapter {
+public class JdbcOutboundGatewayAdapter extends AbstractAdapter<JdbcOutboundGatewayAdapterConfig> implements OutboundAdapter {
 
     private final DataSource dataSource;
 
     public JdbcOutboundGatewayAdapter(String configJson) {
-        super(configJson, JdbcOutboundAdapterConfig.class);
+        super(configJson, JdbcOutboundGatewayAdapterConfig.class);
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.jdbcUrl());

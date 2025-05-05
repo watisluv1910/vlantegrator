@@ -14,7 +14,7 @@ import java.util.List;
  * @param requestPayloadType тип данных тела запроса, ex. {@code java.lang.String}.
  * @param supportedMethods   список допустимых HTTP-методов.
  */
-public record HttpInboundAdapterConfig(
+public record HttpInboundChannelAdapterConfig(
         @NotBlank String path,
         @NotBlank String requestPayloadType,
         @NotEmpty List<HttpMethod> supportedMethods

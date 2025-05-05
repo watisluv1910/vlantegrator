@@ -5,14 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpMethod;
 
-public record HttpOutboundAdapterConfig(
+public record HttpOutboundGatewayAdapterConfig(
         @NotBlank String url,
         @NotNull HttpMethod httpMethod,
         String expectedResponseType
 ) implements AdapterConfig {
 
-    public HttpOutboundAdapterConfig(@NotBlank String url,
-                                     @NotNull HttpMethod httpMethod) {
+    public HttpOutboundGatewayAdapterConfig(@NotBlank String url,
+                                            @NotNull HttpMethod httpMethod) {
         this(url, httpMethod, null);
     }
 }
