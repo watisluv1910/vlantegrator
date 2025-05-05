@@ -289,6 +289,9 @@
                             <option>EXTRA_OPEN_API_FORMAT_VALUES</option>
                             <option>FLATTENED_ENUMS_FROM_TOSTRING</option>
                         </enabled>
+                        <disabled>
+                            <option>SCHEMA_VERSION_INDICATOR</option>
+                        </disabled>
                     </options>
                     <modules>
                         <module>
