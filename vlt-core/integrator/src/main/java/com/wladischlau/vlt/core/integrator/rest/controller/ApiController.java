@@ -19,13 +19,13 @@ public abstract class ApiController {
     protected final DtoMapper dtoMapper;
 
     protected final <R> R logRequestProcessing(String operationId, Callable<R> processingAction,
-                                         Object... requestIdKeyValues) {
+                                               Object... requestIdKeyValues) {
         return withMdc(() -> logRequestProcessingInternal(processingAction, false),
                        concatIdentifiers(operationId, requestIdKeyValues));
     }
 
     protected final <R> R logRequestProcessingWithResponse(String operationId, Callable<R> processingAction,
-                                                     Object... requestIdKeyValues) {
+                                                           Object... requestIdKeyValues) {
         return withMdc(() -> logRequestProcessingInternal(processingAction, true),
                        concatIdentifiers(operationId, requestIdKeyValues));
     }

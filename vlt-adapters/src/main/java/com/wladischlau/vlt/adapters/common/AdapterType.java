@@ -9,23 +9,31 @@ import java.util.Optional;
 
 @Getter
 public enum AdapterType {
-    HTTP_INBOUND("http", Direction.INBOUND, ChannelKind.CHANNEL, "HTTP-вход"),
-    HTTP_OUTBOUND("http", Direction.OUTBOUND, ChannelKind.GATEWAY, "HTTP-выход"),
-    JDBC_OUTBOUND("jdbc", Direction.OUTBOUND, ChannelKind.GATEWAY, "JDBC-выход"),
-    SPEL_TRANSFORMER("spELTransformer", Direction.COMMON, ChannelKind.NONE, "SpEL-преобразователь"),
-    LOGGER("logger", Direction.COMMON, ChannelKind.NONE, "Логгер"),
-    DIVIDER("divider", Direction.COMMON, ChannelKind.NONE, "Разделитель");
+    HTTP_INBOUND("http", Direction.INBOUND, ChannelKind.CHANNEL,
+                 "HTTP-вход", "Принимает HTTP-запросы и публикует их в интеграционный поток"),
+    HTTP_OUTBOUND("http", Direction.OUTBOUND, ChannelKind.GATEWAY,
+                  "HTTP-выход", "Отправляет HTTP-запросы и возвращает ответ во внутренний поток"),
+    JDBC_OUTBOUND("jdbc", Direction.OUTBOUND, ChannelKind.GATEWAY, "JDBC-выход",
+                  "Выполняет SQL-запросы к базе данных и публикует результаты"),
+    SPEL_TRANSFORMER("spELTransformer", Direction.COMMON, ChannelKind.NONE, "SpEL-преобразователь",
+                     "Преобразует входные сообщения с помощью Spring EL-выражения"),
+    LOGGER("logger", Direction.COMMON, ChannelKind.NONE, "Логгер",
+           "Записывает содержимое сообщений и метаданные в журнал"),
+    DIVIDER("divider", Direction.COMMON, ChannelKind.NONE, "Разделитель",
+            "Разделяет поток на независимые ветви");
 
     private final String type;
     private final Direction direction;
     private final ChannelKind channelKind;
     private final String name;
     private final String displayName;
+    private final String description;
 
-    AdapterType(String type, Direction direction, ChannelKind channelKind, String displayName) {
+    AdapterType(String type, Direction direction, ChannelKind channelKind, String displayName, String description) {
         this.type = type;
         this.direction = direction;
         this.channelKind = channelKind;
+        this.description = description;
         this.name = formName(type, direction, channelKind);
         this.displayName = displayName;
     }

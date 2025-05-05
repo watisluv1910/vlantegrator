@@ -24,7 +24,8 @@ create table if not exists vlt_adapter
     id           uuid              not null primary key default pg_catalog.gen_random_uuid(),
     name         text              not null unique,
     display_name text              not null,
-    class        text              not null,
+    description  text              not null,
+    clazz        text              not null,
     type         text              not null,
     direction    adapter_direction not null,
     channel_kind channel_kind      not null
