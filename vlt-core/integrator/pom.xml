@@ -164,6 +164,19 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+
+            <resource>
+                <directory>${project.build.directory}/generated-sources/adapters/config/schemas</directory>
+                <targetPath>META-INF/adapter-schemas</targetPath>
+                <includes>
+                    <include>**/*.json</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -325,6 +338,11 @@
                         <artifactId>jooq-postgres-extensions</artifactId>
                         <version>${jooq.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-jackson-extensions</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
                 </dependencies>
 
                 <configuration>
@@ -350,10 +368,11 @@
                             </forcedTypes>
                         </database>
                         <generate>
-                            <springAnnotations>true</springAnnotations>
                             <pojos>true</pojos>
                             <pojosAsJavaRecordClasses>true</pojosAsJavaRecordClasses>
                             <daos>true</daos>
+                            <springDao>true</springDao>
+                            <springAnnotations>true</springAnnotations>
                         </generate>
                         <target>
                             <packageName>com.wladischlau.vlt.core.jooq</packageName>

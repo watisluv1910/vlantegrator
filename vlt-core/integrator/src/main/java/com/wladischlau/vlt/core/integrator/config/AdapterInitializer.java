@@ -19,9 +19,9 @@ public class AdapterInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initAdapters() {
-        log.info("Синхронизация адаптеров");
+        log.info("Starting adapters synchronization...");
         var adapters = Arrays.stream(AdapterType.values()).toList();
         vltDataService.upsertAdapters(adapters);
-        log.info("Адаптеры успешно синхронизированы");
+        log.info("Adapters synchronization completed");
     }
 }

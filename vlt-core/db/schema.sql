@@ -103,7 +103,7 @@ comment on table vlt_adapter is 'Справочник типов адаптер�
 comment on column vlt_adapter.id is 'UUID адаптера';
 comment on column vlt_adapter.name is 'Системное имя (уникально)';
 comment on column vlt_adapter.display_name is 'Отображаемое имя';
-comment on column vlt_adapter.class is 'Полное имя Java-класса';
+comment on column vlt_adapter.clazz is 'Полное имя Java-класса';
 comment on column vlt_adapter.type is 'Тип адаптера';
 comment on column vlt_adapter.direction is 'Направление (IN/OUT/COMMON)';
 comment on column vlt_adapter.channel_kind is 'Тип канала (CHANNEL/GATEWAY/NONE)';
