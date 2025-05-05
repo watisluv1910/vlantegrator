@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @SecuritySchemes({
         @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT"),
 })
-public interface BuilderApi {
+public interface RouteApi {
 
     String BUILD_ROUTE = "buildRoute";
 

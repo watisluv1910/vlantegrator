@@ -1,7 +1,7 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
-import com.wladischlau.vlt.core.integrator.rest.api.BuilderApi;
+import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-public class BuilderApiController extends ApiController implements BuilderApi {
+public class RouteApiController extends ApiController implements RouteApi {
 
     private final RouteBuildService routeBuildService;
 
-    public BuilderApiController(DtoMapper dtoMapper, RouteBuildService routeBuildService) {
+    public RouteApiController(DtoMapper dtoMapper, RouteBuildService routeBuildService) {
         super(dtoMapper);
         this.routeBuildService = routeBuildService;
     }
