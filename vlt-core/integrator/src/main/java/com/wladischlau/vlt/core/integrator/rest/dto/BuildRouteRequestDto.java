@@ -6,6 +6,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record BuildRouteRequestDto(@JsonProperty("id") UUID routeId,
-                                   @JsonProperty("versionHash") String versionHash) {
+public record BuildRouteRequestDto(@JsonProperty("id") UUID routeId, @JsonProperty("versionHash") String versionHash) {
 }

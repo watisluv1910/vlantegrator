@@ -2,7 +2,7 @@ package com.wladischlau.vlt.core.integrator.service;
 
 import com.wladischlau.vlt.core.integrator.model.Branch;
 import com.wladischlau.vlt.core.integrator.model.Node;
-import com.wladischlau.vlt.core.integrator.model.Route;
+import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import org.jgrapht.Graph;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +27,18 @@ public class BranchExtractor {
      * Для каждого граничного узла, имеющего исходящие ребра, для каждого исходящего ребра строится ветвь – начиная с
      * текущего узла и далее по цепочке, пока не встретится следующий граничный узел.
      *
-     * @param route объект маршрута, содержащий граф {@link Route#getGraphView()} и сопоставление узлов
-     *              {@link Route#getNodes()}.
+     * @param routeDefinition объект маршрута, содержащий граф {@link RouteDefinition#getGraphView()} и сопоставление узлов
+     *              {@link RouteDefinition#getNodes()}.
      *
      * @return список ветвей, каждая ветвь – список узлов.
      */
-    public List<Branch> extractBranches(Route route) {
-        if (route.getNodes().size() == 1) {
-            Node single = route.getNodes().values().stream().findFirst().get();
+    public List<Branch> extractBranches(RouteDefinition routeDefinition) {
+        if (routeDefinition.getNodes().size() == 1) {
+            Node single = routeDefinition.getNodes().values().stream().findFirst().get();
             return Collections.singletonList(new Branch(single));
         }
 
-        var graph = route.getGraphView();
+        var graph = routeDefinition.getGraphView();
 
         var boundaries = graph.vertexSet().stream()
                 .filter(vtx -> isBoundary(graph, vtx))
@@ -53,7 +53,7 @@ public class BranchExtractor {
                 .forEach(boundary -> {
                     var outEdges = graph.outgoingEdgesOf(boundary);
 
-                    var boundaryNode = route.getNodes().get(boundary);
+                    var boundaryNode = routeDefinition.getNodes().get(boundary);
                     if (graph.incomingEdgesOf(boundary).isEmpty() && outEdges.size() > 1) {
                         branches.add(new Branch(boundaryNode));
                     }
@@ -63,7 +63,7 @@ public class BranchExtractor {
 
                         var curr = graph.getEdgeTarget(outEdge);
                         while (!boundaries.contains(curr)) {
-                            branch.addNode(route.getNodes().get(curr));
+                            branch.addNode(routeDefinition.getNodes().get(curr));
                             var currOutEdges = graph.outgoingEdgesOf(curr);
                             if (currOutEdges.size() != 1) {
                                 break;
@@ -73,7 +73,7 @@ public class BranchExtractor {
 
                         // Добавление конечного граничного узла (если он еще не добавлен)
                         if (branch.getNodes().isEmpty() || !branch.getNodes().getLast().id().equals(curr)) {
-                            branch.addNode(route.getNodes().get(curr));
+                            branch.addNode(routeDefinition.getNodes().get(curr));
                         }
 
                         branches.add(branch);

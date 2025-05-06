@@ -1,7 +1,7 @@
 package com.wladischlau.vlt.core.integrator.service;
 
 import com.wladischlau.vlt.core.integrator.IntegrationFlowGenerator;
-import com.wladischlau.vlt.core.integrator.model.Route;
+import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -23,10 +23,10 @@ public class RouteBuildService {
     private final IntegrationFlowGenerator integrationFlowGenerator;
 
     @Async
-    public void buildRouteAsync(UUID routeId, String commitHash, Route route) {
+    public void buildRouteAsync(UUID routeId, String versionHash, RouteDefinition routeDefinition) {
         Path outputDir = Path.of(System.getProperty("user.home"),
                                  ".vlt", "cache", "routes", // TODO: Move to common
-                                 routeId.toString(), COMMIT_DIR_PREFIX + commitHash,
+                                 routeId.toString(), COMMIT_DIR_PREFIX + versionHash,
                                  "src", "main", "java"); // TODO: Move to common
         if (!Files.exists(outputDir)) {
             try {
@@ -36,6 +36,7 @@ public class RouteBuildService {
                 throw new UncheckedIOException(e);
             }
         }
-        integrationFlowGenerator.generateFlowConfig(route, outputDir);
+
+        integrationFlowGenerator.generateFlowConfig(routeDefinition, outputDir);
     }
 }

@@ -23,6 +23,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<Void> buildRoute(BuildRouteRequestDto request, JwtAuthenticationToken principal) {
         return logRequestProcessing(BUILD_ROUTE, () -> {
+
             routeBuildService.buildRouteAsync(request.routeId(), request.versionHash(), null); // TODO: Rework
             return ResponseEntity.ok().build();
         });

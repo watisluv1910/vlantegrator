@@ -1,10 +1,10 @@
 package com.wladischlau.vlt.core.integrator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import com.wladischlau.vlt.core.integrator.service.BranchExtractor;
 import com.wladischlau.vlt.core.integrator.model.FlowDefinition;
 import com.wladischlau.vlt.core.integrator.model.Node;
-import com.wladischlau.vlt.core.integrator.model.Route;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class IntegrationFlowGenerator {
 
     private final BranchExtractor branchExtractor;
 
-    public void generateFlowConfig(Route route, Path outputDir) {
+    public void generateFlowConfig(RouteDefinition routeDefinition, Path outputDir) {
         var enableIntegrationClass = ClassName.get("org.springframework.integration.config", "EnableIntegration");
 
         var configClassBuilder = TypeSpec.classBuilder("IntegrationFlowConfig")
@@ -48,7 +48,7 @@ public class IntegrationFlowGenerator {
                 .addAnnotation(AnnotationSpec.builder(enableIntegrationClass).build())
                 .addAnnotation(RequiredArgsConstructor.class);
 
-        var flows = toIntegrationFlows(route);
+        var flows = toIntegrationFlows(routeDefinition);
 
         for (int i = 0, flowsSize = flows.size(); i < flowsSize; i++) {
             try {
@@ -84,22 +84,22 @@ public class IntegrationFlowGenerator {
 
             for (var node : flow.getNodes()) {
                 ++stepCounter;
-                var adapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapterClassName());
-                var configJson = configMapper.writeValueAsString(node.adapterConfig());
+                var adapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapter().clazz());
+                var configJson = configMapper.writeValueAsString(node.config());
                 flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
                 flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
             }
         } else {
             var start = flow.getNodes().getFirst();
-            var adapterClass = ClassName.get(ADAPTERS_PACKAGE, start.adapterClassName());
-            var configJson = configMapper.writeValueAsString(start.adapterConfig());
+            var adapterClass = ClassName.get(ADAPTERS_PACKAGE, start.adapter().clazz());
+            var configJson = configMapper.writeValueAsString(start.config());
             flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
             flowBuilder.addStatement("var step$1L = step$1LAdapter.start()", stepCounter);
 
             for (var node : flow.getNodes().subList(1, flow.getNodes().size())) {
                 ++stepCounter;
-                var currAdapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapterClassName());
-                var currAdapterConfigJson = configMapper.writeValueAsString(node.adapterConfig());
+                var currAdapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapter().clazz());
+                var currAdapterConfigJson = configMapper.writeValueAsString(node.config());
                 flowBuilder.addStatement("var step$LAdapter = new $T($S)",
                                          stepCounter, currAdapterClass, currAdapterConfigJson);
                 flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
@@ -126,8 +126,8 @@ public class IntegrationFlowGenerator {
                 .build();
     }
 
-    public List<FlowDefinition> toIntegrationFlows(Route route) {
-        var branches = branchExtractor.extractBranches(route);
+    public List<FlowDefinition> toIntegrationFlows(RouteDefinition routeDefinition) {
+        var branches = branchExtractor.extractBranches(routeDefinition);
         var flows = branches.stream()
                 .map(branch -> FlowDefinition.builder()
                         .channel(generateUniqueChannelName(branch.getNodes().getFirst()))
@@ -148,6 +148,6 @@ public class IntegrationFlowGenerator {
     }
 
     public String generateUniqueChannelName(@NotNull Node startNode) {
-        return startNode.adapterName() + "_" + UUID.randomUUID();
+        return startNode.adapter().name() + "_" + UUID.randomUUID();
     }
 }

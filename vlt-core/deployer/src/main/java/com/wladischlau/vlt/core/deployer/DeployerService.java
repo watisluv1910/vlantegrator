@@ -157,6 +157,7 @@ public class DeployerService {
         }
     }
 
+    // TODO: Отдельный запрос из модуля Integrator на предварительное создание сети
     private void connectToNetwork(String netName, String containerId) {
         try {
             var networkId = docker.listNetworksCmd().exec().stream()
