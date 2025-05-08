@@ -1,14 +1,15 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
-import com.wladischlau.vlt.core.integrator.model.RouteId;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +37,15 @@ public class RouteApiController extends ApiController implements RouteApi {
             var owner = Optional.ofNullable(request.ownerName()).orElse(principal.getName());
             var route = dtoMapper.fromDto(request, owner);
             var id = vltDataService.createRoute(route);
-            return ResponseEntity.ok(dtoMapper.toDto(id));
+            return ResponseEntity.status(HttpStatus.CREATED).body(dtoMapper.toDto(id));
+        });
+    }
+
+    @Override
+    public ResponseEntity<Void> updateRoute(RouteDto request, JwtAuthenticationToken principal) {
+        return logRequestProcessing(UPDATE_ROUTE, () -> {
+            vltDataService.updateRoute(dtoMapper.fromDto(request));
+            return ResponseEntity.ok().build();
         });
     }
 
@@ -45,7 +54,7 @@ public class RouteApiController extends ApiController implements RouteApi {
         return logRequestProcessing(DELETE_ROUTE, () -> {
             // TODO: Delete cache, images and containers for this route
             vltDataService.deleteRouteFullData(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         });
     }
 

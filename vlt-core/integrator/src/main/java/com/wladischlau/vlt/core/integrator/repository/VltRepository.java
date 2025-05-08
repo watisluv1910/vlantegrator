@@ -74,6 +74,13 @@ public class VltRepository {
                 .fetchOne(VLT_ROUTE.ID);
     }
 
+    public void updateRoute(VltRoute route) {
+        ctx.update(VLT_ROUTE)
+                .set(ctx.newRecord(VLT_ROUTE, route))
+                .where(VLT_ROUTE.ID.eq(route.id()))
+                .execute();
+    }
+
     public void deleteRoute(UUID routeId) {
         ctx.deleteFrom(VLT_ROUTE)
                 .where(VLT_ROUTE.ID.eq(routeId))
@@ -104,6 +111,13 @@ public class VltRepository {
                 .set(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID, networkId)
                 .onConflictDoNothing()
                 .execute());
+    }
+
+    public void removeNetworksFromRoute(List<UUID> networkIds, UUID routeId) {
+        ctx.deleteFrom(VLT_ROUTE_NETWORKS)
+                .where(VLT_ROUTE_NETWORKS.VLT_ROUTE_ID.eq(routeId))
+                .and(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID.in(networkIds))
+                .execute();
     }
 
     public void removeAllNetworksFromRoute(UUID routeId) {

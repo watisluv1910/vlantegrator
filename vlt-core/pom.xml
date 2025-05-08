@@ -29,6 +29,7 @@
         <jackson.version>2.18.3</jackson.version>
         <lombok.version>1.18.38</lombok.version>
         <slf4j.version>2.0.17</slf4j.version>
+        <apache-commons-collections.version>4.5.0</apache-commons-collections.version>
 
         <maven.version>3.9.9</maven.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -73,6 +74,11 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgres-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${apache-commons-collections.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

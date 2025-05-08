@@ -2,6 +2,7 @@ package com.wladischlau.vlt.core.integrator.rest.api;
 
 import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +37,8 @@ import java.util.UUID;
 public interface RouteApi {
 
     String CREATE_ROUTE = "createRoute";
+    String UPDATE_ROUTE = "updateRoute";
+    String UPDATE_ROUTE_DEFINITION = "updateRouteDefinition";
     String DELETE_ROUTE = "deleteRoute";
     String BUILD_ROUTE = "buildRoute";
 
@@ -44,7 +48,7 @@ public interface RouteApi {
             summary = "Создать маршрут",
             description = "Создаёт новый маршрут на основе переданной конфигурации",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Маршрут создан"),
+                    @ApiResponse(responseCode = "201", description = "Маршрут создан"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
@@ -66,11 +70,63 @@ public interface RouteApi {
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = UPDATE_ROUTE,
+            summary = "Обновляет конфиг маршрута",
+            description = "Обновляет конфиг имеющегося маршрута на основе переданной конфигурации",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Конфиг маршрута обновлён"),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @Tag(name = "routes")
+    @PatchMapping("/v1/route")
+    default ResponseEntity<Void> updateRoute(
+            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = RouteDto.class)))
+            @org.springframework.web.bind.annotation.RequestBody RouteDto request,
+            JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = UPDATE_ROUTE_DEFINITION,
+            summary = "Обновляет структуру маршрута",
+            description = "Обновляет структуру имеющегося маршрута на основе переданной конфигурации",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Структура маршрута обновлена"),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @Tag(name = "routes")
+    @PostMapping("/v1/route/definition")
+    default ResponseEntity<Void> updateRouteDefinition(
+            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
+            @org.springframework.web.bind.annotation.RequestBody CreateRouteRequestDto request,
+            JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
             operationId = DELETE_ROUTE,
             summary = "Удалить маршрут",
             description = "Полностью удалить маршрут, в том числе все его контейнер и образы",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Маршрут удалён"),
+                    @ApiResponse(responseCode = "204", description = "Маршрут удалён"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",

@@ -9,15 +9,20 @@ import com.wladischlau.vlt.core.integrator.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionHashGenerator;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,6 +85,31 @@ public class VltDataService {
         }
 
         return Optional.of(new RouteDefinition(nodes, connections));
+    }
+
+    @Transactional
+    public void updateRoute(@NotNull Route route) {
+        repository.updateRoute(modelMapper.toJooq(route));
+        updateRouteNetworks(route.networks(), route.routeId().id());
+    }
+
+    @Transactional
+    public void updateRouteNetworks(List<RouteNetwork> networks, UUID routeId) {
+        var actual = repository.findRouteNetworksByRouteId(routeId).stream()
+                .map(VltRouteNetwork::name)
+                .toList();
+
+        var expected = networks.stream()
+                .map(RouteNetwork::name)
+                .toList();
+
+        var toAddNames = ListUtils.removeAll(actual, expected);
+        var toAddIds = repository.findNetworkIdsByNames(toAddNames);
+        repository.addNetworksToRoute(toAddIds, routeId);
+
+        var toRemoveNames = ListUtils.removeAll(expected, actual);
+        var toRemoveIds = repository.findNetworkIdsByNames(toRemoveNames);
+        repository.removeNetworksFromRoute(toRemoveIds, routeId);
     }
 
     @Transactional

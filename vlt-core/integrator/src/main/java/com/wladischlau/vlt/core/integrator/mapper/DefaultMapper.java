@@ -1,5 +1,6 @@
 package com.wladischlau.vlt.core.integrator.mapper;
 
+import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,5 +42,10 @@ public interface DefaultMapper {
                         .map(it -> it.split(":"))
                         .map(it -> Pair.of(Integer.parseInt(it[0]), Integer.parseInt(it[1])))
                         .toList();
+    }
+
+    @Named("toNetworksFromNames")
+    default List<RouteNetwork> toNetworksFromNames(List<String> networkNames) {
+        return networkNames.stream().map(it -> new RouteNetwork(it, null)).toList();
     }
 }

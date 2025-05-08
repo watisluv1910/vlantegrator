@@ -3,15 +3,12 @@ package com.wladischlau.vlt.core.integrator.mapper;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.model.RouteId;
-import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-
-import java.util.List;
 
 @Mapper(config = DefaultMapper.class, uses = {DefaultMapper.class})
 public interface DtoMapper {
@@ -35,12 +32,20 @@ public interface DtoMapper {
     @Mapping(target = "env", source = "request.env")
     Route fromDto(CreateRouteRequestDto request, String checkedOwner);
 
-    @Named("toNetworksFromNames")
-    default List<RouteNetwork> toNetworksFromNames(List<String> networkNames) {
-        return networkNames.stream().map(it -> new RouteNetwork(it, null)).toList();
-    }
+    @Mapping(target = "routeId", source = "routeId")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "owner", source = "ownerName")
+    @Mapping(target = "publishedPorts", source = "publishedPorts", qualifiedByName = "toPublishedPortsList")
+    @Mapping(target = "networks", source = "networks", qualifiedByName = "toNetworksFromNames")
+    @Mapping(target = "env", source = "env")
+    Route fromDto(RouteDto src);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
-    RouteIdDto toDto(RouteId routeId);
+    RouteIdDto toDto(RouteId src);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "versionHash", source = "versionHash")
+    RouteId fromDto(RouteIdDto src);
 }

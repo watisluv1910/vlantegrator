@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
-@Schema(description = "Ответ на запрос на создание маршрута")
+@Schema(description = "Полный идентификатор маршрута")
 public record RouteIdDto(
         @Schema(description = "ID маршрута")
         UUID id,
