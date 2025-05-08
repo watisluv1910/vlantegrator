@@ -368,6 +368,11 @@
                                     <name>INSTANT</name>
                                     <includeTypes>TIMESTAMP.*</includeTypes>
                                 </forcedType>
+                                <forcedType>
+                                    <userType>java.util.Map&lt;String, Object&gt;</userType>
+                                    <converter>com.wladischlau.vlt.core.integrator.config.jooq.JsonbToMapConverter</converter>
+                                    <types>jsonb</types>
+                                </forcedType>
                             </forcedTypes>
                         </database>
                         <generate>

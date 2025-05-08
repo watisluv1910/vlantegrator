@@ -17,7 +17,6 @@ public record Route(
         String name,
         String description,
         String owner,
-        RouteDefinition definition,
         List<Pair<@NotNull Integer, @NotNull Integer>> publishedPorts,
         Map<String, Object> env,
         List<RouteNetwork> networks

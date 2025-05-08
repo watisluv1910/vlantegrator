@@ -8,7 +8,6 @@ import org.jgrapht.graph.DirectedMultigraph;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,7 +20,7 @@ public class RouteDefinition {
     private final List<Connection> connections;
     private final Graph<UUID, DefaultEdge> graphView;
 
-    public RouteDefinition(Set<Node> nodes, List<Connection> connections) {
+    public RouteDefinition(List<Node> nodes, List<Connection> connections) {
         this.nodes = nodes.stream().collect(Collectors.toMap(Node::id, Function.identity()));
         this.connections = connections;
         this.graphView = formGraphView(connections);
@@ -44,7 +43,7 @@ public class RouteDefinition {
         return graph;
     }
 
-    private static Node getStartNode(Set<Node> nodes, List<Connection> connections) {
+    private static Node getStartNode(List<Node> nodes, List<Connection> connections) {
         var startNodes = nodes.stream()
                 .filter(node -> connections.stream().noneMatch(it -> it.toNodeId().equals(node.id())))
                 .filter(Objects::nonNull)

@@ -1,4 +1,6 @@
 package com.wladischlau.vlt.core.integrator.model;
 
-public record NodeStyle(String role, String style) {
+import java.util.Map;
+
+public record NodeStyle(String role, Map<String, Object> style) {
 }
