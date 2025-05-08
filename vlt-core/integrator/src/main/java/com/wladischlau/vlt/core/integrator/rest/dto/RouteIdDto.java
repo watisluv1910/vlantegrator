@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
-@Schema(description = "Запрос на создание образа маршрута")
-public record BuildRouteRequestDto(
+@Schema(description = "Ответ на запрос на создание маршрута")
+public record RouteIdDto(
         @Schema(description = "ID маршрута")
         UUID id,
         @Schema(description = "Хэш-код версии маршрута")

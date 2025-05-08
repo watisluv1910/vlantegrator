@@ -7,13 +7,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Validated
 @Builder
 public record Route(
-        UUID id,
-        String versionHash,
+        RouteId routeId,
         String name,
         String description,
         String owner,

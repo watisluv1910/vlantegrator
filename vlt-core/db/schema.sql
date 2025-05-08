@@ -80,8 +80,8 @@ create table if not exists vlt_node_connection_style
 create table if not exists vlt_route_network
 (
     id     uuid           not null primary key default pg_catalog.gen_random_uuid(),
-    name   varchar(128)   not null,
-    driver network_driver not null             default 'bridge'
+    name   varchar(128)   not null unique,
+    driver network_driver not null
 );
 
 create table if not exists vlt_route_networks

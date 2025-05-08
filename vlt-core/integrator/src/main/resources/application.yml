@@ -23,3 +23,6 @@ springdoc:
 api:
   version: 1.0.0
   description: API платформы Vlantegrator
+
+vlt:
+  version-hash-length: 12

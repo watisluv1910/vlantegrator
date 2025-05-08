@@ -10,10 +10,11 @@ import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
-import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
+import com.wladischlau.vlt.core.integrator.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.AdapterDirection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.ChannelKind;
+import com.wladischlau.vlt.core.jooq.vlt_repo.enums.NetworkDriver;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltAdapter;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeConnection;
@@ -22,19 +23,15 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodePosition;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
-import jakarta.validation.constraints.NotNull;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-@Mapper(config = CentralConfig.class,
-        imports = {ChannelKind.class, AdapterDirection.class, Class.class})
+@Mapper(config = DefaultMapper.class,
+        uses = {DefaultMapper.class},
+        imports = {ChannelKind.class, AdapterDirection.class, NetworkDriver.class, Class.class})
 public interface ModelMapper {
 
     @Mapping(target = "id", source = "id")
@@ -71,8 +68,7 @@ public interface ModelMapper {
 
     List<Adapter> toAdaptersFromType(List<AdapterType> src);
 
-    @Mapping(target = "id", source = "route.id")
-    @Mapping(target = "versionHash", source = "route.versionHash")
+    @Mapping(target = "routeId", source = "route", qualifiedByName = "toRouteId")
     @Mapping(target = "name", source = "route.name")
     @Mapping(target = "description", source = "route.description")
     @Mapping(target = "owner", source = "route.ownerName")
@@ -81,31 +77,36 @@ public interface ModelMapper {
     @Mapping(target = "networks", source = "networks")
     Route toModel(VltRoute route, List<VltRouteNetwork> networks);
 
-    @Named("toPublishedPortsList")
-    default List<Pair<@NotNull Integer, @NotNull Integer>> toPublishedPortsList(String ports) {
-        return StringUtils.isBlank(ports)
-                ? Collections.emptyList()
-                : Arrays.stream(ports.split(","))
-                        .map(String::trim)
-                        .map(it -> it.split(":"))
-                        .map(it -> Pair.of(Integer.parseInt(it[0]), Integer.parseInt(it[1])))
-                        .toList();
+    @Named("toRouteId")
+    default RouteId toRouteId(VltRoute route) {
+        return new RouteId(route.id(), route.versionHash());
     }
 
-    @Named("toRouteDefinition")
-    default RouteDefinition toRouteDefinition(List<VltNode> nodes, List<VltNodeConnection> connections) {
-        var nodes_ = toNodesFromJooq(nodes);
-        var connections_ = toConnectionsFromJooq(connections);
-        return new RouteDefinition(nodes_, connections_);
-    }
+    @Mapping(target = "id", source = "routeId.id")
+    @Mapping(target = "versionHash", source = "routeId.versionHash")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "ownerName", source = "owner")
+    @Mapping(target = "publishedPorts", source = "publishedPorts", qualifiedByName = "toPublishedPortsString")
+    @Mapping(target = "env", source = "env")
+    VltRoute toJooq(Route src);
+
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "driver", expression = "java(src.driver().getLiteral())")
+    RouteNetwork toModel(VltRouteNetwork src);
+
+    List<RouteNetwork> toRouteNetworksFromJooq(List<VltRouteNetwork> src);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "driver", expression = "java(NetworkDriver.lookupLiteral(src.driver()))")
+    VltRouteNetwork toJooq(RouteNetwork src);
 
     @Mapping(target = "id", source = "node.id")
     @Mapping(target = "name", source = "node.name")
     @Mapping(target = "adapter", source = "adapter")
     @Mapping(target = "config", source = "node.config")
     Node toModel(VltNode node, VltAdapter adapter);
-
-    List<Node> toNodesFromJooq(List<VltNode> src);
 
     @Mapping(target = "role", expression = "java(src.type().getLiteral())")
     @Mapping(target = "style")
@@ -142,10 +143,4 @@ public interface ModelMapper {
         var style_ = toModel(style);
         return new ConnectionFullData(connection_, style_);
     }
-
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "driver", expression = "java(src.driver().getLiteral())")
-    RouteNetwork toModel(VltRouteNetwork src);
-
-    List<RouteNetwork> toRouteNetworksFromJooq(List<VltRouteNetwork> src);
 }

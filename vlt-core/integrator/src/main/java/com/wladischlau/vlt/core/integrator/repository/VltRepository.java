@@ -67,6 +67,13 @@ public class VltRepository {
                 .fetchOptionalInto(VltRoute.class);
     }
 
+    public UUID insertRoute(VltRoute route) {
+        return ctx.insertInto(VLT_ROUTE)
+                .set(ctx.newRecord(VLT_ROUTE, route))
+                .returningResult(VLT_ROUTE.ID)
+                .fetchOne(VLT_ROUTE.ID);
+    }
+
     public List<VltRouteNetwork> findRouteNetworksByRouteId(UUID routeId) {
         var subStep = ctx.select(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID)
                 .from(VLT_ROUTE_NETWORKS)
@@ -76,6 +83,21 @@ public class VltRepository {
                 .from(VLT_ROUTE_NETWORK)
                 .where(VLT_ROUTE_NETWORK.ID.in(subStep))
                 .fetchInto(VltRouteNetwork.class);
+    }
+
+    public List<UUID> findNetworkIdsByNames(List<String> names) {
+        return ctx.select(VLT_ROUTE_NETWORK.ID)
+                .from(VLT_ROUTE_NETWORK)
+                .where(VLT_ROUTE_NETWORK.NAME.in(names))
+                .fetch(VLT_ROUTE_NETWORK.ID);
+    }
+
+    public void addNetworksToRoute(List<UUID> networkIds, UUID routeId) {
+        networkIds.forEach(networkId -> ctx.insertInto(VLT_ROUTE_NETWORKS)
+                .set(VLT_ROUTE_NETWORKS.VLT_ROUTE_ID, routeId)
+                .set(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID, networkId)
+                .onConflictDoNothing()
+                .execute());
     }
 
     public List<VltNode> findNodesByRouteId(UUID routeId) {
