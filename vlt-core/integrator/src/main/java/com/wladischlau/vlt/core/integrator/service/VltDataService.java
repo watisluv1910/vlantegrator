@@ -81,4 +81,15 @@ public class VltDataService {
 
         return Optional.of(new RouteDefinition(nodes, connections));
     }
+
+    @Transactional
+    public void deleteRouteFullData(@NotNull UUID routeId) {
+        repository.deleteNodeConnectionStylesByRouteId(routeId);
+        repository.deleteNodeConnectionsByRouteId(routeId);
+        repository.deleteNodePositionsByRouteId(routeId);
+        repository.deleteNodeStylesByRouteId(routeId);
+        repository.deleteNodesByRouteId(routeId);
+        repository.removeAllNetworksFromRoute(routeId);
+        repository.deleteRoute(routeId);
+    }
 }

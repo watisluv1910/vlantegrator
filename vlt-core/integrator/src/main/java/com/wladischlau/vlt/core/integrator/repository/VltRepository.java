@@ -74,6 +74,12 @@ public class VltRepository {
                 .fetchOne(VLT_ROUTE.ID);
     }
 
+    public void deleteRoute(UUID routeId) {
+        ctx.deleteFrom(VLT_ROUTE)
+                .where(VLT_ROUTE.ID.eq(routeId))
+                .execute();
+    }
+
     public List<VltRouteNetwork> findRouteNetworksByRouteId(UUID routeId) {
         var subStep = ctx.select(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID)
                 .from(VLT_ROUTE_NETWORKS)
@@ -100,10 +106,22 @@ public class VltRepository {
                 .execute());
     }
 
+    public void removeAllNetworksFromRoute(UUID routeId) {
+        ctx.deleteFrom(VLT_ROUTE_NETWORKS)
+                .where(VLT_ROUTE_NETWORKS.VLT_ROUTE_ID.eq(routeId))
+                .execute();
+    }
+
     public List<VltNode> findNodesByRouteId(UUID routeId) {
         return ctx.selectFrom(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
                 .fetchInto(VltNode.class);
+    }
+
+    public void deleteNodesByRouteId(UUID routeId) {
+        ctx.deleteFrom(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                .execute();
     }
 
     public Optional<VltNodeStyle> findNodeStyleByNodeId(UUID nodeId) {
@@ -112,10 +130,28 @@ public class VltRepository {
                 .fetchOptionalInto(VltNodeStyle.class);
     }
 
+    public void deleteNodeStylesByRouteId(UUID routeId) {
+        ctx.deleteFrom(VLT_NODE_STYLE)
+                .where(VLT_NODE_STYLE.VLT_NODE_ID.in(
+                        ctx.select(VLT_NODE.ID)
+                                .from(VLT_NODE)
+                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))))
+                .execute();
+    }
+
     public Optional<VltNodePosition> findNodePositionByNodeId(UUID nodeId) {
         return ctx.selectFrom(VLT_NODE_POSITION)
                 .where(VLT_NODE_POSITION.VLT_NODE_ID.eq(nodeId))
                 .fetchOptionalInto(VltNodePosition.class);
+    }
+
+    public void deleteNodePositionsByRouteId(UUID routeId) {
+        ctx.deleteFrom(VLT_NODE_POSITION)
+                .where(VLT_NODE_POSITION.VLT_NODE_ID.in(
+                        ctx.select(VLT_NODE.ID)
+                                .from(VLT_NODE)
+                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))))
+                .execute();
     }
 
     public List<VltNodeConnection> findNodeConnectionsByRouteId(UUID routeId) {
@@ -130,9 +166,34 @@ public class VltRepository {
                 .fetchInto(VltNodeConnection.class);
     }
 
+    public void deleteNodeConnectionsByRouteId(UUID routeId) {
+        var subStep = ctx.select(VLT_NODE.ID)
+                .from(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId));
+
+        ctx.deleteFrom(VLT_NODE_CONNECTION)
+                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
+                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))
+                .execute();
+    }
+
     public Optional<VltNodeConnectionStyle> findNodeConnectionStyleByConnectionId(UUID connectionId) {
         return ctx.selectFrom(VLT_NODE_CONNECTION_STYLE)
                 .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.eq(connectionId))
                 .fetchOptionalInto(VltNodeConnectionStyle.class);
+    }
+
+    public void deleteNodeConnectionStylesByRouteId(UUID routeId) {
+        var subStep = ctx.select(VLT_NODE.ID)
+                .from(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId));
+
+        ctx.deleteFrom(VLT_NODE_CONNECTION_STYLE)
+                .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.in(
+                        ctx.select(VLT_NODE_CONNECTION.ID)
+                                .from(VLT_NODE_CONNECTION)
+                                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
+                                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))))
+                .execute();
     }
 }

@@ -32,7 +32,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<RouteIdDto> createRoute(CreateRouteRequestDto request,
                                                   JwtAuthenticationToken principal) {
-        return logRequestProcessing(CREATE_ROUTE, () -> {
+        return logRequestProcessingWithResponse(CREATE_ROUTE, () -> {
             var owner = Optional.ofNullable(request.ownerName()).orElse(principal.getName());
             var route = dtoMapper.fromDto(request, owner);
             var id = vltDataService.createRoute(route);
@@ -43,8 +43,8 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(DELETE_ROUTE, () -> {
-            // TODO
-            log.info("Delete route {}", id);
+            // TODO: Delete cache, images and containers for this route
+            vltDataService.deleteRouteFullData(id);
             return ResponseEntity.ok().build();
         });
     }
