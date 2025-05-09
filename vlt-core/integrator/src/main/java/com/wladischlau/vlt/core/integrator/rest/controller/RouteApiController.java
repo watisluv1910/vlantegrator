@@ -6,6 +6,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteDefinitionRequestDto;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,15 @@ public class RouteApiController extends ApiController implements RouteApi {
             vltDataService.updateRoute(dtoMapper.fromDto(request));
             return ResponseEntity.ok().build();
         });
+    }
+
+    @Override
+    public ResponseEntity<RouteIdDto> updateRouteDefinition(UpdateRouteDefinitionRequestDto request,
+                                                            JwtAuthenticationToken principal) {
+        return RouteApi.super.updateRouteDefinition(request, principal);
+//        return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
+//
+//        });
     }
 
     @Override

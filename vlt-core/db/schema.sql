@@ -62,10 +62,9 @@ create table if not exists vlt_node_connection
 (
     id        uuid not null primary key default pg_catalog.gen_random_uuid(),
     source_id uuid not null references vlt_node,
-    target_id uuid not null unique references vlt_node
+    target_id uuid not null references vlt_node,
+    unique (source_id, target_id)
 );
-
-create unique index if not exists vlt_node_conn_src_uq on vlt_node_connection (source_id);
 
 create table if not exists vlt_node_connection_style
 (

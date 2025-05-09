@@ -4,6 +4,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteDefinitionRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -48,19 +50,20 @@ public interface RouteApi {
             summary = "Создать маршрут",
             description = "Создаёт новый маршрут на основе переданной конфигурации",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Маршрут создан"),
+                    @ApiResponse(responseCode = "201", description = "Маршрут создан",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
     @Tag(name = "routes")
-    @PostMapping("/v1/route")
+    @PostMapping(value = "/v1/route", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> createRoute(
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
             @org.springframework.web.bind.annotation.RequestBody CreateRouteRequestDto request,
@@ -76,13 +79,13 @@ public interface RouteApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Конфиг маршрута обновлён"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
     @Tag(name = "routes")
@@ -100,22 +103,23 @@ public interface RouteApi {
             summary = "Обновляет структуру маршрута",
             description = "Обновляет структуру имеющегося маршрута на основе переданной конфигурации",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Структура маршрута обновлена"),
+                    @ApiResponse(responseCode = "200", description = "Структура маршрута обновлена",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
     @Tag(name = "routes")
-    @PostMapping("/v1/route/definition")
-    default ResponseEntity<Void> updateRouteDefinition(
-            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
-            @org.springframework.web.bind.annotation.RequestBody CreateRouteRequestDto request,
+    @PostMapping(value = "/v1/route/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<RouteIdDto> updateRouteDefinition(
+            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = UpdateRouteDefinitionRequestDto.class)))
+            @org.springframework.web.bind.annotation.RequestBody UpdateRouteDefinitionRequestDto request,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
@@ -128,13 +132,13 @@ public interface RouteApi {
             responses = {
                     @ApiResponse(responseCode = "204", description = "Маршрут удалён"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
     @Tag(name = "routes")
@@ -154,13 +158,13 @@ public interface RouteApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Запрос на сборку принят"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
     @Tag(name = "routes")

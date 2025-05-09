@@ -1,14 +1,26 @@
 package com.wladischlau.vlt.core.integrator.mapper;
 
 import com.wladischlau.vlt.core.integrator.model.Adapter;
+import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
+import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
+import com.wladischlau.vlt.core.integrator.model.Node;
+import com.wladischlau.vlt.core.integrator.model.NodeFullData;
+import com.wladischlau.vlt.core.integrator.model.NodePosition;
+import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.model.RouteId;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.NodeDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.NodePositionDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(config = DefaultMapper.class, uses = {DefaultMapper.class})
 public interface DtoMapper {
@@ -48,4 +60,36 @@ public interface DtoMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
     RouteId fromDto(RouteIdDto src);
+
+    @Mapping(target = "node", expression = "java(fromDtoToNode(src, adapter))")
+    @Mapping(target = "style", source = "src.style")
+    @Mapping(target = "position", source = "src.position")
+    NodeFullData fromDto(NodeDto src, Adapter adapter);
+
+    @Mapping(target = "id", source = "src.id")
+    @Mapping(target = "name", source = "src.name")
+    @Mapping(target = "adapter", source = "adapter")
+    @Mapping(target = "config", source = "src.config")
+    Node fromDtoToNode(NodeDto src, Adapter adapter);
+
+    @Mapping(target = "role", source = "type")
+    @Mapping(target = "style", source = "config")
+    NodeStyle fromDto(NodeStyleDto src);
+
+    @Mapping(target = "x", source = "x")
+    @Mapping(target = "y", source = "y")
+    @Mapping(target = "zIndex", source = "zIndex")
+    NodePosition fromDto(NodePositionDto src);
+
+    @Mapping(target = "connection.fromNodeId", source = "sourceId")
+    @Mapping(target = "connection.toNodeId", source = "targetId")
+    @Mapping(target = "style", source = "style")
+    ConnectionFullData fromDto(ConnectionDto src);
+
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "startMarkerType", source = "startMarkerType")
+    @Mapping(target = "endMarkerType", source = "endMarkerType")
+    @Mapping(target = "animated", source = "animated")
+    @Mapping(target = "focusable", source = "focusable")
+    ConnectionStyle fromDto(ConnectionStyleDto src);
 }
