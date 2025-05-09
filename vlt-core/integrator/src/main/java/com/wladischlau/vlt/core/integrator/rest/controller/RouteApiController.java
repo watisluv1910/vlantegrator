@@ -52,7 +52,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(DELETE_ROUTE, () -> {
-            // TODO: Delete cache, images and containers for this route
+            // TODO: Delete images and containers for this route
             vltDataService.deleteRouteFullData(id);
             return ResponseEntity.noContent().build();
         });

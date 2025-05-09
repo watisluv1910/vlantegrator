@@ -20,4 +20,8 @@ public class VltProperties {
     @Min(4)
     @Max(32)
     private int versionHashLength;
+
+    @Min(2)
+    @Max(10)
+    private int routeCacheMaxSize;
 }

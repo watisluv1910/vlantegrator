@@ -1,13 +1,14 @@
 package com.wladischlau.vlt.core.integrator.repository;
 
 import com.wladischlau.vlt.core.jooq.vlt_repo.Keys;
-import com.wladischlau.vlt.core.jooq.vlt_repo.tables.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltAdapterDao;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltAdapter;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeConnection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeConnectionStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodePosition;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class VltRepository {
     private final DSLContext ctx;
 
     private final VltAdapterDao vltAdapterDao;
+    private final VltRouteDao vltRouteDao;
 
     public List<VltAdapter> findAllAdapters() {
         return vltAdapterDao.findAll();
@@ -58,6 +60,10 @@ public class VltRepository {
                 .set(VLT_ADAPTER.DIRECTION, adapter.direction())
                 .set(VLT_ADAPTER.CHANNEL_KIND, adapter.channelKind())
                 .execute();
+    }
+
+    public List<VltRoute> findAllRoutes() {
+        return vltRouteDao.findAll();
     }
 
     public Optional<VltRoute> findRouteByIdAndVersionHash(UUID routeId, String versionHash) {

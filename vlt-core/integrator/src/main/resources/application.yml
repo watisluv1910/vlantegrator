@@ -26,3 +26,4 @@ api:
 
 vlt:
   version-hash-length: 12
+  route-cache-max-size: 10
