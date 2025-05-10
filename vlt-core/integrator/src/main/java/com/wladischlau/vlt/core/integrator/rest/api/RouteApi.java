@@ -47,6 +47,7 @@ public interface RouteApi {
     String UPDATE_ROUTE_DEFINITION = "updateRouteDefinition";
     String DELETE_ROUTE = "deleteRoute";
     String BUILD_ROUTE = "buildRoute";
+    String DEPLOY_ROUTE = "deployRoute";
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
@@ -231,6 +232,10 @@ public interface RouteApi {
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = BuildRouteRequestDto.class)))
             @org.springframework.web.bind.annotation.RequestBody BuildRouteRequestDto request,
             JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    default ResponseEntity<Void> deployRoute() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }
