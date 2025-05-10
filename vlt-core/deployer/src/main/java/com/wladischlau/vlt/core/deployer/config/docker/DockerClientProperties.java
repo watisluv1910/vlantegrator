@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.deployer.config;
+package com.wladischlau.vlt.core.deployer.config.docker;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

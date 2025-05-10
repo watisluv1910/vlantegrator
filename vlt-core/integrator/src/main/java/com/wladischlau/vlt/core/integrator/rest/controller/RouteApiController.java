@@ -2,12 +2,13 @@ package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.commons.model.RouteId;
+import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
-import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,16 @@ public class RouteApiController extends ApiController implements RouteApi {
 
     private final VltDataService vltDataService;
     private final RouteBuildService routeBuildService;
+    private final DeployerDelegate deployerDelegate;
 
-    public RouteApiController(DtoMapper dtoMapper, VltDataService vltDataService, RouteBuildService routeBuildService) {
+    public RouteApiController(DtoMapper dtoMapper,
+                              VltDataService vltDataService,
+                              RouteBuildService routeBuildService,
+                              DeployerDelegate deployerDelegate) {
         super(dtoMapper);
         this.vltDataService = vltDataService;
         this.routeBuildService = routeBuildService;
+        this.deployerDelegate = deployerDelegate;
     }
 
     @Override
@@ -64,7 +70,7 @@ public class RouteApiController extends ApiController implements RouteApi {
         return logRequestProcessing(GET_ROUTE_DEFINITION, () -> {
             var routeId = new RouteId(id, versionHash);
             return vltDataService.findRouteCacheData(routeId)
-                    .map(cache -> dtoMapper.toDto(cache, routeId))
+                    .map(dtoMapper::toDto)
                     .map(ResponseEntity::ok)
                     .orElseThrow(() -> {
                         var msg = MessageFormat.format("Route definition not found [id: {0}]", routeId);
@@ -84,7 +90,9 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<RouteIdDto> updateRouteDefinition(RouteDefinitionDto request,
+    public ResponseEntity<RouteIdDto> updateRouteDefinition(UUID id,
+                                                            String versionHash,
+                                                            RouteDefinitionDto request,
                                                             JwtAuthenticationToken principal) {
         // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
@@ -98,7 +106,7 @@ public class RouteApiController extends ApiController implements RouteApi {
                             }))
                     .toList();
             var connections = dtoMapper.fromDtoToConnectionsFullData(request.connections());
-            var routeId = dtoMapper.fromDto(request.id());
+            var routeId = new RouteId(id, versionHash);
             var newRouteId = vltDataService.updateRouteDefinition(routeId, nodes, connections);
             return ResponseEntity.ok().body(dtoMapper.toDto(newRouteId));
         });
@@ -115,14 +123,24 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<Void> buildRoute(BuildRouteRequestDto request, JwtAuthenticationToken principal) {
+    public ResponseEntity<Void> buildRoute(UUID id, String versionHash, JwtAuthenticationToken principal) {
         return logRequestProcessing(BUILD_ROUTE, () -> {
-            var def = vltDataService.findLatestRouteDefinitionByRouteId(request.id());
+            var def = vltDataService.findLatestRouteDefinitionByRouteId(id);
             return def.map(it -> {
                 // TODO: Add check if route with the same version hash was already built
-                routeBuildService.buildRouteAsync(request.id(), request.versionHash(), it);
+                routeBuildService.buildRouteAsync(id, versionHash, it);
                 return ResponseEntity.ok().<Void>build();
             }).orElse(ResponseEntity.badRequest().build());
+        });
+    }
+
+    @Override
+    public ResponseEntity<Void> deployRoute(UUID id, String action, JwtAuthenticationToken principal) {
+        return logRequestProcessing(DEPLOY_ROUTE, () -> {
+            var actionType = DeployActionType.valueOf(action.trim().toUpperCase());
+            vltDataService.findRouteById(id)
+                    .ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
+            return ResponseEntity.ok().build();
         });
     }
 }

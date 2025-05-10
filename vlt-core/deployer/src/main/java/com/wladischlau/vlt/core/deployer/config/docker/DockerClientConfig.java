@@ -1,4 +1,4 @@
-package com.wladischlau.vlt.core.deployer.config;
+package com.wladischlau.vlt.core.deployer.config.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
@@ -14,6 +14,10 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class DockerClientConfig {
 
+    public static final int DOCKER_CLIENT_MAX_CONNECTIONS = 100;
+    public static final int DOCKER_CLIENT_CONNECTION_TIMEOUT_SEC = 30;
+    public static final int DOCKER_CLIENT_RESPONSE_TIMEOUT_SEC = 45;
+
     private final DockerClientProperties props;
 
     @Bean
@@ -27,9 +31,9 @@ public class DockerClientConfig {
 
         var client = new ApacheDockerHttpClient.Builder()
                 .dockerHost(config.getDockerHost())
-                .maxConnections(100)
-                .connectionTimeout(Duration.ofSeconds(30))
-                .responseTimeout(Duration.ofSeconds(45))
+                .maxConnections(DOCKER_CLIENT_MAX_CONNECTIONS)
+                .connectionTimeout(Duration.ofSeconds(DOCKER_CLIENT_CONNECTION_TIMEOUT_SEC))
+                .responseTimeout(Duration.ofSeconds(DOCKER_CLIENT_RESPONSE_TIMEOUT_SEC))
                 .build();
 
         return DockerClientImpl.getInstance(config, client);

@@ -10,7 +10,8 @@ import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
 import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
 import com.wladischlau.vlt.core.commons.dto.DeployStatusDto;
 import com.wladischlau.vlt.core.commons.model.kafka.KafkaStatusCode;
-import com.wladischlau.vlt.core.deployer.config.DockerClientProperties;
+import com.wladischlau.vlt.core.commons.utils.KafkaTopics;
+import com.wladischlau.vlt.core.deployer.config.docker.DockerClientProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -38,14 +39,11 @@ public class DeployerService {
     public static final String ROUTE_CONTAINER_NAME_PREFIX = "vlt-route-";
     public static final List<String> ROUTE_CONTAINER_DEFAULT_NETWORKS = List.of("monitoring");
 
-    public static final String INTEGRATION_DEPLOY_REQUEST_TOPIC = "integration.deploy.request";
-    public static final String INTEGRATION_DEPLOY_STATUS_TOPIC = "integration.deploy.status";
-
     private final DockerClient docker;
     private final DockerClientProperties dockerProperties;
     private final KafkaTemplate<String, DeployStatusDto> statusProducer;
 
-    @KafkaListener(topics = INTEGRATION_DEPLOY_REQUEST_TOPIC, containerFactory = "deployRequestFactory")
+    @KafkaListener(topics = KafkaTopics.INTEGRATION_DEPLOY_REQUEST, containerFactory = "deployRequestConsumerFactory")
     public void handleDeployRequest(@Payload DeployRequestDto request) {
         log.info("Получен запрос [route: {}, action: {}]", request.routeId().full(), request.action());
         switch (request.action()) {
@@ -250,7 +248,7 @@ public class DeployerService {
                 .timestamp(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
 
-        statusProducer.send(INTEGRATION_DEPLOY_STATUS_TOPIC, status);
+        statusProducer.send(KafkaTopics.INTEGRATION_DEPLOY_STATUS, status);
         log.debug("Отослан статус развёртывания [route: {}, status: {}]", req.routeId().full(), statusCode);
     }
 

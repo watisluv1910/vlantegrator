@@ -1,6 +1,8 @@
 package com.wladischlau.vlt.core.integrator.mapper;
 
+import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
+import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
 import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
@@ -74,10 +76,9 @@ public interface DtoMapper {
     @Mapping(target = "versionHash", source = "versionHash")
     RouteId fromDto(RouteIdDto src);
 
-    @Mapping(target = "id", source = "routeId")
     @Mapping(target = "nodes", source = "cache.nodes")
     @Mapping(target = "connections", source = "cache.connections")
-    RouteDefinitionDto toDto(RouteCacheData cache, RouteId routeId);
+    RouteDefinitionDto toDto(RouteCacheData cache);
 
     @Mapping(target = "node", expression = "java(fromDtoToNode(src, adapter))")
     @Mapping(target = "style", source = "src.style")
@@ -146,4 +147,11 @@ public interface DtoMapper {
     @Mapping(target = "animated", source = "animated")
     @Mapping(target = "focusable", source = "focusable")
     ConnectionStyle fromDto(ConnectionStyleDto src);
+
+    @Mapping(target = "routeId", source = "route.routeId")
+    @Mapping(target = "action", source = "action")
+    @Mapping(target = "env", source = "route.env")
+    @Mapping(target = "ports", source = "route.publishedPorts", qualifiedByName = "toPublishedPortsString")
+    @Mapping(target = "networks", source = "route.networks", qualifiedByName = "toNamesFromNetworks")
+    DeployRequestDto toDto(Route route, DeployActionType action);
 }

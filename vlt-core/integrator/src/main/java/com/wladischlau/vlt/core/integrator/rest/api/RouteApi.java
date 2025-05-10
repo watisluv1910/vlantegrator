@@ -108,7 +108,7 @@ public interface RouteApi {
             summary = "Получить структуру маршрута",
             description = "Отдаёт структуру маршрута в качестве ответа",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Маршрут создан",
+                    @ApiResponse(responseCode = "200", description = "Структура маршрута получена",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteDefinitionDto.class))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
@@ -121,7 +121,7 @@ public interface RouteApi {
             }
     )
     @Tag(name = "routes")
-    @GetMapping(value = "/v1/route/definition/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/v1/route/{id}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDefinitionDto> getRouteDefinition(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
@@ -175,8 +175,12 @@ public interface RouteApi {
             }
     )
     @Tag(name = "routes")
-    @PostMapping(value = "/v1/route/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/v1/route/{id}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> updateRouteDefinition(
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id,
+            @Parameter(schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
+            @NotNull @RequestParam(name = "versionHash") String versionHash,
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = RouteDefinitionDto.class)))
             @org.springframework.web.bind.annotation.RequestBody RouteDefinitionDto request,
             JwtAuthenticationToken principal) {
@@ -215,7 +219,7 @@ public interface RouteApi {
             summary = "Асинхронная сборка маршрута",
             description = "Принимает описание маршрута в DTO и запускает процесс сборки в фоновом режиме",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Запрос на сборку принят"),
+                    @ApiResponse(responseCode = "202", description = "Запрос на сборку принят"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
@@ -227,15 +231,41 @@ public interface RouteApi {
             }
     )
     @Tag(name = "routes")
-    @PostMapping("/v1/route/build")
+    @PostMapping("/v1/route/{id}/build")
     default ResponseEntity<Void> buildRoute(
-            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = BuildRouteRequestDto.class)))
-            @org.springframework.web.bind.annotation.RequestBody BuildRouteRequestDto request,
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id,
+            @Parameter(required = true, schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
+            @NotNull @RequestParam(name = "versionHash") String versionHash,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    default ResponseEntity<Void> deployRoute() {
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = DEPLOY_ROUTE,
+            summary = "Выполняет действие по отношению к развёртыванию маршрута",
+            description = "Принимает описание маршрута в DTO и запускает процесс сборки в фоновом режиме",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Запрос на выполнение действия по отношению к развёртыванию маршрута принят"),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @Tag(name = "routes")
+    @PostMapping("/v1/route/{id}/deploy")
+    default ResponseEntity<Void> deployRoute(
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id,
+            @Parameter(required = true, schema = @Schema(description = "Действие", type = "string"))
+            @NotNull @RequestParam(name = "action") String action,
+            JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

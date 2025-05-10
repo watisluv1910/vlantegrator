@@ -15,6 +15,7 @@ services:
   kafka1:
     container_name: vlt-kafka.broker_1
     image: confluentinc/cp-kafka:7.9.0
+    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
@@ -35,6 +36,7 @@ services:
   kafka2:
     container_name: vlt-kafka.broker_2
     image: confluentinc/cp-kafka:7.9.0
+    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
