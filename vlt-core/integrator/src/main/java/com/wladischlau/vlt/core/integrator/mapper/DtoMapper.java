@@ -57,6 +57,15 @@ public interface DtoMapper {
     @Mapping(target = "env", source = "env")
     Route fromDto(RouteDto src);
 
+    @Mapping(target = "routeId", source = "routeId")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "ownerName", source = "owner")
+    @Mapping(target = "publishedPorts", source = "publishedPorts", qualifiedByName = "toPublishedPortsString")
+    @Mapping(target = "networks", source = "networks", qualifiedByName = "toNamesFromNetworks")
+    @Mapping(target = "env", source = "env")
+    RouteDto toDto(Route src);
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
     RouteIdDto toDto(RouteId src);

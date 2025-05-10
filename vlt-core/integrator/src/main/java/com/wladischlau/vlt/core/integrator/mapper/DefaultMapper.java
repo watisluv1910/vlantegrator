@@ -48,4 +48,9 @@ public interface DefaultMapper {
     default List<RouteNetwork> toNetworksFromNames(List<String> networkNames) {
         return networkNames.stream().map(it -> new RouteNetwork(it, null)).toList();
     }
+
+    @Named("toNamesFromNetworks")
+    default List<String> toNamesFromNetworks(List<RouteNetwork> networks) {
+        return networks.stream().map(RouteNetwork::name).toList();
+    }
 }

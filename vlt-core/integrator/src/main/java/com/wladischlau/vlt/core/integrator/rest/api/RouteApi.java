@@ -77,12 +77,38 @@ public interface RouteApi {
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = GET_ROUTE,
+            summary = "Получить информацию о маршруте",
+            description = "Отдаёт информацию о маршруте",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Информация о маршруте",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @Tag(name = "routes")
+    @GetMapping(value = "/v1/route/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<RouteDto> getRoute(
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
             operationId = GET_ROUTE_DEFINITION,
             summary = "Получить структуру маршрута",
             description = "Отдаёт структуру маршрута в качестве ответа",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Маршрут создан",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteDefinitionDto.class))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",

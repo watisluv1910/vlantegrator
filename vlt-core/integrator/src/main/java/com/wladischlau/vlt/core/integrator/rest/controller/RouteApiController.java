@@ -46,6 +46,20 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
+    public ResponseEntity<RouteDto> getRoute(UUID id) {
+        return logRequestProcessing(GET_ROUTE, () -> {
+            return vltDataService.findRouteById(id)
+                    .map(dtoMapper::toDto)
+                    .map(ResponseEntity::ok)
+                    .orElseThrow(() -> {
+                        var msg = MessageFormat.format("Route information not found [id: {0}]", id);
+                        log.error(msg);
+                        return new NoSuchElementException(msg);
+                    });
+        });
+    }
+
+    @Override
     public ResponseEntity<RouteDefinitionDto> getRouteDefinition(UUID id, String versionHash) {
         return logRequestProcessing(GET_ROUTE_DEFINITION, () -> {
             var routeId = new RouteId(id, versionHash);
@@ -62,6 +76,7 @@ public class RouteApiController extends ApiController implements RouteApi {
 
     @Override
     public ResponseEntity<Void> updateRoute(RouteDto request, JwtAuthenticationToken principal) {
+        // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE, () -> {
             vltDataService.updateRoute(dtoMapper.fromDto(request));
             return ResponseEntity.ok().build();
@@ -71,6 +86,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<RouteIdDto> updateRouteDefinition(RouteDefinitionDto request,
                                                             JwtAuthenticationToken principal) {
+        // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
             var nodes = request.nodes().stream()
                     .map(nodeDto -> vltDataService.findAdapterById(nodeDto.adapterId())
@@ -90,6 +106,7 @@ public class RouteApiController extends ApiController implements RouteApi {
 
     @Override
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
+        // TODO: Add owner check
         return logRequestProcessing(DELETE_ROUTE, () -> {
             // TODO: Delete images and containers for this route
             vltDataService.deleteRouteFullData(id);

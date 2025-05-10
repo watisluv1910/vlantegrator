@@ -90,6 +90,15 @@ public class VltDataService {
         return new RouteId(id, routeHashGen.generate());
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Route> findRouteById(UUID id) {
+        return repository.findRouteById(id)
+                .map(it -> {
+                    var networks = repository.findRouteNetworksByRouteId(id);
+                    return modelMapper.toModel(it, networks);
+                });
+    }
+
     public Optional<RouteCacheData> findRouteCacheData(@NotNull RouteId routeId) {
         return getFromCache(routeId.id(), routeId.versionHash());
     }
@@ -118,8 +127,10 @@ public class VltDataService {
                                          List<ConnectionFullData> connections) {
         return findRouteCacheData(routeId)
                 .map(cache -> { // Если версия уже есть в кэше - не вычисляем новый хэш
-                    routeCache.get(routeId.id()).dropNewerThan(routeId.versionHash()); // Удаление кэша более новых версий
-                    updateRouteDefinitionInternal(routeId, cache.nodes(), cache.connections()); // Приведение БД к прошлой версии
+                    routeCache.get(routeId.id()).dropNewerThan(
+                            routeId.versionHash()); // Удаление кэша более новых версий
+                    updateRouteDefinitionInternal(routeId, cache.nodes(),
+                                                  cache.connections()); // Приведение БД к прошлой версии
                     return routeId;
                 })
                 .orElseGet(() -> {
@@ -135,7 +146,8 @@ public class VltDataService {
                 });
     }
 
-    private void updateRouteDefinitionInternal(RouteId routeId, List<NodeFullData> nodes, List<ConnectionFullData> connections) {
+    private void updateRouteDefinitionInternal(RouteId routeId, List<NodeFullData> nodes,
+                                               List<ConnectionFullData> connections) {
         var nodesToKeep = nodes.stream().map(it -> it.node().id()).toList();
         deleteNodesAndConnectionsFullDataByRouteIdExcluding(routeId.id(), nodesToKeep);
 
