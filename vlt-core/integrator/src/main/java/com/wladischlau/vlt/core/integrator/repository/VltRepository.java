@@ -3,7 +3,6 @@ package com.wladischlau.vlt.core.integrator.repository;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.jooq.vlt_repo.Keys;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltAdapterDao;
-import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltNodeDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltAdapter;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
@@ -34,7 +33,6 @@ public class VltRepository {
 
     private final VltAdapterDao vltAdapterDao;
     private final VltRouteDao vltRouteDao;
-    private final VltNodeDao vltNodeDao;
 
     public List<VltAdapter> findAllAdapters() {
         return vltAdapterDao.findAll();
