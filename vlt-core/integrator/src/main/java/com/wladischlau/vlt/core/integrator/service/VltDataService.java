@@ -90,8 +90,12 @@ public class VltDataService {
         return new RouteId(id, routeHashGen.generate());
     }
 
+    public Optional<RouteCacheData> findRouteCacheData(@NotNull RouteId routeId) {
+        return getFromCache(routeId.id(), routeId.versionHash());
+    }
+
     @Transactional(readOnly = true)
-    public Optional<RouteDefinition> findRouteDefinitionByRouteId(@NotNull UUID routeId) {
+    public Optional<RouteDefinition> findLatestRouteDefinitionByRouteId(@NotNull UUID routeId) {
         var connections = findNodeConnectionsByRouteId(routeId);
         var nodes = findNodesByRouteId(routeId);
 
@@ -109,16 +113,34 @@ public class VltDataService {
     }
 
     @Transactional
-    public RouteId updateRouteDefinition(@NotNull UUID id,
+    public RouteId updateRouteDefinition(@NotNull RouteId routeId,
                                          List<NodeFullData> nodes,
                                          List<ConnectionFullData> connections) {
-        var versionHash = routeHashGen.generate();
+        return findRouteCacheData(routeId)
+                .map(cache -> { // Если версия уже есть в кэше - не вычисляем новый хэш
+                    routeCache.get(routeId.id()).dropNewerThan(routeId.versionHash()); // Удаление кэша более новых версий
+                    updateRouteDefinitionInternal(routeId, cache.nodes(), cache.connections()); // Приведение БД к прошлой версии
+                    return routeId;
+                })
+                .orElseGet(() -> {
+                    updateRouteDefinitionInternal(routeId, nodes, connections); // Приведение БД к новой версии
 
+                    var newVersionHash = routeHashGen.generate();
+                    var newRouteId = new RouteId(routeId.id(), newVersionHash);
+
+                    repository.updateRouteVersion(newRouteId.id(), newRouteId.versionHash());
+                    findAndWriteRouteCacheData(newRouteId); // Добавление новой версии структуры маршрута в кэш
+
+                    return newRouteId;
+                });
+    }
+
+    private void updateRouteDefinitionInternal(RouteId routeId, List<NodeFullData> nodes, List<ConnectionFullData> connections) {
         var nodesToKeep = nodes.stream().map(it -> it.node().id()).toList();
-        deleteNodesAndConnectionsFullDataByRouteIdExcluding(id, nodesToKeep);
+        deleteNodesAndConnectionsFullDataByRouteIdExcluding(routeId.id(), nodesToKeep);
 
         nodes.forEach(node -> {
-            var nodeId = repository.upsertNode(modelMapper.toJooq(node.node(), id));
+            var nodeId = repository.upsertNode(modelMapper.toJooq(node.node(), routeId.id()));
             repository.upsertNodeStyle(modelMapper.toJooq(node.style(), nodeId));
             repository.upsertNodePosition(modelMapper.toJooq(node.position(), nodeId));
         });
@@ -127,13 +149,6 @@ public class VltDataService {
             var connectionId = repository.insertNodeConnection(modelMapper.toJooq(connection.connection()));
             repository.upsertNodeConnectionStyle(modelMapper.toJooq(connection.style(), connectionId));
         });
-
-        var routeId = new RouteId(id, versionHash);
-
-        repository.updateRouteVersion(routeId);
-        findAndWriteRouteCacheData(routeId);
-
-        return routeId;
     }
 
     @Transactional(readOnly = true)
@@ -259,12 +274,12 @@ public class VltDataService {
         dropFromCache(routeId);
     }
 
-    public Optional<RouteCacheData> getFromCache(UUID routeId, String versionHash) {
+    private Optional<RouteCacheData> getFromCache(UUID routeId, String versionHash) {
         var bucket = routeCache.getOrDefault(routeId, new VersionBucket(props.getRouteCacheMaxSize()));
         return Optional.ofNullable(bucket.get(versionHash));
     }
 
-    public void dropFromCache(UUID routeId) {
+    private void dropFromCache(UUID routeId) {
         routeCache.remove(routeId);
     }
 

@@ -121,8 +121,8 @@ public interface ModelMapper {
     NodeStyle toModel(VltNodeStyle src);
 
     @Mapping(target = "vltNodeId", source = "nodeId")
-    @Mapping(target = "type", source = "role")
-    @Mapping(target = "style", source = "style")
+    @Mapping(target = "type", source = "style.role")
+    @Mapping(target = "style", source = "style.style")
     VltNodeStyle toJooq(NodeStyle style, UUID nodeId);
 
     @Mapping(target = "x", source = "coordX")
@@ -131,9 +131,9 @@ public interface ModelMapper {
     NodePosition toModel(VltNodePosition src);
 
     @Mapping(target = "vltNodeId", source = "nodeId")
-    @Mapping(target = "coordX", source = "x")
-    @Mapping(target = "coordY", source = "y")
-    @Mapping(target = "zIndex", source = "zIndex")
+    @Mapping(target = "coordX", source = "position.x")
+    @Mapping(target = "coordY", source = "position.y")
+    @Mapping(target = "zIndex", source = "position.zIndex")
     VltNodePosition toJooq(NodePosition position, UUID nodeId);
 
     default NodeFullData toNodeFullData(VltNode node, VltAdapter adapter, VltNodeStyle style, VltNodePosition position) {

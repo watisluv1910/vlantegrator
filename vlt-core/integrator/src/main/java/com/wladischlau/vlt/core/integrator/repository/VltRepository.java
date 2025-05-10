@@ -1,6 +1,5 @@
 package com.wladischlau.vlt.core.integrator.repository;
 
-import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.jooq.vlt_repo.Keys;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltAdapterDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteDao;
@@ -75,10 +74,9 @@ public class VltRepository {
         return vltRouteDao.findAll();
     }
 
-    public Optional<VltRoute> findRouteByIdAndVersionHash(UUID routeId, String versionHash) {
+    public Optional<VltRoute> findRouteById(UUID routeId) {
         return ctx.selectFrom(VLT_ROUTE)
                 .where(VLT_ROUTE.ID.eq(routeId))
-                .and(VLT_ROUTE.VERSION_HASH.eq(versionHash))
                 .fetchOptionalInto(VltRoute.class);
     }
 
@@ -87,10 +85,6 @@ public class VltRepository {
                 .set(ctx.newRecord(VLT_ROUTE, route))
                 .where(VLT_ROUTE.ID.eq(route.id()))
                 .execute();
-    }
-
-    public void updateRouteVersion(RouteId routeId) {
-        updateRouteVersion(routeId.id(), routeId.versionHash());
     }
 
     public void updateRouteVersion(UUID id, String versionHash) {
