@@ -1,5 +1,6 @@
 package com.wladischlau.vlt.core.integrator.model;
 
+import com.wladischlau.vlt.core.commons.model.RouteId;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.apache.commons.lang3.tuple.Pair;

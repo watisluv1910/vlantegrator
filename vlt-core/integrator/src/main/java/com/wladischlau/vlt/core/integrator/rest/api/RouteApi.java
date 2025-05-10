@@ -1,9 +1,9 @@
 package com.wladischlau.vlt.core.integrator.rest.api;
 
+import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteDefinitionRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

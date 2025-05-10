@@ -7,8 +7,8 @@ import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Network;
 import com.github.dockerjava.api.model.Ports;
 import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployRequest;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployStatus;
+import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
+import com.wladischlau.vlt.core.commons.dto.DeployStatusDto;
 import com.wladischlau.vlt.core.commons.model.kafka.KafkaStatusCode;
 import com.wladischlau.vlt.core.deployer.config.DockerClientProperties;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +43,10 @@ public class DeployerService {
 
     private final DockerClient docker;
     private final DockerClientProperties dockerProperties;
-    private final KafkaTemplate<String, DeployStatus> statusProducer;
+    private final KafkaTemplate<String, DeployStatusDto> statusProducer;
 
     @KafkaListener(topics = INTEGRATION_DEPLOY_REQUEST_TOPIC, containerFactory = "deployRequestFactory")
-    public void handleDeployRequest(@Payload DeployRequest request) {
+    public void handleDeployRequest(@Payload DeployRequestDto request) {
         log.info("Получен запрос [route: {}, action: {}]", request.routeId().full(), request.action());
         switch (request.action()) {
             case START -> handleStart(request);
@@ -56,7 +56,7 @@ public class DeployerService {
         }
     }
 
-    private void handleStart(DeployRequest req) {
+    private void handleStart(DeployRequestDto req) {
         var containerName = toRouteContainerName(req.routeId().full());
         var container = docker.listContainersCmd().withShowAll(true).exec().stream()
                 .filter(c -> Arrays.asList(c.getNames()).contains("/" + containerName))
@@ -89,14 +89,14 @@ public class DeployerService {
         );
     }
 
-    private void createAndStartContainer(String containerName, DeployRequest req) {
+    private void createAndStartContainer(String containerName, DeployRequestDto req) {
         try {
             var image = toRouteImageName(req.routeId().full());
             pullImageIfNeeded(image);
 
             var defaultLabels = new HashMap<String, String>();
-            defaultLabels.put("routeUuid", req.routeId().uuid().toString());
-            defaultLabels.put("commitHash", req.routeId().commitHash());
+            defaultLabels.put("routeUuid", req.routeId().id().toString());
+            defaultLabels.put("commitHash", req.routeId().versionHash());
 
             var createCmd = docker.createContainerCmd(image)
                     .withName(containerName)
@@ -179,7 +179,7 @@ public class DeployerService {
         }
     }
 
-    private void handleStop(DeployRequest req) {
+    private void handleStop(DeployRequestDto req) {
         var containerName = toRouteContainerName(req.routeId().full());
         var cont = findContainer(containerName);
 
@@ -203,7 +203,7 @@ public class DeployerService {
         }
     }
 
-    private void handleDelete(DeployRequest req) {
+    private void handleDelete(DeployRequestDto req) {
         handleStop(req);
 
         var containerName = toRouteContainerName(req.routeId().full());
@@ -228,7 +228,7 @@ public class DeployerService {
         }
     }
 
-    private void handleRestart(DeployRequest req) {
+    private void handleRestart(DeployRequestDto req) {
         // restart = stop + start
         handleStop(req);
         handleStart(req);
@@ -241,8 +241,8 @@ public class DeployerService {
                 .orElse(null);
     }
 
-    private void sendStatus(DeployRequest req, KafkaStatusCode statusCode, String msg) {
-        var status = DeployStatus.builder()
+    private void sendStatus(DeployRequestDto req, KafkaStatusCode statusCode, String msg) {
+        var status = DeployStatusDto.builder()
                 .routeId(req.routeId())
                 .status(statusCode)
                 .action(DeployActionType.valueOf(req.action().name()))

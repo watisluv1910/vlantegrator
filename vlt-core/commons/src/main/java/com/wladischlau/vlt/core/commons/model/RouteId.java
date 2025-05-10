@@ -1,15 +1,10 @@
 package com.wladischlau.vlt.core.commons.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.UUID;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public record RouteId(@JsonProperty("uuid") UUID uuid,
-                      @JsonProperty("commitHash") String commitHash) {
+public record RouteId(UUID id, String versionHash) {
 
     public String full() {
-        return uuid + "." + commitHash;
+        return id + "." + versionHash;
     }
 }

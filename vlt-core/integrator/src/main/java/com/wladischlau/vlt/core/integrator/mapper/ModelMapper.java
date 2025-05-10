@@ -10,7 +10,7 @@ import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
-import com.wladischlau.vlt.core.integrator.model.RouteId;
+import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.AdapterDirection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.ChannelKind;
@@ -28,6 +28,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(config = DefaultMapper.class,
         uses = {DefaultMapper.class},
@@ -108,14 +109,32 @@ public interface ModelMapper {
     @Mapping(target = "config", source = "node.config")
     Node toModel(VltNode node, VltAdapter adapter);
 
+    @Mapping(target = "id", source = "node.id")
+    @Mapping(target = "name", source = "node.name")
+    @Mapping(target = "vltRouteId", source = "routeId")
+    @Mapping(target = "vltAdapterId", source = "node.adapter.id")
+    @Mapping(target = "config", source = "node.config")
+    VltNode toJooq(Node node, UUID routeId);
+
     @Mapping(target = "role", expression = "java(src.type().getLiteral())")
     @Mapping(target = "style")
     NodeStyle toModel(VltNodeStyle src);
+
+    @Mapping(target = "vltNodeId", source = "nodeId")
+    @Mapping(target = "type", source = "role")
+    @Mapping(target = "style", source = "style")
+    VltNodeStyle toJooq(NodeStyle style, UUID nodeId);
 
     @Mapping(target = "x", source = "coordX")
     @Mapping(target = "y", source = "coordY")
     @Mapping(target = "zIndex", source = "zIndex")
     NodePosition toModel(VltNodePosition src);
+
+    @Mapping(target = "vltNodeId", source = "nodeId")
+    @Mapping(target = "coordX", source = "x")
+    @Mapping(target = "coordY", source = "y")
+    @Mapping(target = "zIndex", source = "zIndex")
+    VltNodePosition toJooq(NodePosition position, UUID nodeId);
 
     default NodeFullData toNodeFullData(VltNode node, VltAdapter adapter, VltNodeStyle style, VltNodePosition position) {
         var node_ = toModel(node, adapter);
@@ -130,12 +149,25 @@ public interface ModelMapper {
 
     List<Connection> toConnectionsFromJooq(List<VltNodeConnection> src);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "sourceId", source = "fromNodeId")
+    @Mapping(target = "targetId", source = "toNodeId")
+    VltNodeConnection toJooq(Connection src);
+
     @Mapping(target = "type", expression = "java(src.type().getLiteral())")
     @Mapping(target = "startMarkerType", expression = "java(src.markerStartType().getLiteral())")
     @Mapping(target = "endMarkerType", expression = "java(src.markerEndType().getLiteral())")
     @Mapping(target = "animated", source = "animated")
     @Mapping(target = "focusable", source = "focusable")
     ConnectionStyle toModel(VltNodeConnectionStyle src);
+
+    @Mapping(target = "vltNodeConnectionId", source = "connectionId")
+    @Mapping(target = "type", expression = "java(EdgeType.lookupLiteral(style.type()))")
+    @Mapping(target = "markerStartType", expression = "java(MarkerType.lookupLiteral(style.startMarkerType()))")
+    @Mapping(target = "markerEndType", expression = "java(MarkerType.lookupLiteral(style.endMarkerType()))")
+    @Mapping(target = "animated", source = "style.animated")
+    @Mapping(target = "focusable", source = "style.focusable")
+    VltNodeConnectionStyle toJooq(ConnectionStyle style, UUID connectionId);
 
     @Named("toConnectionFullData")
     default ConnectionFullData toConnectionFullData(VltNodeConnection connection, VltNodeConnectionStyle style) {

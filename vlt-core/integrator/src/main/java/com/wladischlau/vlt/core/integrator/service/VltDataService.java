@@ -14,7 +14,7 @@ import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.model.RouteCacheData;
 import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
-import com.wladischlau.vlt.core.integrator.model.RouteId;
+import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionBucket;
@@ -56,17 +56,17 @@ public class VltDataService {
         routeCache.clear();
         repository.findAllRoutes().stream()
                 .map(modelMapper::toRouteId)
-                .forEach(id -> {
-                    var nodes = findNodesFullDataByRouteId(id);
-                    var connections = findNodeConnectionsFullDataByRouteId(id);
-                    var routeData = new RouteCacheData(nodes, connections);
-                    putInCache(id.id(), id.versionHash(), routeData);
-                });
+                .forEach(this::findAndWriteRouteCacheData);
     }
 
     @Transactional(readOnly = true)
     public List<Adapter> findAllAdapters() {
         return modelMapper.toAdaptersFromJooq(repository.findAllAdapters());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Adapter> findAdapterById(@NotNull UUID id) {
+        return repository.findAdapterById(id).map(modelMapper::toModel);
     }
 
     @Transactional(readOnly = true)
@@ -106,6 +106,34 @@ public class VltDataService {
     public void updateRoute(@NotNull Route route) {
         repository.updateRoute(modelMapper.toJooq(route));
         updateRouteNetworks(route.networks(), route.routeId().id());
+    }
+
+    @Transactional
+    public RouteId updateRouteDefinition(@NotNull UUID id,
+                                         List<NodeFullData> nodes,
+                                         List<ConnectionFullData> connections) {
+        var versionHash = routeHashGen.generate();
+
+        var nodesToKeep = nodes.stream().map(it -> it.node().id()).toList();
+        deleteNodesAndConnectionsFullDataByRouteIdExcluding(id, nodesToKeep);
+
+        nodes.forEach(node -> {
+            var nodeId = repository.upsertNode(modelMapper.toJooq(node.node(), id));
+            repository.upsertNodeStyle(modelMapper.toJooq(node.style(), nodeId));
+            repository.upsertNodePosition(modelMapper.toJooq(node.position(), nodeId));
+        });
+
+        connections.forEach(connection -> {
+            var connectionId = repository.insertNodeConnection(modelMapper.toJooq(connection.connection()));
+            repository.upsertNodeConnectionStyle(modelMapper.toJooq(connection.style(), connectionId));
+        });
+
+        var routeId = new RouteId(id, versionHash);
+
+        repository.updateRouteVersion(routeId);
+        findAndWriteRouteCacheData(routeId);
+
+        return routeId;
     }
 
     @Transactional(readOnly = true)
@@ -150,6 +178,25 @@ public class VltDataService {
                     return new NodeFullData(it, style, position);
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void deleteNodesAndConnectionsFullDataByRouteId(UUID routeId) {
+        repository.deleteNodeConnectionStylesByRouteId(routeId);
+        repository.deleteNodeConnectionsByRouteId(routeId);
+        repository.deleteNodePositionsByRouteId(routeId);
+        repository.deleteNodeStylesByRouteId(routeId);
+        repository.deleteNodesByRouteId(routeId);
+    }
+
+    @Transactional
+    public void deleteNodesAndConnectionsFullDataByRouteIdExcluding(UUID routeId,
+                                                                    List<UUID> toExcludeNodesIds) {
+        repository.deleteNodeConnectionStylesFromRouteExcludingNodes(routeId, toExcludeNodesIds);
+        repository.deleteNodeConnectionsFromRouteExcludingNodes(routeId, toExcludeNodesIds);
+        repository.deleteNodePositionsFromRouteExcluding(routeId, toExcludeNodesIds);
+        repository.deleteNodeStylesFromRouteExcluding(routeId, toExcludeNodesIds);
+        repository.deleteNodesFromRouteExcluding(routeId, toExcludeNodesIds);
     }
 
     @Transactional(readOnly = true)
@@ -205,11 +252,7 @@ public class VltDataService {
 
     @Transactional
     public void deleteRouteFullData(@NotNull UUID routeId) {
-        repository.deleteNodeConnectionStylesByRouteId(routeId);
-        repository.deleteNodeConnectionsByRouteId(routeId);
-        repository.deleteNodePositionsByRouteId(routeId);
-        repository.deleteNodeStylesByRouteId(routeId);
-        repository.deleteNodesByRouteId(routeId);
+        deleteNodesAndConnectionsFullDataByRouteId(routeId);
         repository.removeAllNetworksFromRoute(routeId);
         repository.deleteRoute(routeId);
 
@@ -226,11 +269,17 @@ public class VltDataService {
     }
 
     private void putInCache(UUID routeId, String versionHash, RouteCacheData data) {
-        var bucket = routeCache.computeIfAbsent(routeId,
-                                                ignored -> new VersionBucket(props.getRouteCacheMaxSize()));
+        var bucket = routeCache.computeIfAbsent(routeId, id -> new VersionBucket(props.getRouteCacheMaxSize()));
 
         synchronized (bucket) {
             bucket.put(versionHash, data);
         }
+    }
+
+    private void findAndWriteRouteCacheData(RouteId id) {
+        var nodes = findNodesFullDataByRouteId(id);
+        var connections = findNodeConnectionsFullDataByRouteId(id);
+        var routeData = new RouteCacheData(nodes, connections);
+        putInCache(id.id(), id.versionHash(), routeData);
     }
 }

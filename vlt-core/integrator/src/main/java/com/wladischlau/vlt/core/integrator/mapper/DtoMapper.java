@@ -1,5 +1,6 @@
 package com.wladischlau.vlt.core.integrator.mapper;
 
+import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
 import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
@@ -8,7 +9,7 @@ import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
-import com.wladischlau.vlt.core.integrator.model.RouteId;
+import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionStyleDto;
@@ -17,10 +18,10 @@ import com.wladischlau.vlt.core.integrator.rest.dto.NodeDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodePositionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+
+import java.util.List;
 
 @Mapper(config = DefaultMapper.class, uses = {DefaultMapper.class})
 public interface DtoMapper {
@@ -85,6 +86,8 @@ public interface DtoMapper {
     @Mapping(target = "connection.toNodeId", source = "targetId")
     @Mapping(target = "style", source = "style")
     ConnectionFullData fromDto(ConnectionDto src);
+
+    List<ConnectionFullData> fromDtoToConnectionsFullData(List<ConnectionDto> src);
 
     @Mapping(target = "type", source = "type")
     @Mapping(target = "startMarkerType", source = "startMarkerType")

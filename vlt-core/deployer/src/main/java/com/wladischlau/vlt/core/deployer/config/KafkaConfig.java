@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployRequest;
+import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
 import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +26,9 @@ public class KafkaConfig {
     private int concurrency;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DeployRequest> deployRequestFactory(
-            ConsumerFactory<String, DeployRequest> consumerFactory) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, DeployRequest>();
+    public ConcurrentKafkaListenerContainerFactory<String, DeployRequestDto> deployRequestFactory(
+            ConsumerFactory<String, DeployRequestDto> consumerFactory) {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, DeployRequestDto>();
         factory.setConsumerFactory(consumerFactory);
         factory.setConcurrency(concurrency);
         return factory;

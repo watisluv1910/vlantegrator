@@ -19,6 +19,7 @@
         <spring-kafka.version>3.3.4</spring-kafka.version>
         <spring-dotenv.version>4.0.0</spring-dotenv.version>
         <springdoc-openapi-starter.version>2.8.6</springdoc-openapi-starter.version>
+        <swagger-annotations-jakarta.version>2.2.29</swagger-annotations-jakarta.version>
 
         <docker-java.version>3.5.0</docker-java.version>
 

@@ -1,5 +1,6 @@
 package com.wladischlau.vlt.core.integrator.rest.dto;
 
+import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

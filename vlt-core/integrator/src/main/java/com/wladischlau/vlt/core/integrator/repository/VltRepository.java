@@ -1,7 +1,9 @@
 package com.wladischlau.vlt.core.integrator.repository;
 
+import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.jooq.vlt_repo.Keys;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltAdapterDao;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltNodeDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltAdapter;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
@@ -14,6 +16,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -31,6 +34,7 @@ public class VltRepository {
 
     private final VltAdapterDao vltAdapterDao;
     private final VltRouteDao vltRouteDao;
+    private final VltNodeDao vltNodeDao;
 
     public List<VltAdapter> findAllAdapters() {
         return vltAdapterDao.findAll();
@@ -62,6 +66,13 @@ public class VltRepository {
                 .execute();
     }
 
+    public UUID insertRoute(VltRoute route) {
+        return ctx.insertInto(VLT_ROUTE)
+                .set(ctx.newRecord(VLT_ROUTE, route))
+                .returningResult(VLT_ROUTE.ID)
+                .fetchOne(VLT_ROUTE.ID);
+    }
+
     public List<VltRoute> findAllRoutes() {
         return vltRouteDao.findAll();
     }
@@ -73,17 +84,21 @@ public class VltRepository {
                 .fetchOptionalInto(VltRoute.class);
     }
 
-    public UUID insertRoute(VltRoute route) {
-        return ctx.insertInto(VLT_ROUTE)
-                .set(ctx.newRecord(VLT_ROUTE, route))
-                .returningResult(VLT_ROUTE.ID)
-                .fetchOne(VLT_ROUTE.ID);
-    }
-
     public void updateRoute(VltRoute route) {
         ctx.update(VLT_ROUTE)
                 .set(ctx.newRecord(VLT_ROUTE, route))
                 .where(VLT_ROUTE.ID.eq(route.id()))
+                .execute();
+    }
+
+    public void updateRouteVersion(RouteId routeId) {
+        updateRouteVersion(routeId.id(), routeId.versionHash());
+    }
+
+    public void updateRouteVersion(UUID id, String versionHash) {
+        ctx.update(VLT_ROUTE)
+                .set(VLT_ROUTE.VERSION_HASH, versionHash)
+                .where(VLT_ROUTE.ID.eq(id))
                 .execute();
     }
 
@@ -132,6 +147,29 @@ public class VltRepository {
                 .execute();
     }
 
+    public UUID upsertNode(VltNode node) {
+        return ctx.insertInto(VLT_NODE)
+                .set(ctx.newRecord(VLT_NODE, node))
+                .onDuplicateKeyUpdate()
+                .set(VLT_NODE.NAME, node.name())
+                .set(VLT_NODE.CONFIG, node.config())
+                .returning(VLT_NODE.ID)
+                .fetchOneInto(UUID.class);
+    }
+
+    public void upsertNodes(List<VltNode> nodes) {
+        var records = nodes.stream().map(n -> ctx.newRecord(VLT_NODE, n)).toList();
+
+        ctx.insertInto(VLT_NODE)
+                .set(records)
+                .onConflictOnConstraint(Keys.VLT_NODE_PKEY)
+                .doUpdate()
+                // ID адаптера и маршрута для узла не могут быть изменены после создания
+                .set(VLT_NODE.NAME, DSL.excluded(VLT_NODE.NAME))
+                .set(VLT_NODE.CONFIG, DSL.excluded(VLT_NODE.CONFIG))
+                .execute();
+    }
+
     public List<VltNode> findNodesByRouteId(UUID routeId) {
         return ctx.selectFrom(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
@@ -141,6 +179,34 @@ public class VltRepository {
     public void deleteNodesByRouteId(UUID routeId) {
         ctx.deleteFrom(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                .execute();
+    }
+
+    public void deleteNodesFromRouteExcluding(UUID routeId, List<UUID> toExclude) {
+        ctx.deleteFrom(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                .and(VLT_NODE.VLT_ROUTE_ID.notIn(toExclude))
+                .execute();
+    }
+
+    public void upsertNodeStyle(VltNodeStyle style) {
+        ctx.insertInto(VLT_NODE_STYLE)
+                .set(ctx.newRecord(VLT_NODE_STYLE, style))
+                .onDuplicateKeyUpdate()
+                .set(VLT_NODE_STYLE.TYPE, style.type())
+                .set(VLT_NODE_STYLE.STYLE, style.style())
+                .execute();
+    }
+
+    public void upsertNodeStyles(List<VltNodeStyle> styles) {
+        var records = styles.stream().map(n -> ctx.newRecord(VLT_NODE_STYLE, n)).toList();
+
+        ctx.insertInto(VLT_NODE_STYLE)
+                .set(records)
+                .onConflictOnConstraint(Keys.VLT_NODE_STYLE_PKEY)
+                .doUpdate()
+                .set(VLT_NODE_STYLE.TYPE, DSL.excluded(VLT_NODE_STYLE.TYPE))
+                .set(VLT_NODE_STYLE.STYLE, DSL.excluded(VLT_NODE_STYLE.STYLE))
                 .execute();
     }
 
@@ -159,6 +225,29 @@ public class VltRepository {
                 .execute();
     }
 
+    public void deleteNodeStylesFromRouteExcluding(UUID routeId,
+                                                   List<UUID> toExcludeNodesIds) {
+        ctx.deleteFrom(VLT_NODE_STYLE)
+                .where(VLT_NODE_STYLE.VLT_NODE_ID.in(
+                        ctx.select(VLT_NODE.ID)
+                                .from(VLT_NODE)
+                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                                .and(VLT_NODE.ID.notIn(toExcludeNodesIds))
+                ))
+                .execute();
+    }
+
+    public void upsertNodePosition(VltNodePosition position) {
+        ctx.insertInto(VLT_NODE_POSITION)
+                .set(ctx.newRecord(VLT_NODE_POSITION, position))
+                .onConflictOnConstraint(Keys.VLT_NODE_POSITION_PKEY)
+                .doUpdate()
+                .set(VLT_NODE_POSITION.COORD_X, position.coordX())
+                .set(VLT_NODE_POSITION.COORD_Y, position.coordY())
+                .set(VLT_NODE_POSITION.Z_INDEX, position.zIndex())
+                .execute();
+    }
+
     public Optional<VltNodePosition> findNodePositionByNodeId(UUID nodeId) {
         return ctx.selectFrom(VLT_NODE_POSITION)
                 .where(VLT_NODE_POSITION.VLT_NODE_ID.eq(nodeId))
@@ -172,6 +261,26 @@ public class VltRepository {
                                 .from(VLT_NODE)
                                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))))
                 .execute();
+    }
+
+    public void deleteNodePositionsFromRouteExcluding(UUID routeId,
+                                                      List<UUID> toExcludeNodesIds) {
+        ctx.deleteFrom(VLT_NODE_POSITION)
+                .where(VLT_NODE_POSITION.VLT_NODE_ID.in(
+                        ctx.select(VLT_NODE.ID)
+                                .from(VLT_NODE)
+                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                                .and(VLT_NODE.ID.notIn(toExcludeNodesIds)))
+                )
+                .execute();
+    }
+
+    public UUID insertNodeConnection(VltNodeConnection conn) {
+        return ctx.insertInto(VLT_NODE_CONNECTION)
+                .set(ctx.newRecord(VLT_NODE_CONNECTION, conn))
+                .onDuplicateKeyIgnore()
+                .returning(VLT_NODE_CONNECTION.ID)
+                .fetchOneInto(UUID.class);
     }
 
     public List<VltNodeConnection> findNodeConnectionsByRouteId(UUID routeId) {
@@ -197,6 +306,32 @@ public class VltRepository {
                 .execute();
     }
 
+    public void deleteNodeConnectionsFromRouteExcludingNodes(UUID routeId,
+                                                             List<UUID> toExcludeNodesIds) {
+        var subStep = ctx.select(VLT_NODE.ID)
+                .from(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                .and(VLT_NODE.ID.notIn(toExcludeNodesIds));
+
+        ctx.deleteFrom(VLT_NODE_CONNECTION)
+                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
+                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))
+                .execute();
+    }
+
+    public void upsertNodeConnectionStyle(VltNodeConnectionStyle style) {
+        ctx.insertInto(VLT_NODE_CONNECTION_STYLE)
+                .set(ctx.newRecord(VLT_NODE_CONNECTION_STYLE, style))
+                .onConflictOnConstraint(Keys.VLT_NODE_CONNECTION_STYLE_PKEY)
+                .doUpdate()
+                .set(VLT_NODE_CONNECTION_STYLE.TYPE, style.type())
+                .set(VLT_NODE_CONNECTION_STYLE.MARKER_START_TYPE, style.markerStartType())
+                .set(VLT_NODE_CONNECTION_STYLE.MARKER_END_TYPE, style.markerEndType())
+                .set(VLT_NODE_CONNECTION_STYLE.ANIMATED, style.animated())
+                .set(VLT_NODE_CONNECTION_STYLE.FOCUSABLE, style.focusable())
+                .execute();
+    }
+
     public Optional<VltNodeConnectionStyle> findNodeConnectionStyleByConnectionId(UUID connectionId) {
         return ctx.selectFrom(VLT_NODE_CONNECTION_STYLE)
                 .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.eq(connectionId))
@@ -207,6 +342,22 @@ public class VltRepository {
         var subStep = ctx.select(VLT_NODE.ID)
                 .from(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId));
+
+        ctx.deleteFrom(VLT_NODE_CONNECTION_STYLE)
+                .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.in(
+                        ctx.select(VLT_NODE_CONNECTION.ID)
+                                .from(VLT_NODE_CONNECTION)
+                                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
+                                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))))
+                .execute();
+    }
+
+    public void deleteNodeConnectionStylesFromRouteExcludingNodes(UUID routeId,
+                                                                  List<UUID> toExcludeNodeIds) {
+        var subStep = ctx.select(VLT_NODE.ID)
+                .from(VLT_NODE)
+                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
+                .and(VLT_NODE.ID.notIn(toExcludeNodeIds));
 
         ctx.deleteFrom(VLT_NODE_CONNECTION_STYLE)
                 .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.in(

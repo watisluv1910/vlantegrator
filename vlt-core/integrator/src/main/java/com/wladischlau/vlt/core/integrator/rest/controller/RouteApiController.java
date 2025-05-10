@@ -1,11 +1,11 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
+import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteDefinitionRequestDto;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.MessageFormat;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,10 +55,20 @@ public class RouteApiController extends ApiController implements RouteApi {
     @Override
     public ResponseEntity<RouteIdDto> updateRouteDefinition(UpdateRouteDefinitionRequestDto request,
                                                             JwtAuthenticationToken principal) {
-        return RouteApi.super.updateRouteDefinition(request, principal);
-//        return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
-//
-//        });
+        return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
+            var nodes = request.nodes().stream()
+                    .map(dto -> vltDataService.findAdapterById(dto.adapterId())
+                            .map(a -> dtoMapper.fromDto(dto, a))
+                            .orElseThrow(() -> {
+                                var msg = MessageFormat.format("Adapter with not found [id: {0}]", dto.adapterId());
+                                log.error(msg);
+                                return new NoSuchElementException(msg);
+                            }))
+                    .toList();
+            var connections = dtoMapper.fromDtoToConnectionsFullData(request.connections());
+            var routeId = vltDataService.updateRouteDefinition(request.id(), nodes, connections);
+            return ResponseEntity.ok().body(dtoMapper.toDto(routeId));
+        });
     }
 
     @Override
