@@ -412,40 +412,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build-image</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <image>
-                        <name>watisluv/vlt-integrator:${vlt.version}</name>
-                        <env>
-                            <BP_JVM_VERSION>${java.version}</BP_JVM_VERSION>
-                            <BPE_DELIM_JAVA_TOOL_OPTIONS xml:space="preserve"> </BPE_DELIM_JAVA_TOOL_OPTIONS>
-                            <BPE_APPEND_JAVA_TOOL_OPTIONS>-XX:+HeapDumpOnOutOfMemoryError</BPE_APPEND_JAVA_TOOL_OPTIONS>
-                        </env>
-                        <builder>paketobuildpacks/builder-jammy-buildpackless-tiny</builder>
-                        <buildpacks>
-                            <buildpack>paketobuildpacks/java-azure</buildpack>
-                            <buildpack>paketobuildpacks/spring-boot</buildpack>
-                            <buildpack>paketobuildpacks/environment-variables</buildpack>
-                        </buildpacks>
-                    </image>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
