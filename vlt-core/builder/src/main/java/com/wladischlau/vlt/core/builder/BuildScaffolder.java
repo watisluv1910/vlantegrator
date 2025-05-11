@@ -14,6 +14,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,7 +67,7 @@ public class BuildScaffolder {
      */
     public void scaffold(RoutePathInfo routePathInfo) {
         if (!Files.exists(routePathInfo.commitDir())) {
-            String msg = MessageFormat.format("Маршрут не может быть подготовлен для сборки [path: {0}]",
+            String msg = MessageFormat.format("Route can not be prepared for build procedure [path: {0}]",
                                               routePathInfo.commitDir().toAbsolutePath());
             log.error(msg);
             throw new IllegalStateException(msg);
@@ -81,11 +82,15 @@ public class BuildScaffolder {
     private void generateMavenConfiguration(RoutePathInfo routePathInfo) {
         var mavenPomPath = routePathInfo.commitDir().resolve("pom.xml");
         if (Files.exists(mavenPomPath)) {
-            log.debug("POM файл уже существует в файлах маршрута [path: {}]", mavenPomPath);
-            return;
+            log.debug("POM file already exists in route dir, removing... [path: {}]", mavenPomPath);
+            try {
+                Files.delete(mavenPomPath);
+            } catch (IOException e) {
+                var msg = MessageFormat.format("Unable to delete existing file [path: {0}]", routePathInfo);
+                log.error(msg, e);
+                throw new UncheckedIOException(msg, e);
+            }
         }
-
-        log.debug("POM файл отсутствует в файлах маршрута [path: {}]", routePathInfo.commitDir());
 
         var model = new HashMap<String, Object>();
         var mavenProps = mavenPomPropertiesExtractor.getProperties();
@@ -128,21 +133,29 @@ public class BuildScaffolder {
         model.put("route", routeConfig);
 
         freemarker.generateFile("pom.ftl", model, mavenPomPath);
-        log.info("Сгенерирован POM-файл для маршрута {}@{}", routePathInfo.routeUuid(), routePathInfo.commitHash());
+        log.info("Generated POM-file for route {}.{}", routePathInfo.routeUuid(), routePathInfo.commitHash());
     }
 
     private void generateSpringConfiguration(RoutePathInfo routePathInfo) {
         var springConfigPath = getRouteResourcesDir(routePathInfo.commitDir()).resolve("application.properties");
         if (Files.exists(springConfigPath)) {
-            log.debug("Spring application.properties уже существует в файлах маршрута [path: {}]", springConfigPath);
-            return;
+            log.debug("Spring application.properties file already exists in route dir, removing... [path: {}]", springConfigPath);
+            try {
+                Files.delete(springConfigPath);
+            } catch (IOException e) {
+                var msg = MessageFormat.format("Unable to delete existing file [path: {0}]", routePathInfo);
+                log.error(msg, e);
+                throw new UncheckedIOException(msg, e);
+            }
         }
 
-        log.debug("application.properties отсутствует в файлах маршрута [path: {}]", routePathInfo.commitDir());
+        var model = new HashMap<String, Object>();
+        var routeConfig = new HashMap<String, Object>();
+        routeConfig.put("name", routePathInfo.routeUuid() + "." + routePathInfo.commitHash());
+        model.put("route", routeConfig);
 
-        Map<String, Object> model = new HashMap<>();
         freemarker.generateFile("application.properties.ftl", model, springConfigPath);
-        log.info("Сгенерирован application.properties-файл для маршрута {}.{}", routePathInfo.routeUuid(),
+        log.info("Generated application.properties file for route {}.{}", routePathInfo.routeUuid(),
                  routePathInfo.commitHash());
     }
 
@@ -152,7 +165,7 @@ public class BuildScaffolder {
         var resources = resolver.getResources(ROUTE_CONFIG_CLASSPATH);
 
         if (resources.length == 0) {
-            log.debug("Не найдено дополнительных ресурсов конфигурации маршрута [path: {}]", ROUTE_CONFIG_CLASSPATH);
+            log.debug("Additional route configuration resources were not found [path: {}]", ROUTE_CONFIG_CLASSPATH);
             return;
         }
 
@@ -174,8 +187,14 @@ public class BuildScaffolder {
             }
 
             if (Files.exists(targetFile)) {
-                log.debug("Ресурс конфигурации уже имеется в директории маршрута [path: {}]", targetFile);
-                continue;
+                log.debug("Configuration resource file already exists in route dir, removing... [path: {}]", targetFile);
+                try {
+                    Files.delete(targetFile);
+                } catch (IOException e) {
+                    var msg = MessageFormat.format("Unable to delete existing file [path: {0}]", targetFile);
+                    log.error(msg, e);
+                    throw new UncheckedIOException(msg, e);
+                }
             }
 
             Files.createDirectories(targetFile.getParent());
@@ -184,12 +203,17 @@ public class BuildScaffolder {
                 copied.add(targetFile.getFileName());
             }
 
-            log.debug("Ресурс {} скопирован в {}", resource.getFilename(), targetFile);
+            log.debug("Resource {} copied in {}", resource.getFilename(), targetFile);
         }
 
-        log.info("Дополнительные ресурсы конфигурации перенесены в папку маршрута {}.{} [resources: {}]",
-                 routePathInfo.routeUuid(), routePathInfo.commitHash(),
-                 String.join(",", copied.stream().map(Path::toString).toList()));
+        if (copied.isEmpty()) {
+            log.info("All additional configuration resources are already present in route {}.{}",
+                     routePathInfo.routeUuid(), routePathInfo.commitHash());
+        } else {
+            log.info("Additional configuration resources copied to route {}.{} [resources: {}]",
+                     routePathInfo.routeUuid(), routePathInfo.commitHash(),
+                     String.join(",", copied.stream().map(Path::toString).toList()));
+        }
     }
 
     private static Path getRouteSourcesDir(Path dir) {
@@ -226,6 +250,6 @@ public class BuildScaffolder {
             Files.copy(wrapperSource, wrapperTarget, REPLACE_EXISTING);
         }
 
-        log.info("Maven Wrapper добавлен в директорию: {}", dir);
+        log.info("Maven Wrapper copied to the directory: {}", dir);
     }
 }

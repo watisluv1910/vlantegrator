@@ -19,6 +19,7 @@ import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionBucket;
 import com.wladischlau.vlt.core.integrator.utils.VersionHashGenerator;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotEmpty;
@@ -87,7 +88,7 @@ public class VltDataService {
         var networkNames = route.networks().stream().map(RouteNetwork::name).toList();
         var networkIds = repository.findNetworkIdsByNames(networkNames);
         repository.addNetworksToRoute(networkIds, id);
-        return new RouteId(id, routeHashGen.generate());
+        return new RouteId(id, null);
     }
 
     @Transactional(readOnly = true)
@@ -127,10 +128,8 @@ public class VltDataService {
                                          List<ConnectionFullData> connections) {
         return findRouteCacheData(routeId)
                 .map(cache -> { // Если версия уже есть в кэше - не вычисляем новый хэш
-                    routeCache.get(routeId.id()).dropNewerThan(
-                            routeId.versionHash()); // Удаление кэша более новых версий
-                    updateRouteDefinitionInternal(routeId, cache.nodes(),
-                                                  cache.connections()); // Приведение БД к прошлой версии
+                    routeCache.get(routeId.id()).dropNewerThan(routeId.versionHash()); // Удаление кэша более новых версий
+                    updateRouteDefinitionInternal(routeId, cache.nodes(), cache.connections()); // Приведение БД к прошлой версии
                     return routeId;
                 })
                 .orElseGet(() -> {
@@ -148,8 +147,7 @@ public class VltDataService {
 
     private void updateRouteDefinitionInternal(RouteId routeId, List<NodeFullData> nodes,
                                                List<ConnectionFullData> connections) {
-        var nodesToKeep = nodes.stream().map(it -> it.node().id()).toList();
-        deleteNodesAndConnectionsFullDataByRouteIdExcluding(routeId.id(), nodesToKeep);
+        deleteNodesAndConnectionsFullDataByRouteId(routeId.id());
 
         nodes.forEach(node -> {
             var nodeId = repository.upsertNode(modelMapper.toJooq(node.node(), routeId.id()));
@@ -217,8 +215,7 @@ public class VltDataService {
     }
 
     @Transactional
-    public void deleteNodesAndConnectionsFullDataByRouteIdExcluding(UUID routeId,
-                                                                    List<UUID> toExcludeNodesIds) {
+    public void deleteNodesAndConnectionsFullDataByRouteIdExcluding(UUID routeId, List<UUID> toExcludeNodesIds) {
         repository.deleteNodeConnectionStylesFromRouteExcludingNodes(routeId, toExcludeNodesIds);
         repository.deleteNodeConnectionsFromRouteExcludingNodes(routeId, toExcludeNodesIds);
         repository.deleteNodePositionsFromRouteExcluding(routeId, toExcludeNodesIds);

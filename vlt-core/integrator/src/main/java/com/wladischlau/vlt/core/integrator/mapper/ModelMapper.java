@@ -121,7 +121,7 @@ public interface ModelMapper {
     NodeStyle toModel(VltNodeStyle src);
 
     @Mapping(target = "vltNodeId", source = "nodeId")
-    @Mapping(target = "type", source = "style.role")
+    @Mapping(target = "type", expression = "java(NodeRole.lookupLiteral(style.role()))")
     @Mapping(target = "style", source = "style.style")
     VltNodeStyle toJooq(NodeStyle style, UUID nodeId);
 

@@ -149,8 +149,8 @@ public class VltRepository {
                 .onDuplicateKeyUpdate()
                 .set(VLT_NODE.NAME, node.name())
                 .set(VLT_NODE.CONFIG, node.config())
-                .returning(VLT_NODE.ID)
-                .fetchOneInto(UUID.class);
+                .returning()
+                .fetchOne(VLT_NODE.ID);
     }
 
     public void upsertNodes(List<VltNode> nodes) {
@@ -276,7 +276,7 @@ public class VltRepository {
                 .set(ctx.newRecord(VLT_NODE_CONNECTION, conn))
                 .onDuplicateKeyIgnore()
                 .returning(VLT_NODE_CONNECTION.ID)
-                .fetchOneInto(UUID.class);
+                .fetchOne(VLT_NODE_CONNECTION.ID);
     }
 
     public List<VltNodeConnection> findNodeConnectionsByRouteId(UUID routeId) {

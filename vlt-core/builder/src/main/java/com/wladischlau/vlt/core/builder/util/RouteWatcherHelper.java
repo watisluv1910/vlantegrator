@@ -21,12 +21,12 @@ public class RouteWatcherHelper {
     public void handleRouteChange(Path file, BuildScaffolder scaffolder, MavenCompiler compiler) {
         var routeInfo = resolveRouteInfo(file);
 
-        log.info("Обнаружено изменение в маршруте {}@{} [file: {}]", routeInfo.routeUuid(), routeInfo.commitHash(), file.getFileName());
+        log.info("Обнаружено изменение в маршруте {}.{} [file: {}]", routeInfo.routeUuid(), routeInfo.commitHash(), file.getFileName());
         try {
             scaffolder.scaffold(routeInfo);
             compiler.compile(routeInfo.commitDir());
         } catch (Exception e) {
-            log.error("Ошибка при сборке маршрута {}@{}", routeInfo.routeUuid(), routeInfo.commitHash(), e);
+            log.error("Ошибка при сборке маршрута {}.{}", routeInfo.routeUuid(), routeInfo.commitHash(), e);
         }
     }
 

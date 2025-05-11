@@ -116,13 +116,13 @@ public class RouteWatcher implements Runnable {
                             registerAllSubdirectories(child);
 
                             try (var files = Files.walk(child)) {
-                                files.filter(fileUtil::isJavaFile).forEach(
-                                        file -> helper.handleRouteChange(file, scaffolder, compiler));
+                                files.filter(fileUtil::isJavaFile)
+                                        .forEach(file -> helper.handleRouteChange(file, scaffolder, compiler));
                             }
                         } else if (fileUtil.isJavaFile(child)) {
                             helper.handleRouteChange(child, scaffolder, compiler);
                         }
-                    } else if (kind == ENTRY_MODIFY && Files.isRegularFile(child)) {
+                    } else if (kind == ENTRY_MODIFY && fileUtil.isJavaFile(child)) {
                         helper.handleRouteChange(child, scaffolder, compiler);
                     }
                 } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.wladischlau.vlt.core.integrator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wladischlau.vlt.adapters.DividerAdapter;
 import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import com.wladischlau.vlt.core.integrator.service.BranchExtractor;
 import com.wladischlau.vlt.core.integrator.model.FlowDefinition;
@@ -34,8 +35,6 @@ import static com.wladischlau.vlt.adapters.common.AdapterUtils.configMapper;
 @Service
 @RequiredArgsConstructor
 public class IntegrationFlowGenerator {
-
-    private static final String ADAPTERS_PACKAGE = "com.wladischlau.vlt.adapters";
 
     private final BranchExtractor branchExtractor;
 
@@ -84,31 +83,25 @@ public class IntegrationFlowGenerator {
 
             for (var node : flow.getNodes()) {
                 ++stepCounter;
-                var adapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapter().clazz());
-                var configJson = configMapper.writeValueAsString(node.config());
-                flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
-                flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
+                performGenerationStep(node, flowBuilder, stepCounter);
             }
         } else {
             var start = flow.getNodes().getFirst();
-            var adapterClass = ClassName.get(ADAPTERS_PACKAGE, start.adapter().clazz());
+            var adapterClass = getClassFromFullyQualifiedName(start.adapter().clazz());
+            var adapterClassName = ClassName.get(adapterClass);
             var configJson = configMapper.writeValueAsString(start.config());
-            flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
+            flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClassName, configJson);
             flowBuilder.addStatement("var step$1L = step$1LAdapter.start()", stepCounter);
 
             for (var node : flow.getNodes().subList(1, flow.getNodes().size())) {
                 ++stepCounter;
-                var currAdapterClass = ClassName.get(ADAPTERS_PACKAGE, node.adapter().clazz());
-                var currAdapterConfigJson = configMapper.writeValueAsString(node.config());
-                flowBuilder.addStatement("var step$LAdapter = new $T($S)",
-                                         stepCounter, currAdapterClass, currAdapterConfigJson);
-                flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
+                performGenerationStep(node, flowBuilder, stepCounter);
             }
         }
 
         if (!flow.getSubflowChannels().isEmpty()) {
             ++stepCounter;
-            var adapterClass = ClassName.get(ADAPTERS_PACKAGE, "DividerAdapter");
+            var adapterClass = ClassName.get(DividerAdapter.class);
             var configJson = configMapper.writeValueAsString(Map.of("subFlowChannels", flow.getSubflowChannels()));
             flowBuilder.addStatement("var step$LAdapter = new $T($S)", stepCounter, adapterClass, configJson);
             flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
@@ -126,7 +119,16 @@ public class IntegrationFlowGenerator {
                 .build();
     }
 
-    public List<FlowDefinition> toIntegrationFlows(RouteDefinition routeDefinition) {
+    private void performGenerationStep(Node node, CodeBlock.Builder flowBuilder, int stepCounter) throws JsonProcessingException {
+        var currAdapterClass = getClassFromFullyQualifiedName(node.adapter().clazz());
+        var currAdapterClassName = ClassName.get(currAdapterClass);
+        var currAdapterConfigJson = configMapper.writeValueAsString(node.config());
+        flowBuilder.addStatement("var step$LAdapter = new $T($S)",
+                                 stepCounter, currAdapterClassName, currAdapterConfigJson);
+        flowBuilder.addStatement("var step$1L = step$1LAdapter.apply(step$2L)", stepCounter, stepCounter - 1);
+    }
+
+    private List<FlowDefinition> toIntegrationFlows(RouteDefinition routeDefinition) {
         var branches = branchExtractor.extractBranches(routeDefinition);
         var flows = branches.stream()
                 .map(branch -> FlowDefinition.builder()
@@ -147,7 +149,17 @@ public class IntegrationFlowGenerator {
         return flows;
     }
 
-    public String generateUniqueChannelName(@NotNull Node startNode) {
+    private String generateUniqueChannelName(@NotNull Node startNode) {
         return startNode.adapter().name() + "_" + UUID.randomUUID();
+    }
+
+    private Class<?> getClassFromFullyQualifiedName(String fullyQualifiedName) {
+        try {
+            return Class.forName(fullyQualifiedName);
+        } catch (ClassNotFoundException e) {
+            var msg = MessageFormat.format("Unable to find class [name: {0}]", fullyQualifiedName);
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
+        }
     }
 }
