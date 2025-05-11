@@ -119,15 +119,19 @@ public class RouteApiController extends ApiController implements RouteApi {
         });
     }
 
-    // TODO: Delete images and containers for this route
+    // TODO: Delete images for this route
     @Override
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(DELETE_ROUTE, () -> {
             if (!canModifyRoute(principal, id)) {
-                 throw new AccessDeniedException("Not allowed to modify desired route");
+                 throw new AccessDeniedException("Not allowed to modify a desired route");
             }
 
-            vltDataService.deleteRouteFullData(id);
+            vltDataService.findRouteById(id).ifPresent(it -> {
+                deployerDelegate.sendDeployRequest(it, DeployActionType.DELETE);
+                vltDataService.deleteRouteFullData(id);
+            });
+
             return ResponseEntity.noContent().build();
         });
     }
