@@ -19,7 +19,6 @@ import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionBucket;
 import com.wladischlau.vlt.core.integrator.utils.VersionHashGenerator;
-import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotEmpty;
