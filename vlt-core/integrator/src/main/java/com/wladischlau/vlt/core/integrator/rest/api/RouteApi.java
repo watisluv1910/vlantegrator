@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Routes API", description = "Операции для работы с маршрутами")
@@ -44,6 +45,7 @@ public interface RouteApi {
     String CREATE_ROUTE = "createRoute";
     String GET_ROUTE = "getRoute";
     String UPDATE_ROUTE = "updateRoute";
+    String GET_ROUTE_VERSIONS = "getRouteVersions";
     String GET_ROUTE_DEFINITION = "getRouteDefinition";
     String UPDATE_ROUTE_DEFINITION = "updateRouteDefinition";
     String DELETE_ROUTE = "deleteRoute";
@@ -68,7 +70,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @PostMapping(value = "/v1/route", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> createRoute(
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
@@ -95,9 +96,33 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @GetMapping(value = "/v1/route/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDto> getRoute(
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = GET_ROUTE_VERSIONS,
+            summary = "Получить информацию об имеющихся в кэше версиях маршрута",
+            description = "Получить версии маршрута, структура которых хранится в кэше",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список версий",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @GetMapping(value = "/v1/route/{id}/versions", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<List<String>> getRouteCachedVersions(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -121,7 +146,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @GetMapping(value = "/v1/route/{id}/{versionHash}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDefinitionDto> getRouteDefinition(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -148,7 +172,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @PatchMapping("/v1/route/{id}")
     default ResponseEntity<Void> updateRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -177,7 +200,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @PostMapping(value = "/v1/route/{id}/{versionHash}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> updateRouteDefinition(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -207,7 +229,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @DeleteMapping("/v1/route/{id}")
     default ResponseEntity<Void> deleteRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -233,7 +254,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @PostMapping("/v1/route/{id}/build")
     default ResponseEntity<Void> buildRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -259,7 +279,6 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "Routes API")
     @PostMapping("/v1/route/{id}/deploy")
     default ResponseEntity<Void> deployRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))

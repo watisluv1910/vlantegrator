@@ -103,6 +103,10 @@ public class VltDataService {
         return getFromCache(routeId.id(), routeId.versionHash());
     }
 
+    public List<String> findRouteCachedVersions(@NotNull UUID routeId) {
+         return routeCache.get(routeId).sequencedKeySet().stream().toList();
+    }
+
     @Transactional(readOnly = true)
     public Optional<RouteDefinition> findLatestRouteDefinitionByRouteId(@NotNull UUID routeId) {
         var connections = findNodeConnectionsByRouteId(routeId);

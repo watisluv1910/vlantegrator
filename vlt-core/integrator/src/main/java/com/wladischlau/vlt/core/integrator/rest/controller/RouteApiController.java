@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,6 +69,13 @@ public class RouteApiController extends ApiController implements RouteApi {
                         log.error(msg);
                         return new NoSuchElementException(msg);
                     });
+        });
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getRouteCachedVersions(UUID id) {
+        return logRequestProcessing(GET_ROUTE_VERSIONS, () -> {
+            return ResponseEntity.ok(vltDataService.findRouteCachedVersions(id));
         });
     }
 
@@ -149,9 +157,8 @@ public class RouteApiController extends ApiController implements RouteApi {
                     });
 
             return def.map(it -> {
-                // TODO: Add check if route with the same version hash was already built
                 routeBuildService.buildRouteAsync(id, versionHash, it);
-                return ResponseEntity.ok().<Void>build();
+                return ResponseEntity.accepted().<Void>build();
             }).orElse(ResponseEntity.badRequest().build());
         });
     }
@@ -162,7 +169,7 @@ public class RouteApiController extends ApiController implements RouteApi {
             var actionType = DeployActionType.valueOf(action.trim().toUpperCase());
             vltDataService.findRouteById(id)
                     .ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
-            return ResponseEntity.ok().build();
+            return ResponseEntity.accepted().build();
         });
     }
 
