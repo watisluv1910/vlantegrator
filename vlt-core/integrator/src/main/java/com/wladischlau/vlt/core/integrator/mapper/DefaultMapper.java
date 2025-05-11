@@ -4,7 +4,9 @@ import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
         nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
         builder = @org.mapstruct.Builder(disableBuilder = true)
 )
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DefaultMapper {
 
     @Named("toPublishedPortsString")

@@ -23,10 +23,12 @@ import com.wladischlau.vlt.core.integrator.rest.dto.NodePositionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(config = DefaultMapper.class, uses = {DefaultMapper.class})
 public interface DtoMapper {
@@ -49,6 +51,15 @@ public interface DtoMapper {
     @Mapping(target = "networks", source = "request.networks", qualifiedByName = "toNetworksFromNames")
     @Mapping(target = "env", source = "request.env")
     Route fromDto(CreateRouteRequestDto request, String checkedOwner);
+
+    @Mapping(target = "routeId", expression = "java(new RouteId(id, null))")
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "owner", source = "request.ownerName")
+    @Mapping(target = "publishedPorts", source = "request.publishedPorts", qualifiedByName = "toPublishedPortsList")
+    @Mapping(target = "networks", source = "request.networks", qualifiedByName = "toNetworksFromNames")
+    @Mapping(target = "env", source = "request.env")
+    Route fromDto(UpdateRouteRequestDto request, UUID id);
 
     @Mapping(target = "routeId", source = "routeId")
     @Mapping(target = "name", source = "name")

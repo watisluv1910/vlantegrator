@@ -1,10 +1,10 @@
 package com.wladischlau.vlt.core.integrator.rest.api;
 
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.BuildRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
+@Tag(name = "Routes API", description = "Операции для работы с маршрутами")
 @Validated
 @RequestMapping("/api")
 @SecuritySchemes({
@@ -67,7 +68,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
+    @Tag(name = "Routes API")
     @PostMapping(value = "/v1/route", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> createRoute(
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
@@ -94,7 +95,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
+    @Tag(name = "Routes API")
     @GetMapping(value = "/v1/route/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDto> getRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -120,20 +121,20 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
-    @GetMapping(value = "/v1/route/{id}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Tag(name = "Routes API")
+    @GetMapping(value = "/v1/route/{id}/{versionHash}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDefinitionDto> getRouteDefinition(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
             @Parameter(required = true, schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
-            @NotNull @RequestParam(name = "versionHash") String versionHash) {
+            @NotNull @PathVariable(name = "versionHash") String versionHash) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
             operationId = UPDATE_ROUTE,
-            summary = "Обновляет конфиг маршрута",
+            summary = "Обновить конфиг маршрута",
             description = "Обновляет конфиг имеющегося маршрута на основе переданной конфигурации",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Конфиг маршрута обновлён"),
@@ -147,11 +148,13 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
-    @PatchMapping("/v1/route")
+    @Tag(name = "Routes API")
+    @PatchMapping("/v1/route/{id}")
     default ResponseEntity<Void> updateRoute(
-            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = RouteDto.class)))
-            @org.springframework.web.bind.annotation.RequestBody RouteDto request,
+            @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
+            @NotNull @PathVariable(name = "id") UUID id,
+            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = UpdateRouteRequestDto.class)))
+            @org.springframework.web.bind.annotation.RequestBody UpdateRouteRequestDto request,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
@@ -159,7 +162,7 @@ public interface RouteApi {
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
             operationId = UPDATE_ROUTE_DEFINITION,
-            summary = "Обновляет структуру маршрута",
+            summary = "Обновить структуру маршрута",
             description = "Обновляет структуру имеющегося маршрута на основе переданной конфигурации",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Структура маршрута обновлена",
@@ -174,13 +177,13 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
-    @PostMapping(value = "/v1/route/{id}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Tag(name = "Routes API")
+    @PostMapping(value = "/v1/route/{id}/{versionHash}/definition", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteIdDto> updateRouteDefinition(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
-            @Parameter(schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
-            @NotNull @RequestParam(name = "versionHash") String versionHash,
+            @Parameter(required = true, schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
+            @NotNull @PathVariable(name = "versionHash") String versionHash,
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = RouteDefinitionDto.class)))
             @org.springframework.web.bind.annotation.RequestBody RouteDefinitionDto request,
             JwtAuthenticationToken principal) {
@@ -204,7 +207,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
+    @Tag(name = "Routes API")
     @DeleteMapping("/v1/route/{id}")
     default ResponseEntity<Void> deleteRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
@@ -217,7 +220,7 @@ public interface RouteApi {
             security = @SecurityRequirement(name = "bearerAuth"),
             operationId = BUILD_ROUTE,
             summary = "Асинхронная сборка маршрута",
-            description = "Принимает описание маршрута в DTO и запускает процесс сборки в фоновом режиме",
+            description = "Запускает процесс сборки маршрута (compile + build image) в фоновом режиме",
             responses = {
                     @ApiResponse(responseCode = "202", description = "Запрос на сборку принят"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
@@ -230,13 +233,11 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
+    @Tag(name = "Routes API")
     @PostMapping("/v1/route/{id}/build")
     default ResponseEntity<Void> buildRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
-            @Parameter(required = true, schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
-            @NotNull @RequestParam(name = "versionHash") String versionHash,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
@@ -244,8 +245,8 @@ public interface RouteApi {
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
             operationId = DEPLOY_ROUTE,
-            summary = "Выполняет действие по отношению к развёртыванию маршрута",
-            description = "Принимает описание маршрута в DTO и запускает процесс сборки в фоновом режиме",
+            summary = "Развернуть маршрута",
+            description = "Выполнить действие по отношению к развёртыванию маршрута: запустить, остановить, удалить, перезапустить",
             responses = {
                     @ApiResponse(responseCode = "202", description = "Запрос на выполнение действия по отношению к развёртыванию маршрута принят"),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
@@ -258,7 +259,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "routes")
+    @Tag(name = "Routes API")
     @PostMapping("/v1/route/{id}/deploy")
     default ResponseEntity<Void> deployRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))

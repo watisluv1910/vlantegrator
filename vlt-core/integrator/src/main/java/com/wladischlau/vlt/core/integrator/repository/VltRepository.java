@@ -82,7 +82,11 @@ public class VltRepository {
 
     public void updateRoute(VltRoute route) {
         ctx.update(VLT_ROUTE)
-                .set(ctx.newRecord(VLT_ROUTE, route))
+                .set(VLT_ROUTE.NAME, route.name())
+                .set(VLT_ROUTE.DESCRIPTION, route.description())
+                .set(VLT_ROUTE.OWNER_NAME, route.ownerName())
+                .set(VLT_ROUTE.ENV, route.env())
+                .set(VLT_ROUTE.PUBLISHED_PORTS, route.publishedPorts())
                 .where(VLT_ROUTE.ID.eq(route.id()))
                 .execute();
     }

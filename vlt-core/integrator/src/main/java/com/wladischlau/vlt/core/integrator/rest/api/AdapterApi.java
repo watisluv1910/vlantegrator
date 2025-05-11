@@ -25,12 +25,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Adapters API", description = "Операции для работы с адаптерами маршрутов")
 @Validated
 @RequestMapping("/api")
 @SecuritySchemes({
         @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT"),
 })
-public interface AdaptersApi {
+public interface AdapterApi {
 
     String GET_ALL_ADAPTERS = "getAllAdapters";
     String GET_ADAPTER_CONFIG_SCHEMA = "getAdapterConfigSchema";
@@ -52,8 +53,7 @@ public interface AdaptersApi {
                             content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "adapters")
-    @GetMapping(value = "/v1/adapters", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/v1/adapter", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<List<AdapterDto>> getAdapters(JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
@@ -75,12 +75,11 @@ public interface AdaptersApi {
                             content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @Tag(name = "adapters")
-    @GetMapping(value = "/v1/adapters/config/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/v1/adapter/{id}/config", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<String> getAdapterConfigSchema(
-            JwtAuthenticationToken principal,
             @Parameter(required = true, schema = @Schema(description = "ID адаптера", type = "string", format = "uuid"))
-            @NotNull @PathVariable(name = "id") UUID id) {
+            @NotNull @PathVariable(name = "id") UUID id,
+            JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

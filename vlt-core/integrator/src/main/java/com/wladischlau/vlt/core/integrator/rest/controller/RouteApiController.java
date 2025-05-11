@@ -8,6 +8,7 @@ import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
@@ -81,10 +82,11 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateRoute(RouteDto request, JwtAuthenticationToken principal) {
+    public ResponseEntity<Void> updateRoute(UUID routeId, UpdateRouteRequestDto request,
+                                            JwtAuthenticationToken principal) {
         // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE, () -> {
-            vltDataService.updateRoute(dtoMapper.fromDto(request));
+            vltDataService.updateRoute(dtoMapper.fromDto(request, routeId));
             return ResponseEntity.ok().build();
         });
     }
@@ -123,9 +125,17 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<Void> buildRoute(UUID id, String versionHash, JwtAuthenticationToken principal) {
+    public ResponseEntity<Void> buildRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(BUILD_ROUTE, () -> {
             var def = vltDataService.findLatestRouteDefinitionByRouteId(id);
+            var versionHash = vltDataService.findRouteById(id) // Находит последний versionHash
+                    .map(it -> it.routeId().versionHash())
+                    .orElseThrow(() -> {
+                        var msg = MessageFormat.format("Unable to find route version hash [id: {0}]", id);
+                        log.error(msg);
+                        return new IllegalStateException(msg);
+                    });
+
             return def.map(it -> {
                 // TODO: Add check if route with the same version hash was already built
                 routeBuildService.buildRouteAsync(id, versionHash, it);

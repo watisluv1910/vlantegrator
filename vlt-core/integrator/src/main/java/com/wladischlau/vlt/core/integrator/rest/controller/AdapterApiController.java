@@ -1,7 +1,7 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
-import com.wladischlau.vlt.core.integrator.rest.api.AdaptersApi;
+import com.wladischlau.vlt.core.integrator.rest.api.AdapterApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.service.AdapterConfigService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @SuppressWarnings("CodeBlock2Expr")
-public class AdaptersApiController extends ApiController implements AdaptersApi {
+public class AdapterApiController extends ApiController implements AdapterApi {
 
     private final VltDataService vltDataService;
     private final AdapterConfigService adapterConfigService;
 
-    public AdaptersApiController(DtoMapper dtoMapper, VltDataService vltDataService,
-                                 AdapterConfigService adapterConfigService) {
+    public AdapterApiController(DtoMapper dtoMapper, VltDataService vltDataService,
+                                AdapterConfigService adapterConfigService) {
         super(dtoMapper);
         this.vltDataService = vltDataService;
         this.adapterConfigService = adapterConfigService;
@@ -39,7 +39,7 @@ public class AdaptersApiController extends ApiController implements AdaptersApi 
     }
 
     @Override
-    public ResponseEntity<String> getAdapterConfigSchema(JwtAuthenticationToken principal, UUID id) {
+    public ResponseEntity<String> getAdapterConfigSchema(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ADAPTER_CONFIG_SCHEMA, () -> {
             var schema = adapterConfigService.getAdapterConfigSchemaById(id);
             return ResponseEntity.ok(schema);
