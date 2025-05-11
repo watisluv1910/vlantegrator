@@ -4,6 +4,7 @@ import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
+import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
@@ -13,8 +14,11 @@ import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +26,7 @@ import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -114,11 +119,14 @@ public class RouteApiController extends ApiController implements RouteApi {
         });
     }
 
+    // TODO: Delete images and containers for this route
     @Override
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
-        // TODO: Add owner check
         return logRequestProcessing(DELETE_ROUTE, () -> {
-            // TODO: Delete images and containers for this route
+            if (!canModifyRoute(principal, id)) {
+                 throw new AccessDeniedException("Not allowed to modify desired route");
+            }
+
             vltDataService.deleteRouteFullData(id);
             return ResponseEntity.noContent().build();
         });
@@ -152,5 +160,24 @@ public class RouteApiController extends ApiController implements RouteApi {
                     .ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
             return ResponseEntity.ok().build();
         });
+    }
+
+    public boolean canModifyRoute(JwtAuthenticationToken principal, UUID routeId) {
+        var initiator = principal.getName().trim();
+        var initiatorRoles = principal.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toUnmodifiableSet());
+
+        return vltDataService.findRouteById(routeId)
+                .map(Route::owner)
+                .map(owner -> {
+                    return StringUtils.isNotBlank(initiator)
+                            && (owner.equals(initiator) || initiatorRoles.contains("ROLE_ADMIN"));
+                })
+                .orElseThrow(() -> {
+                    var msg = MessageFormat.format("Route information not found [id: {0}]", routeId);
+                    log.error(msg);
+                    return new NoSuchElementException(msg);
+                });
     }
 }
