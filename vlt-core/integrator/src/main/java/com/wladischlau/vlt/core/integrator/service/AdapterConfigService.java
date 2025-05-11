@@ -28,7 +28,6 @@ public class AdapterConfigService {
     private final VltDataService vltDataService;
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-    @PostConstruct
     public void init() throws IOException {
         cache.clear();
 

@@ -10,13 +10,13 @@ create type network_driver as enum ('bridge', 'host', 'none', 'overlay', 'ipvlan
 
 create table if not exists vlt_route
 (
-    id              uuid  not null primary key default pg_catalog.gen_random_uuid(),
-    version_hash    text  unique nulls distinct,
-    name            text  not null unique,
-    description     text  not null,
-    owner_name      text  not null,
-    published_ports text  not null,
-    env             jsonb not null
+    id              uuid not null primary key default pg_catalog.gen_random_uuid(),
+    version_hash    text unique,
+    name            text not null unique,
+    description     text not null,
+    owner_name      text not null,
+    published_ports text,
+    env             jsonb
 );
 
 create table if not exists vlt_adapter
