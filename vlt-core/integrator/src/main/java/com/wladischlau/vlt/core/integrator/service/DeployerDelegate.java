@@ -20,6 +20,7 @@ public class DeployerDelegate {
     private final DtoMapper dtoMapper;
     private final KafkaTemplate<String, DeployRequestDto> deployRequestKafkaTemplate;
 
+    @SuppressWarnings("UnusedReturnValue")
     public CompletableFuture<SendResult<String, DeployRequestDto>> sendDeployRequest(Route route, DeployActionType action) {
         var request = dtoMapper.toDto(route, action);
         var requestId = UUID.randomUUID().toString();
