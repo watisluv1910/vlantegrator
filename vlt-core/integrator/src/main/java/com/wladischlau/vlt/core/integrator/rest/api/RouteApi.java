@@ -44,6 +44,7 @@ import java.util.UUID;
 public interface RouteApi {
 
     String CREATE_ROUTE = "createRoute";
+    String GET_ALL_ROUTES = "getAllRoutes";
     String GET_ROUTE = "getRoute";
     String UPDATE_ROUTE = "updateRoute";
     String GET_ROUTE_VERSIONS = "getRouteVersions";
@@ -77,6 +78,29 @@ public interface RouteApi {
             @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CreateRouteRequestDto.class)))
             @org.springframework.web.bind.annotation.RequestBody CreateRouteRequestDto request,
             JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = GET_ALL_ROUTES,
+            summary = "Получить информацию о всех маршрутах",
+            description = "Отдаёт информацию о всех маршрутах",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Информация о всех маршрутах",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @GetMapping(value = "/v1/route", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<List<RouteDto>> getAllRoutes(JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

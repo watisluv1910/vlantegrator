@@ -64,6 +64,13 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
+    public ResponseEntity<List<RouteDto>> getAllRoutes(JwtAuthenticationToken principal) {
+        return logRequestProcessing(GET_ALL_ROUTES, () -> {
+           return ResponseEntity.ok(dtoMapper.toRouteDto(vltDataService.finaAllRoutes()));
+        });
+    }
+
+    @Override
     public ResponseEntity<RouteDto> getRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE, () -> {
             return vltDataService.findRouteById(id)

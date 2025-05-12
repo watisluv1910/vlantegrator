@@ -90,6 +90,16 @@ public class VltDataService {
     }
 
     @Transactional(readOnly = true)
+    public List<Route> finaAllRoutes() {
+        return repository.findAllRoutes().stream()
+                .map(it -> {
+                    var networks = repository.findRouteNetworksByRouteId(it.id());
+                    return modelMapper.toModel(it, networks);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public Optional<Route> findRouteById(UUID id) {
         return repository.findRouteById(id)
                 .map(it -> {
