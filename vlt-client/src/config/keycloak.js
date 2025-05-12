@@ -9,5 +9,5 @@ export const userManager = new UserManager({
         store: window.sessionStorage,
         prefix: 'authorization',
     }),
-    monitorSession: true, // cross tab login/logout
+    monitorSession: true, // cross-tab login/logout
 });

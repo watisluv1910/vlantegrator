@@ -52,7 +52,7 @@ export const HomePage = () => {
     const [sidebarWidth, _] = useSidebarWidth();
     return (
         <>
-            <Header path={["Главная", "Дашборд"]}/>
+            <Header path={["Главная"]}/>
             <Sidebar/>
 
             <Box

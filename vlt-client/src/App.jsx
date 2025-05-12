@@ -8,7 +8,6 @@ import {Info} from "./pages/Info";
 import '@fontsource/ubuntu';
 import '@fontsource/madimi-one';
 import '@fontsource/ubuntu/500.css';
-
 import '@fontsource/ubuntu/700.css';
 
 function App() {
