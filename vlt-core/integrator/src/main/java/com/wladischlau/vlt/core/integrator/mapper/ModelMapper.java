@@ -3,15 +3,15 @@ package com.wladischlau.vlt.core.integrator.mapper;
 import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
-import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
 import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
 import com.wladischlau.vlt.core.integrator.model.Node;
-import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
+import com.wladischlau.vlt.core.integrator.model.RouteAction;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
+import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.AdapterDirection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.ChannelKind;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.NetworkDriver;
@@ -23,6 +23,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodePosition;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -92,6 +93,31 @@ public interface ModelMapper {
     @Mapping(target = "env", source = "env")
     VltRoute toJooq(Route src);
 
+    @Mapping(target = "routeId", source = "routeId")
+    @Mapping(target = "username", source = "action.userName")
+    @Mapping(target = "userDisplayName", source = "action.userDisplayName")
+    @Mapping(target = "action", source = "action.actionType", qualifiedByName = "toModelRouteAction")
+    @Mapping(target = "attemptedAt", source = "action.attemptedAt")
+    RouteUserAction toModel(VltRouteUserAction action, RouteId routeId);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "vltRouteId", source = "src.routeId.id")
+    @Mapping(target = "userName", source = "username")
+    @Mapping(target = "userDisplayName", source = "userDisplayName")
+    @Mapping(target = "actionType", source = "action", qualifiedByName = "toJooqRouteAction")
+    @Mapping(target = "attemptedAt", source = "attemptedAt")
+    VltRouteUserAction toJooq(RouteUserAction src);
+
+    @Named("toModelRouteAction")
+    default RouteAction toModelRouteAction(com.wladischlau.vlt.core.jooq.vlt_repo.enums.RouteUserAction src) {
+        return RouteAction.fromLiteral(src.getLiteral()).orElse(null);
+    }
+
+    @Named("toJooqRouteAction")
+    default com.wladischlau.vlt.core.jooq.vlt_repo.enums.RouteUserAction toJooqRouteAction(RouteAction src) {
+        return com.wladischlau.vlt.core.jooq.vlt_repo.enums.RouteUserAction.lookupLiteral(src.getLiteral());
+    }
+
     @Mapping(target = "name", source = "name")
     @Mapping(target = "driver", expression = "java(src.driver().getLiteral())")
     RouteNetwork toModel(VltRouteNetwork src);
@@ -136,13 +162,6 @@ public interface ModelMapper {
     @Mapping(target = "zIndex", source = "position.zIndex")
     VltNodePosition toJooq(NodePosition position, UUID nodeId);
 
-    default NodeFullData toNodeFullData(VltNode node, VltAdapter adapter, VltNodeStyle style, VltNodePosition position) {
-        var node_ = toModel(node, adapter);
-        var style_ = toModel(style);
-        var position_ = toModel(position);
-        return new NodeFullData(node_, style_, position_);
-    }
-
     @Mapping(target = "fromNodeId", source = "sourceId")
     @Mapping(target = "toNodeId", source = "targetId")
     Connection toModel(VltNodeConnection src);
@@ -168,11 +187,4 @@ public interface ModelMapper {
     @Mapping(target = "animated", source = "style.animated")
     @Mapping(target = "focusable", source = "style.focusable")
     VltNodeConnectionStyle toJooq(ConnectionStyle style, UUID connectionId);
-
-    @Named("toConnectionFullData")
-    default ConnectionFullData toConnectionFullData(VltNodeConnection connection, VltNodeConnectionStyle style) {
-        var connection_ = toModel(connection);
-        var style_ = toModel(style);
-        return new ConnectionFullData(connection_, style_);
-    }
 }

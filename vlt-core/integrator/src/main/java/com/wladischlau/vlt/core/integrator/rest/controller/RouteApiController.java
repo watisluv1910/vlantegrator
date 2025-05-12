@@ -9,6 +9,7 @@ import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
@@ -76,6 +77,17 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<List<String>> getRouteCachedVersions(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE_VERSIONS, () -> {
             return ResponseEntity.ok(vltDataService.findRouteCachedVersions(id));
+        });
+    }
+
+    @Override
+    public ResponseEntity<List<RouteUserActionDto>> getRouteUserActions(boolean displayPersonal,
+                                                                        JwtAuthenticationToken principal) {
+        return logRequestProcessing(GET_ROUTE_USER_ACTIONS, () -> {
+            var res = displayPersonal
+                    ? vltDataService.findRouteUserActionsByUsername(principal.getName())
+                    : vltDataService.findAllRouteUserActions();
+            return ResponseEntity.ok(dtoMapper.toDtoFromRouteUserAction(res));
         });
     }
 

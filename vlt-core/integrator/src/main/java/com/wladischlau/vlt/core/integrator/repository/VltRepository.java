@@ -3,6 +3,7 @@ package com.wladischlau.vlt.core.integrator.repository;
 import com.wladischlau.vlt.core.jooq.vlt_repo.Keys;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltAdapterDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteDao;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.daos.VltRouteUserActionDao;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltAdapter;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNode;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeConnection;
@@ -11,6 +12,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodePosition;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -32,6 +34,7 @@ public class VltRepository {
 
     private final VltAdapterDao vltAdapterDao;
     private final VltRouteDao vltRouteDao;
+    private final VltRouteUserActionDao vltRouteUserActionDao;
 
     public List<VltAdapter> findAllAdapters() {
         return vltAdapterDao.findAll();
@@ -102,6 +105,16 @@ public class VltRepository {
         ctx.deleteFrom(VLT_ROUTE)
                 .where(VLT_ROUTE.ID.eq(routeId))
                 .execute();
+    }
+
+    public List<VltRouteUserAction> findAllRouteUserActions() {
+        return vltRouteUserActionDao.findAll();
+    }
+
+    public List<VltRouteUserAction> findRouteUserActionsByUsername(String username) {
+        return ctx.selectFrom(VLT_ROUTE_USER_ACTION)
+                .where(VLT_ROUTE_USER_ACTION.USER_NAME.equalIgnoreCase(username))
+                .fetchInto(VltRouteUserAction.class);
     }
 
     public List<VltRouteNetwork> findRouteNetworksByRouteId(UUID routeId) {

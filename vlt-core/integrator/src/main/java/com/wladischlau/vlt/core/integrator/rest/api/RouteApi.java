@@ -4,6 +4,7 @@ import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,6 +52,7 @@ public interface RouteApi {
     String DELETE_ROUTE = "deleteRoute";
     String BUILD_ROUTE = "buildRoute";
     String DEPLOY_ROUTE = "deployRoute";
+    String GET_ROUTE_USER_ACTIONS = "getRouteUserActions";
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
@@ -132,6 +134,33 @@ public interface RouteApi {
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = GET_ROUTE_USER_ACTIONS,
+            summary = "Получить действия пользователей над маршрутами",
+            description = "Получить список действий, предпринимаемых текущим или всеми пользователями над маршрутами " +
+                    "в платформе, отсортированный по времени совершения действия от нового к старому",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список действий нам маршрутами",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @GetMapping(value = "/v1/route/actions", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<List<RouteUserActionDto>> getRouteUserActions(
+            @Parameter(required = true, schema = @Schema(description = "Возвращать только действия текущего пользователя", type = "boolean"))
+            @NotNull @RequestParam(name = "personal") boolean displayPersonal,
+            JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
             operationId = GET_ROUTE_DEFINITION,
             summary = "Получить структуру маршрута",
             description = "Отдаёт структуру маршрута в качестве ответа",
@@ -175,7 +204,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @PatchMapping("/v1/route/{id}")
+    @PatchMapping(value = "/v1/route/{id}")
     default ResponseEntity<Void> updateRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
@@ -232,7 +261,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @DeleteMapping("/v1/route/{id}")
+    @DeleteMapping(value = "/v1/route/{id}")
     default ResponseEntity<Void> deleteRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
@@ -257,7 +286,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @PostMapping("/v1/route/{id}/build")
+    @PostMapping(value = "/v1/route/{id}/build")
     default ResponseEntity<Void> buildRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
@@ -282,7 +311,7 @@ public interface RouteApi {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
             }
     )
-    @PostMapping("/v1/route/{id}/deploy")
+    @PostMapping(value = "/v1/route/{id}/deploy")
     default ResponseEntity<Void> deployRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,

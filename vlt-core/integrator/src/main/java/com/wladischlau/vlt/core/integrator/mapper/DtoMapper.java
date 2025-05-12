@@ -15,6 +15,7 @@ import com.wladischlau.vlt.core.integrator.model.PlatformBasicHealth;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteCacheData;
+import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionStyleDto;
@@ -25,6 +26,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.PlatformBasicHealthDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -83,15 +85,24 @@ public interface DtoMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
-    RouteIdDto toDto(RouteId src);
+    RouteId fromDto(RouteIdDto src);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
-    RouteId fromDto(RouteIdDto src);
+    RouteIdDto toDto(RouteId src);
 
     @Mapping(target = "nodes", source = "cache.nodes")
     @Mapping(target = "connections", source = "cache.connections")
     RouteDefinitionDto toDto(RouteCacheData cache);
+
+    @Mapping(target = "routeId", source = "routeId")
+    @Mapping(target = "userName", source = "username")
+    @Mapping(target = "userDisplayName", source = "userDisplayName")
+    @Mapping(target = "action", expression = "java(src.action().getLiteral())")
+    @Mapping(target = "attemptedAt", source = "attemptedAt")
+    RouteUserActionDto toDto(RouteUserAction src);
+
+    List<RouteUserActionDto> toDtoFromRouteUserAction(List<RouteUserAction> src);
 
     @Mapping(target = "node", expression = "java(fromDtoToNode(src, adapter))")
     @Mapping(target = "style", source = "src.style")
