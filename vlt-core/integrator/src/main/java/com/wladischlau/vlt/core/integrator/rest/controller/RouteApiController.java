@@ -2,7 +2,7 @@ package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
 import com.wladischlau.vlt.core.commons.model.RouteId;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
+import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;

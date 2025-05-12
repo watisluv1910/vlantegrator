@@ -2,7 +2,7 @@ package com.wladischlau.vlt.core.integrator.mapper;
 
 import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
+import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
 import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
@@ -11,6 +11,7 @@ import com.wladischlau.vlt.core.integrator.model.Node;
 import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
+import com.wladischlau.vlt.core.integrator.model.PlatformBasicHealth;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteCacheData;
@@ -21,6 +22,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodePositionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.PlatformBasicHealthDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
@@ -165,4 +167,11 @@ public interface DtoMapper {
     @Mapping(target = "ports", source = "route.publishedPorts", qualifiedByName = "toPublishedPortsString")
     @Mapping(target = "networks", source = "route.networks", qualifiedByName = "toNamesFromNetworks")
     DeployRequestDto toDto(Route route, DeployActionType action);
+
+    @Mapping(target = "cpuPercent", source = "cpuPercent")
+    @Mapping(target = "memUsedBytes", source = "memUsed")
+    @Mapping(target = "memTotalBytes", source = "memTotal")
+    @Mapping(target = "dbStatus", source = "dbStatus")
+    @Mapping(target = "kafkaStatus", source = "kafkaStatus")
+    PlatformBasicHealthDto toDto(PlatformBasicHealth src);
 }

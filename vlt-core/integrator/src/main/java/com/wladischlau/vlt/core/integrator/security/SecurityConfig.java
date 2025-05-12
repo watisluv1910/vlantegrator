@@ -25,7 +25,6 @@ public class SecurityConfig {
                                                    JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         http.authorizeHttpRequests(
                         it -> it
-                                .requestMatchers("/api/v1/**").permitAll() // TODO: Remove
                                 .requestMatchers("/public/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()

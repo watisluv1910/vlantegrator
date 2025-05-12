@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
-import com.wladischlau.vlt.core.commons.model.kafka.KafkaStatusCode;
+import com.wladischlau.vlt.core.commons.model.DeployActionType;
+import com.wladischlau.vlt.core.commons.model.KafkaStatusCode;
 import lombok.Builder;
 
 import java.time.ZonedDateTime;

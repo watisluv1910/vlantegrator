@@ -1,7 +1,7 @@
 package com.wladischlau.vlt.core.integrator.service;
 
 import com.wladischlau.vlt.core.commons.dto.DeployRequestDto;
-import com.wladischlau.vlt.core.commons.model.deploy.DeployActionType;
+import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import com.wladischlau.vlt.core.commons.utils.KafkaTopics;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
 import com.wladischlau.vlt.core.integrator.model.Route;

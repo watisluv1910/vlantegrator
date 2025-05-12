@@ -92,6 +92,25 @@ services:
     networks:
       - socat
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    container_name: vlt-cadvisor
+    restart: unless-stopped
+    privileged: true
+    profiles:
+      - donotstart # Temp disable until grafana configured for cadvisor
+    ports:
+      - "${CV_EXTERNAL_PORT}:8080"
+    volumes: # readonly FS access
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - "--docker=${HOST_DOCKER_SOCK}"
+    networks:
+      - monitoring
+
 volumes:
   vlt_prometheus_data:
   vlt_grafana_data:
