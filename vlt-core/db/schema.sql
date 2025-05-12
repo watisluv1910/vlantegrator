@@ -6,6 +6,7 @@ create type channel_kind as enum ('CHANNEL', 'GATEWAY', 'NONE');
 create type edge_type as enum ('default', 'straight', 'step', 'smoothstep', 'simplebezier');
 create type marker_type as enum ('arrow', 'arrowclosed');
 create type node_role as enum ('default', 'input', 'output', 'group');
+create type route_user_action as enum ('create','build','deploy','stop','restart','remove','delete');
 create type network_driver as enum ('bridge', 'host', 'none', 'overlay', 'ipvlan', 'macvlan');
 
 create table if not exists vlt_route
@@ -18,6 +19,18 @@ create table if not exists vlt_route
     published_ports text,
     env             jsonb
 );
+
+create table if not exists vlt_route_user_action
+(
+    id                uuid              not null primary key default pg_catalog.gen_random_uuid(),
+    vlt_route_id      uuid              not null references vlt_route,
+    user_name         text              not null,
+    user_display_name text              not null,
+    action_type       route_user_action not null,
+    attempted_at      timestamptz       not null             default clock_timestamp()
+);
+
+create index if not exists vlt_route_user_action_vlt_route_idx on vlt_route_user_action (vlt_route_id);
 
 create table if not exists vlt_adapter
 (
