@@ -253,15 +253,6 @@ public class VltDataService {
         repository.deleteNodesByRouteId(routeId);
     }
 
-    @Transactional
-    public void deleteNodesAndConnectionsFullDataByRouteIdExcluding(UUID routeId, List<UUID> toExcludeNodesIds) {
-        repository.deleteNodeConnectionStylesFromRouteExcludingNodes(routeId, toExcludeNodesIds);
-        repository.deleteNodeConnectionsFromRouteExcludingNodes(routeId, toExcludeNodesIds);
-        repository.deleteNodePositionsFromRouteExcluding(routeId, toExcludeNodesIds);
-        repository.deleteNodeStylesFromRouteExcluding(routeId, toExcludeNodesIds);
-        repository.deleteNodesFromRouteExcluding(routeId, toExcludeNodesIds);
-    }
-
     public Optional<NodePosition> findNodePositionByNodeId(UUID nodeId) {
         return repository.findNodePositionByNodeId(nodeId).map(modelMapper::toModel);
     }

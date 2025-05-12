@@ -152,7 +152,7 @@ public class RouteWatcher implements Runnable {
     private void registerAllSubdirectories(Path start) throws IOException {
         Files.walkFileTree(start, new SimpleFileVisitor<>() {
             @Override
-            public @Nonnull FileVisitResult preVisitDirectory(Path dir,
+            public @Nonnull FileVisitResult preVisitDirectory(@Nonnull Path dir,
                                                               @Nonnull BasicFileAttributes attrs) throws IOException {
                 String dirName = dir.getFileName().toString();
                 if (WATCHER_IGNORED_DIRS.contains(dirName)) {

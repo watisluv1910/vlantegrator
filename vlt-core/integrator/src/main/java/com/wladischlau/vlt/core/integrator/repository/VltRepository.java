@@ -172,19 +172,6 @@ public class VltRepository {
                 .fetchOne(VLT_NODE.ID);
     }
 
-    public void upsertNodes(List<VltNode> nodes) {
-        var records = nodes.stream().map(n -> ctx.newRecord(VLT_NODE, n)).toList();
-
-        ctx.insertInto(VLT_NODE)
-                .set(records)
-                .onConflictOnConstraint(Keys.VLT_NODE_PKEY)
-                .doUpdate()
-                // ID адаптера и маршрута для узла не могут быть изменены после создания
-                .set(VLT_NODE.NAME, DSL.excluded(VLT_NODE.NAME))
-                .set(VLT_NODE.CONFIG, DSL.excluded(VLT_NODE.CONFIG))
-                .execute();
-    }
-
     public List<VltNode> findNodesByRouteId(UUID routeId) {
         return ctx.selectFrom(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
@@ -210,18 +197,6 @@ public class VltRepository {
                 .onDuplicateKeyUpdate()
                 .set(VLT_NODE_STYLE.TYPE, style.type())
                 .set(VLT_NODE_STYLE.STYLE, style.style())
-                .execute();
-    }
-
-    public void upsertNodeStyles(List<VltNodeStyle> styles) {
-        var records = styles.stream().map(n -> ctx.newRecord(VLT_NODE_STYLE, n)).toList();
-
-        ctx.insertInto(VLT_NODE_STYLE)
-                .set(records)
-                .onConflictOnConstraint(Keys.VLT_NODE_STYLE_PKEY)
-                .doUpdate()
-                .set(VLT_NODE_STYLE.TYPE, DSL.excluded(VLT_NODE_STYLE.TYPE))
-                .set(VLT_NODE_STYLE.STYLE, DSL.excluded(VLT_NODE_STYLE.STYLE))
                 .execute();
     }
 
