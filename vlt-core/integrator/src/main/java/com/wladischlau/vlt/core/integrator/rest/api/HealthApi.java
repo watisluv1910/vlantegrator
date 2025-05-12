@@ -1,7 +1,6 @@
 package com.wladischlau.vlt.core.integrator.rest.api;
 
 import com.wladischlau.vlt.core.integrator.rest.dto.PlatformBasicHealthDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.media.Content;

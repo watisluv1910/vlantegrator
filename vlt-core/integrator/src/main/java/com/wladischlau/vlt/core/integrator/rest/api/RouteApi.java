@@ -99,7 +99,8 @@ public interface RouteApi {
     @GetMapping(value = "/v1/route/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<RouteDto> getRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
-            @NotNull @PathVariable(name = "id") UUID id) {
+            @NotNull @PathVariable(name = "id") UUID id,
+            JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -124,7 +125,8 @@ public interface RouteApi {
     @GetMapping(value = "/v1/route/{id}/versions", produces = {MediaType.APPLICATION_JSON_VALUE})
     default ResponseEntity<List<String>> getRouteCachedVersions(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
-            @NotNull @PathVariable(name = "id") UUID id) {
+            @NotNull @PathVariable(name = "id") UUID id,
+            JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -151,7 +153,8 @@ public interface RouteApi {
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
             @Parameter(required = true, schema = @Schema(description = "Хэш-код версии маршрута", type = "string"))
-            @NotNull @PathVariable(name = "versionHash") String versionHash) {
+            @NotNull @PathVariable(name = "versionHash") String versionHash,
+            JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

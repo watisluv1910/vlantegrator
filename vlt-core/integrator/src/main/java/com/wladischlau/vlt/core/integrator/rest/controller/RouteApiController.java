@@ -59,7 +59,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<RouteDto> getRoute(UUID id) {
+    public ResponseEntity<RouteDto> getRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE, () -> {
             return vltDataService.findRouteById(id)
                     .map(dtoMapper::toDto)
@@ -73,14 +73,15 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<List<String>> getRouteCachedVersions(UUID id) {
+    public ResponseEntity<List<String>> getRouteCachedVersions(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE_VERSIONS, () -> {
             return ResponseEntity.ok(vltDataService.findRouteCachedVersions(id));
         });
     }
 
     @Override
-    public ResponseEntity<RouteDefinitionDto> getRouteDefinition(UUID id, String versionHash) {
+    public ResponseEntity<RouteDefinitionDto> getRouteDefinition(UUID id, String versionHash,
+                                                                 JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE_DEFINITION, () -> {
             var routeId = new RouteId(id, versionHash);
             return vltDataService.findRouteCacheData(routeId)
