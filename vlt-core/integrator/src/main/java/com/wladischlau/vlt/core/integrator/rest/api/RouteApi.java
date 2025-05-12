@@ -265,7 +265,7 @@ public interface RouteApi {
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
             operationId = DEPLOY_ROUTE,
-            summary = "Развернуть маршрута",
+            summary = "Развернуть маршрут",
             description = "Выполнить действие по отношению к развёртыванию маршрута: запустить, остановить, удалить, перезапустить",
             responses = {
                     @ApiResponse(responseCode = "202", description = "Запрос на выполнение действия по отношению к развёртыванию маршрута принят"),
