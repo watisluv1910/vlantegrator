@@ -5,6 +5,8 @@ import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
 import com.wladischlau.vlt.core.integrator.model.Route;
+import com.wladischlau.vlt.core.integrator.model.RouteAction;
+import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.integrator.rest.api.RouteApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
@@ -24,6 +26,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.MessageFormat;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -55,6 +58,7 @@ public class RouteApiController extends ApiController implements RouteApi {
             var owner = Optional.ofNullable(request.ownerName()).orElse(principal.getName());
             var route = dtoMapper.fromDto(request, owner);
             var id = vltDataService.createRoute(route);
+            vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.CREATE));
             return ResponseEntity.status(HttpStatus.CREATED).body(dtoMapper.toDto(id));
         });
     }
@@ -87,7 +91,8 @@ public class RouteApiController extends ApiController implements RouteApi {
             var res = displayPersonal
                     ? vltDataService.findRouteUserActionsByUsername(principal.getName())
                     : vltDataService.findAllRouteUserActions();
-            return ResponseEntity.ok(dtoMapper.toDtoFromRouteUserAction(res));
+            var sorted = res.stream().sorted(Comparator.comparing(RouteUserAction::attemptedAt).reversed()).toList();
+            return ResponseEntity.ok(dtoMapper.toDtoFromRouteUserAction(sorted));
         });
     }
 
@@ -145,13 +150,15 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(DELETE_ROUTE, () -> {
             if (!canModifyRoute(principal, id)) {
-                 throw new AccessDeniedException("Not allowed to modify a desired route");
+                throw new AccessDeniedException("Not allowed to modify a desired route");
             }
 
             vltDataService.findRouteById(id).ifPresent(it -> {
                 deployerDelegate.sendDeployRequest(it, DeployActionType.DELETE);
                 vltDataService.deleteRouteFullData(id);
             });
+
+            vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.DELETE));
 
             return ResponseEntity.noContent().build();
         });
@@ -171,6 +178,8 @@ public class RouteApiController extends ApiController implements RouteApi {
 
             return def.map(it -> {
                 routeBuildService.buildRouteAsync(id, versionHash, it);
+                var action = new RouteUserAction(id, versionHash, principal, RouteAction.BUILD);
+                vltDataService.insertRouteUserAction(action);
                 return ResponseEntity.accepted().<Void>build();
             }).orElse(ResponseEntity.badRequest().build());
         });
@@ -180,8 +189,9 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<Void> deployRoute(UUID id, String action, JwtAuthenticationToken principal) {
         return logRequestProcessing(DEPLOY_ROUTE, () -> {
             var actionType = DeployActionType.valueOf(action.trim().toUpperCase());
-            vltDataService.findRouteById(id)
-                    .ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
+            vltDataService.findRouteById(id).ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
+            var routeUserAction = new RouteUserAction(id, principal, RouteAction.fromDeployRequestType(actionType));
+            vltDataService.insertRouteUserAction(routeUserAction);
             return ResponseEntity.accepted().build();
         });
     }

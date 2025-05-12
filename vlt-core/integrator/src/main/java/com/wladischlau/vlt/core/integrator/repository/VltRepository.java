@@ -117,6 +117,12 @@ public class VltRepository {
                 .fetchInto(VltRouteUserAction.class);
     }
 
+    public void insertRouteUserAction(VltRouteUserAction routeUserAction) {
+        ctx.insertInto(VLT_ROUTE_USER_ACTION)
+                .set(ctx.newRecord(VLT_ROUTE_USER_ACTION, routeUserAction))
+                .execute();
+    }
+
     public List<VltRouteNetwork> findRouteNetworksByRouteId(UUID routeId) {
         var subStep = ctx.select(VLT_ROUTE_NETWORKS.VLT_ROUTE_NETWORK_ID)
                 .from(VLT_ROUTE_NETWORKS)

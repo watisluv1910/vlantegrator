@@ -61,17 +61,14 @@ public class VltDataService {
                 .forEach(this::findAndWriteRouteCacheData);
     }
 
-    @Transactional(readOnly = true)
     public List<Adapter> findAllAdapters() {
         return modelMapper.toAdaptersFromJooq(repository.findAllAdapters());
     }
 
-    @Transactional(readOnly = true)
     public Optional<Adapter> findAdapterById(@NotNull UUID id) {
         return repository.findAdapterById(id).map(modelMapper::toModel);
     }
 
-    @Transactional(readOnly = true)
     public Optional<Adapter> findAdapterByName(@NotEmpty String adapterName) {
         return repository.findAdapterByName(adapterName).map(modelMapper::toModel);
     }
@@ -109,12 +106,10 @@ public class VltDataService {
         return routeCache.get(routeId).sequencedKeySet().stream().toList();
     }
 
-    @Transactional(readOnly = true)
     public List<RouteUserAction> findAllRouteUserActions() {
         return toRouteUserActionsModel(repository.findAllRouteUserActions());
     }
 
-    @Transactional(readOnly = true)
     public List<RouteUserAction> findRouteUserActionsByUsername(@NotEmpty String username) {
         return toRouteUserActionsModel(repository.findRouteUserActionsByUsername(username));
     }
@@ -154,20 +149,22 @@ public class VltDataService {
                                          List<ConnectionFullData> connections) {
         return findRouteCacheData(routeId)
                 .map(cache -> { // Если версия уже есть в кэше - не вычисляем новый хэш
-                    routeCache.get(routeId.id()).dropNewerThan(
-                            routeId.versionHash()); // Удаление кэша более новых версий
-                    updateRouteDefinitionInternal(routeId, cache.nodes(),
-                                                  cache.connections()); // Приведение БД к прошлой версии
+                    // Удаление кэша более новых версий
+                    routeCache.get(routeId.id()).dropNewerThan(routeId.versionHash());
+                    // Приведение БД к прошлой версии
+                    updateRouteDefinitionInternal(routeId, cache.nodes(), cache.connections());
                     return routeId;
                 })
                 .orElseGet(() -> {
-                    updateRouteDefinitionInternal(routeId, nodes, connections); // Приведение БД к новой версии
+                    // Приведение БД к новой версии
+                    updateRouteDefinitionInternal(routeId, nodes, connections);
 
                     var newVersionHash = routeHashGen.generate();
                     var newRouteId = new RouteId(routeId.id(), newVersionHash);
 
                     repository.updateRouteVersion(newRouteId.id(), newRouteId.versionHash());
-                    findAndWriteRouteCacheData(newRouteId); // Добавление новой версии структуры маршрута в кэш
+                    // Добавление новой версии структуры маршрута в кэш
+                    findAndWriteRouteCacheData(newRouteId);
 
                     return newRouteId;
                 });
@@ -187,6 +184,10 @@ public class VltDataService {
             var connectionId = repository.insertNodeConnection(modelMapper.toJooq(connection.connection()));
             repository.upsertNodeConnectionStyle(modelMapper.toJooq(connection.style(), connectionId));
         });
+    }
+
+    public void insertRouteUserAction(@NotNull RouteUserAction routeUserAction) {
+        repository.insertRouteUserAction(modelMapper.toJooq(routeUserAction));
     }
 
     @Transactional(readOnly = true)
@@ -251,12 +252,10 @@ public class VltDataService {
         repository.deleteNodesFromRouteExcluding(routeId, toExcludeNodesIds);
     }
 
-    @Transactional(readOnly = true)
     public Optional<NodePosition> findNodePositionByNodeId(UUID nodeId) {
         return repository.findNodePositionByNodeId(nodeId).map(modelMapper::toModel);
     }
 
-    @Transactional(readOnly = true)
     public Optional<NodeStyle> findNodeStyleByNodeId(UUID nodeId) {
         return repository.findNodeStyleByNodeId(nodeId).map(modelMapper::toModel);
     }
@@ -278,7 +277,6 @@ public class VltDataService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public Optional<ConnectionStyle> findNodeConnectionStyleByConnectionId(UUID connectionId) {
         return repository.findNodeConnectionStyleByConnectionId(connectionId).map(modelMapper::toModel);
     }
@@ -293,11 +291,11 @@ public class VltDataService {
                 .map(RouteNetwork::name)
                 .toList();
 
-        var toAddNames = ListUtils.removeAll(actual, expected);
+        var toAddNames = ListUtils.removeAll(expected, actual);
         var toAddIds = repository.findNetworkIdsByNames(toAddNames);
         repository.addNetworksToRoute(toAddIds, routeId);
 
-        var toRemoveNames = ListUtils.removeAll(expected, actual);
+        var toRemoveNames = ListUtils.removeAll(actual, expected);
         var toRemoveIds = repository.findNetworkIdsByNames(toRemoveNames);
         repository.removeNetworksFromRoute(toRemoveIds, routeId);
     }

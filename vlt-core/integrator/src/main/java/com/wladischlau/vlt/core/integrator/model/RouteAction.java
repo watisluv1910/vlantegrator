@@ -1,5 +1,6 @@
 package com.wladischlau.vlt.core.integrator.model;
 
+import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +13,7 @@ public enum RouteAction {
     CREATE("create"),
     DELETE("delete"),
     BUILD("build"),
-    DEPLOY("deploy"),
+    START("start"),
     STOP("stop"),
     RESTART("restart"),
     REMOVE("remove");
@@ -23,5 +24,14 @@ public enum RouteAction {
         return Arrays.stream(values())
                 .filter(it -> it.literal.equals(literal))
                 .findFirst();
+    }
+
+    public static RouteAction fromDeployRequestType(DeployActionType deployActionType) {
+        return switch (deployActionType) {
+            case DeployActionType.START -> RouteAction.START;
+            case DeployActionType.STOP -> RouteAction.STOP;
+            case DeployActionType.RESTART -> RouteAction.RESTART;
+            case DeployActionType.DELETE -> RouteAction.DELETE;
+        };
     }
 }
