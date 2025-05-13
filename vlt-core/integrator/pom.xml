@@ -198,7 +198,6 @@
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
-
             <resource>
                 <directory>${project.build.directory}/generated-sources/adapters/config/schemas</directory>
                 <targetPath>META-INF/adapter-schemas</targetPath>
@@ -295,6 +294,26 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>openapi</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:8080/v3/api-docs.yaml</apiDocsUrl>
+                    <outputFileName>integrator-api.yaml</outputFileName>
+                    <outputDir>${project.basedir}/../../openapi</outputDir>
+                    <failOnError>true</failOnError>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.github.victools</groupId>
                 <artifactId>jsonschema-maven-plugin</artifactId>
                 <version>${jsonschema-generator.version}</version>
@@ -335,7 +354,9 @@
                             </options>
                         </module>
                         <module>
-                            <className>com.wladischlau.vlt.core.integrator.config.jsonschema.SpringHttpMethodSchemaModule</className>
+                            <className>
+                                com.wladischlau.vlt.core.integrator.config.jsonschema.SpringHttpMethodSchemaModule
+                            </className>
                         </module>
                     </modules>
                 </configuration>
@@ -400,7 +421,8 @@
                                 </forcedType>
                                 <forcedType>
                                     <userType>java.util.Map&lt;String, Object&gt;</userType>
-                                    <converter>com.wladischlau.vlt.core.integrator.config.jooq.JsonbToMapConverter</converter>
+                                    <converter>com.wladischlau.vlt.core.integrator.config.jooq.JsonbToMapConverter
+                                    </converter>
                                     <types>jsonb</types>
                                 </forcedType>
                             </forcedTypes>

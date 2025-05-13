@@ -1,0 +1,1032 @@
+openapi: 3.1.0
+info:
+  title: Vlantegrator API
+  description: API платформы Vlantegrator
+  contact:
+    name: Support
+    email: vlantegrator-support@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Routes API
+  description: Операции для работы с маршрутами
+- name: Actuator
+  description: Monitor and interact
+  externalDocs:
+    description: Spring Boot Actuator Web API Documentation
+    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+- name: Health API
+  description: Информация о состоянии системы
+- name: Adapters API
+  description: Операции для работы с адаптерами маршрутов
+paths:
+  /api/v1/route:
+    get:
+      tags:
+      - Routes API
+      summary: Получить информацию о всех маршрутах
+      description: Отдаёт информацию о всех маршрутах
+      operationId: getAllRoutes
+      responses:
+        "200":
+          description: Информация о всех маршрутах
+          content:
+            application/json: {}
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Routes API
+      summary: Создать маршрут
+      description: Создаёт новый маршрут на основе переданной конфигурации
+      operationId: createRoute
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRouteRequestDto"
+        required: true
+      responses:
+        "201":
+          description: Маршрут создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteIdDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/{id}/{versionHash}/definition:
+    get:
+      tags:
+      - Routes API
+      summary: Получить структуру маршрута
+      description: Отдаёт структуру маршрута в качестве ответа
+      operationId: getRouteDefinition
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      - name: versionHash
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Хэш-код версии маршрута
+      responses:
+        "200":
+          description: Структура маршрута получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteDefinitionDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Routes API
+      summary: Обновить структуру маршрута
+      description: Обновляет структуру имеющегося маршрута на основе переданной конфигурации
+      operationId: updateRouteDefinition
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      - name: versionHash
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Хэш-код версии маршрута
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteDefinitionDto"
+        required: true
+      responses:
+        "200":
+          description: Структура маршрута обновлена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteIdDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/{id}/deploy:
+    post:
+      tags:
+      - Routes API
+      summary: Развернуть маршрут
+      description: "Выполнить действие по отношению к развёртыванию маршрута: запу\
+        стить, остановить, удалить, перезапустить"
+      operationId: deployRoute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      - name: action
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Действие
+      responses:
+        "202":
+          description: Запрос на выполнение действия по отношению к развёртыванию
+            маршрута принят
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/{id}/build:
+    post:
+      tags:
+      - Routes API
+      summary: Асинхронная сборка маршрута
+      description: Запускает процесс сборки маршрута (compile + build image) в фоновом
+        режиме
+      operationId: buildRoute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      responses:
+        "202":
+          description: Запрос на сборку принят
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/{id}:
+    get:
+      tags:
+      - Routes API
+      summary: Получить информацию о маршруте
+      description: Отдаёт информацию о маршруте
+      operationId: getRoute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      responses:
+        "200":
+          description: Информация о маршруте
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Routes API
+      summary: Удалить маршрут
+      description: "Полностью удалить маршрут, в том числе все его контейнер и обр\
+        азы"
+      operationId: deleteRoute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      responses:
+        "204":
+          description: Маршрут удалён
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Routes API
+      summary: Обновить конфиг маршрута
+      description: Обновляет конфиг имеющегося маршрута на основе переданной конфигурации
+      operationId: updateRoute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRouteRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Конфиг маршрута обновлён
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/{id}/versions:
+    get:
+      tags:
+      - Routes API
+      summary: Получить информацию об имеющихся в кэше версиях маршрута
+      description: "Получить версии маршрута, структура которых хранится в кэше"
+      operationId: getRouteVersions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID маршрута
+      responses:
+        "200":
+          description: Список версий
+          content:
+            application/json: {}
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/actions:
+    get:
+      tags:
+      - Routes API
+      summary: Получить действия пользователей над маршрутами
+      description: "Получить список действий, предпринимаемых текущим или всеми по\
+        льзователями над маршрутами в платформе, отсортированный по времени соверш\
+        ения действия от нового к старому"
+      operationId: getRouteUserActions
+      parameters:
+      - name: personal
+        in: query
+        required: true
+        schema:
+          type: boolean
+          description: Возвращать только действия текущего пользователя
+      responses:
+        "200":
+          description: Список действий нам маршрутами
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteIdDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/health/basic:
+    get:
+      tags:
+      - Health API
+      summary: Получить основную информацию о состоянии системы
+      description: "Получить информацию о потребляемых ресурсах процессора и памят\
+        и, а также о здоровье БД ядра и кластеров Kafka"
+      operationId: getBasicHealth
+      responses:
+        "200":
+          description: Основная информация о состоянии системы
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformBasicHealthDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/adapter:
+    get:
+      tags:
+      - Adapters API
+      summary: Получить информацию об адаптерах
+      description: Возвращает краткое описание всех имеющихся адаптеров
+      operationId: getAllAdapters
+      responses:
+        "200":
+          description: Описания получены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdapterDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/adapter/{id}/config:
+    get:
+      tags:
+      - Adapters API
+      summary: Получить описание конфигурации адаптера
+      description: Возвращает описание конфигурации адаптера с переданным ID в формате
+        JSONSchema
+      operationId: getAdapterConfigSchema
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: ID адаптера
+      responses:
+        "200":
+          description: Конфигурация получена
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /actuator:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator root web endpoint
+      operationId: links
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+  /actuator/health:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'health'
+      operationId: health
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    RouteIdDto:
+      type: object
+      description: Полный идентификатор маршрута
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID маршрута
+        versionHash:
+          type: string
+          description: Хэш-код версии маршрута
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        properties:
+          type: object
+          additionalProperties:
+            type: object
+    CreateRouteRequestDto:
+      type: object
+      description: Запрос на создание маршрута
+      properties:
+        name:
+          type: string
+          description: Имя маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        ownerName:
+          type: string
+          description: Username владельца. Если пустой – владельцем маршрута становится
+            инициатор запроса
+        publishedPorts:
+          type: string
+          description: Маппинг портов
+        networks:
+          type: array
+          description: Сети маршрута. Должны быть предварительно созданы
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            type: object
+          description: Конфигурация среды маршрута
+    ConnectionDto:
+      type: object
+      description: Соединение узлов
+      properties:
+        sourceId:
+          type: string
+          format: uuid
+          description: Идентификатор узла-источника
+        targetId:
+          type: string
+          format: uuid
+          description: Идентификатор узла-цели
+        style:
+          $ref: "#/components/schemas/ConnectionStyleDto"
+          description: Стили соединения
+    ConnectionStyleDto:
+      type: object
+      description: Стилизация соединения
+      properties:
+        type:
+          type: string
+          description: Тип соединения
+        startMarkerType:
+          type: string
+          description: Тип начала соединения
+        endMarkerType:
+          type: string
+          description: Тип конца соединения
+        animated:
+          type: boolean
+          description: Соединение анимировано
+        focusable:
+          type: boolean
+          description: Соединение можно взять в фокус
+    NodeDto:
+      type: object
+      description: Узел маршрута
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Идентификатор узла
+        adapterId:
+          type: string
+          format: uuid
+          description: Идентификатор адаптера узла
+        name:
+          type: string
+          description: Кастомное имя узла
+        config:
+          type: object
+          additionalProperties:
+            type: object
+          description: Конфиг узла
+        style:
+          $ref: "#/components/schemas/NodeStyleDto"
+          description: Стилизация узла
+        position:
+          $ref: "#/components/schemas/NodePositionDto"
+          description: Координаты узла на canvas
+    NodePositionDto:
+      type: object
+      description: Координаты узла на canvas
+      properties:
+        x:
+          type: integer
+          format: int32
+          description: Координата X
+        "y":
+          type: integer
+          format: int32
+          description: Координата Y
+        zIndex:
+          type: integer
+          format: int32
+          description: Z-индекс узла
+    NodeStyleDto:
+      type: object
+      description: Стилизация узла
+      properties:
+        type:
+          type: string
+          description: Тип узла
+          examples:
+          - default
+          - input
+          - output
+          - group
+        config:
+          type: object
+          additionalProperties:
+            type: object
+          description: Стили узла
+    RouteDefinitionDto:
+      type: object
+      description: Структура маршрута
+      properties:
+        nodes:
+          type: array
+          description: Узлы маршрута
+          items:
+            $ref: "#/components/schemas/NodeDto"
+        connections:
+          type: array
+          description: Соединения маршрута
+          items:
+            $ref: "#/components/schemas/ConnectionDto"
+    UpdateRouteRequestDto:
+      type: object
+      description: Запрос на изменение конфигурации маршрута
+      properties:
+        name:
+          type: string
+          description: Имя маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        ownerName:
+          type: string
+          description: Username владельца. Если пустой – владельцем маршрута становится
+            инициатор запроса
+        publishedPorts:
+          type: string
+          description: Маппинг портов
+        networks:
+          type: array
+          description: Сети маршрута. Должны быть предварительно созданы
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            type: object
+          description: Конфигурация среды маршрута
+    RouteDto:
+      type: object
+      description: Конфигурация маршрута
+      properties:
+        routeId:
+          $ref: "#/components/schemas/RouteIdDto"
+          description: Идентификатор маршрута (uuid + versionHash)
+        name:
+          type: string
+          description: Имя маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        ownerName:
+          type: string
+          description: Username владельца. Если пустой – владельцем маршрута становится
+            инициатор запроса
+        publishedPorts:
+          type: string
+          description: Маппинг портов
+        networks:
+          type: array
+          description: Сети маршрута. Должны быть предварительно созданы
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            type: object
+          description: Конфигурация среды маршрута
+    PlatformBasicHealthDto:
+      type: object
+      description: Основная информация о состоянии платформы
+      properties:
+        cpuPercent:
+          type: number
+          format: double
+          description: Процент используемых ресурсов CPU
+        memUsedBytes:
+          type: integer
+          format: int64
+          description: Используемая оперативная память в байтах
+        memTotalBytes:
+          type: integer
+          format: int64
+          description: Общий объём выделенной памяти на клиент
+        dbStatus:
+          type: string
+          description: Статус БД ядра
+          enum:
+          - HEALTHY
+          - UNHEALTHY
+          - UNKNOWN
+          - STARTING
+        kafkaStatus:
+          type: string
+          description: Статус Kafka
+          enum:
+          - HEALTHY
+          - UNHEALTHY
+          - UNKNOWN
+          - STARTING
+    AdapterDto:
+      type: object
+      description: Описание адаптера
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Идентификатор адаптера
+        name:
+          type: string
+          description: Название адаптера
+        displayName:
+          type: string
+          description: Отображаемое название адаптера
+        description:
+          type: string
+          description: Описание адаптера
+        className:
+          type: string
+          description: Полное имя класса адаптера
+        type:
+          type: string
+          description: Тип адаптера
+        direction:
+          type: string
+          description: Направление (IN/OUT/COMMON)
+        channelKind:
+          type: string
+          description: Тип канала (CHANNEL/GATEWAY/NONE)
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+        templated:
+          type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
