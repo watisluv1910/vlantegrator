@@ -518,13 +518,21 @@ paths:
         schema:
           type: boolean
           description: Возвращать только действия текущего пользователя
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          description: Ограничить количество возвращаемых записей
       responses:
         "200":
-          description: Список действий нам маршрутами
+          description: Список действий над маршрутами
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RouteIdDto"
+                type: array
+                items:
+                  $ref: "#/components/schemas/RouteUserActionDto"
         "400":
           description: Некорректный запрос
           content:
@@ -1006,6 +1014,32 @@ components:
       - ownerName
       - publishedPorts
       - routeId
+    RouteUserActionDto:
+      type: object
+      description: Описание действия пользователя
+      properties:
+        routeId:
+          $ref: "#/components/schemas/RouteIdDto"
+          description: "Идентификатор маршрута, с которым было совершено действие"
+        userName:
+          type: string
+          description: Имя пользователя
+        userDisplayName:
+          type: string
+          description: Полное имя пользователя
+        action:
+          type: string
+          description: Действие
+        attemptedAt:
+          type: string
+          format: date-time
+          description: "Момент времени, в который было совершено действие"
+      required:
+      - action
+      - attemptedAt
+      - routeId
+      - userDisplayName
+      - userName
     PlatformBasicHealthDto:
       type: object
       description: Основная информация о состоянии платформы
