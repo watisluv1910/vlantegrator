@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {AuthContextProps, hasAuthParams, useAuth} from 'react-oidc-context';
-import {Alert} from './Alert';
+import React, {useEffect, useState} from "react";
+import {AuthContextProps, hasAuthParams, useAuth} from "react-oidc-context";
+import {Alert} from "./Alert";
 
 type ProtectedAppProps = {
     children: React.ReactNode;

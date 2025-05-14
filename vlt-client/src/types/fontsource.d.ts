@@ -1,2 +1,2 @@
-declare module '@fontsource/ubuntu';
-declare module '@fontsource/madimi-one';
+declare module "@fontsource/ubuntu";
+declare module "@fontsource/madimi-one";

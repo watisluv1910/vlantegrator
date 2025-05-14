@@ -39,7 +39,7 @@ import {
     Typography
 } from "@mui/material";
 
-import '@xyflow/react/dist/style.css';
+import "@xyflow/react/dist/style.css";
 import {useColorScheme} from "@mui/material/styles";
 
 const nodeDefaults = {
@@ -49,11 +49,11 @@ const nodeDefaults = {
 
 const initialNodes = [
     {
-        id: 'http-inbound',
-        type: 'default',
+        id: "http-inbound",
+        type: "default",
         data: {
             label: (
-                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1}}>
+                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
                     <HttpAdapterIcon fontSize="large"/>
                     <Typography>HTTP Inbound Gateway</Typography>
                 </Box>
@@ -64,11 +64,11 @@ const initialNodes = [
         targetPosition: Position.Bottom,
     },
     {
-        id: 'transform',
-        type: 'default',
+        id: "transform",
+        type: "default",
         data: {
             label: (
-                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1}}>
+                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
                     <TransformerAdapterIcon fontSize="large"/>
                     <Typography>Transformer</Typography>
                 </Box>
@@ -79,11 +79,11 @@ const initialNodes = [
         ...nodeDefaults,
     },
     {
-        id: 'log-http',
-        type: 'default',
+        id: "log-http",
+        type: "default",
         data: {
             label: (
-                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1}}>
+                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
                     <LoggerAdapterIcon fontSize="large"/>
                     <Typography>Logger</Typography>
                 </Box>
@@ -94,11 +94,11 @@ const initialNodes = [
         ...nodeDefaults,
     },
     {
-        id: 'log-transform',
-        type: 'default',
+        id: "log-transform",
+        type: "default",
         data: {
             label: (
-                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1}}>
+                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
                     <LoggerAdapterIcon fontSize="large"/>
                     <Typography>Logger</Typography>
                 </Box>
@@ -109,11 +109,11 @@ const initialNodes = [
         ...nodeDefaults,
     },
     {
-        id: 'jdbc-outbound',
-        type: 'default',
+        id: "jdbc-outbound",
+        type: "default",
         data: {
             label: (
-                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1}}>
+                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
                     <JdbcAdapterIcon fontSize="large"/>
                     <Typography>JDBC Outbound Gateway</Typography>
                 </Box>
@@ -127,23 +127,23 @@ const initialNodes = [
 
 const initialEdges = [
     {
-        id: 'e1',
-        source: 'http-inbound',
-        target: 'transform',
-        type: 'default',
+        id: "e1",
+        source: "http-inbound",
+        target: "transform",
+        type: "default",
         markerEnd: {type: MarkerType.ArrowClosed},
         animated: true
     },
-    {id: 'e2', source: 'http-inbound', target: 'log-http', type: 'default', markerEnd: {type: MarkerType.ArrowClosed}},
+    {id: "e2", source: "http-inbound", target: "log-http", type: "default", markerEnd: {type: MarkerType.ArrowClosed}},
     {
-        id: 'e3',
-        source: 'transform',
-        target: 'jdbc-outbound',
-        type: 'default',
+        id: "e3",
+        source: "transform",
+        target: "jdbc-outbound",
+        type: "default",
         markerEnd: {type: MarkerType.ArrowClosed},
         animated: true
     },
-    {id: 'e4', source: 'transform', target: 'log-transform', type: 'default', markerEnd: {type: MarkerType.ArrowClosed}}
+    {id: "e4", source: "transform", target: "log-transform", type: "default", markerEnd: {type: MarkerType.ArrowClosed}}
 ];
 
 export const Integrator = () => {
@@ -175,7 +175,7 @@ export const Integrator = () => {
             <Header
                 currPath={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
             <Sidebar/>
-            <Box style={{height: '92vh', width: `calc(100%-${sidebarWidth}px)`}}>
+            <Box style={{height: "92vh", width: `calc(100%-${sidebarWidth}px)`}}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -187,20 +187,20 @@ export const Integrator = () => {
                     nodesConnectable={true}
                     elementsSelectable={true}
                     colorMode={colorMode}
-                    style={{width: '100%', height: '100%'}}
+                    style={{width: "100%", height: "100%"}}
                 >
                     <Controls position={"bottom-right"}/>
                     <Background/>
                 </ReactFlow>
             </Box>
             <Paper elevation={3} sx={{
-                position: 'fixed',
+                position: "fixed",
                 top: 60,
                 right: 0,
                 width: 300,
-                height: '100vh',
+                height: "100vh",
                 p: 2,
-                overflow: 'auto'
+                overflow: "auto"
             }}>
                 <Typography variant="h6" gutterBottom>
                     HTTP Inbound Config
@@ -226,10 +226,10 @@ export const Integrator = () => {
                         value={adapterConfig.supportedMethods}
                         onChange={(e) => setAdapterConfig({...adapterConfig, supportedMethods: [...e.target.value]})}
                         input={<OutlinedInput placeholder="Methods"/>}
-                        renderValue={(selected) => selected.join(', ')}
+                        renderValue={(selected) => selected.join(", ")}
                         variant={"filled"}
                     >
-                        {['GET', 'POST', 'PUT', 'DELETE'].map((method) => (
+                        {["GET", "POST", "PUT", "DELETE"].map((method) => (
                             <MenuItem key={method} value={method}>
                                 <Checkbox checked={adapterConfig.supportedMethods.includes(method)}/>
                                 <ListItemText primary={method}/>
@@ -240,7 +240,7 @@ export const Integrator = () => {
             </Paper>
             <Box
                 sx={{
-                    position: 'fixed',
+                    position: "fixed",
                     bottom: 16,
                     mr: 38,
                     right: 16,
@@ -251,17 +251,17 @@ export const Integrator = () => {
             >
                 <Box
                     sx={{
-                        backgroundColor: 'background.paper',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: '24px',
+                        backgroundColor: "background.paper",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        borderRadius: "24px",
                         width: 48,
-                        height: menuOpen ? 'auto' : 48,
-                        overflow: 'hidden',
-                        transition: 'height 0.3s ease'
+                        height: menuOpen ? "auto" : 48,
+                        overflow: "hidden",
+                        transition: "height 0.3s ease"
                     }}
                 >
-                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', py: 1}}>
+                    <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", py: 1}}>
                         {menuOpen ? (
                             <>
                                 <IconButton size="small" aria-label="Валидировать структуру">
@@ -270,7 +270,7 @@ export const Integrator = () => {
                                 <IconButton size="small" aria-label="Сохранить маршрут">
                                     <SaveIcon/>
                                 </IconButton>
-                                <Divider sx={{width: '80%', my: 1}}/>
+                                <Divider sx={{width: "80%", my: 1}}/>
                                 <IconButton size="small" aria-label="Собрать образ">
                                     <BuildIcon/>
                                 </IconButton>

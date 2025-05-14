@@ -5,7 +5,7 @@ import React, {
     SetStateAction,
     useContext,
     useState
-} from 'react';
+} from "react";
 
 export const SIDEBAR_OPENED_WIDTH: number = 240;
 export const SIDEBAR_COLLAPSED_WIDTH: number = 60;
@@ -50,7 +50,7 @@ export const SidebarProvider = ({children, initialOpen = true}: SidebarProviderP
 export const useSidebarWidth = (): [number, React.Dispatch<React.SetStateAction<number>>] => {
     const context = useContext(SidebarWidthContext);
     if (!context) {
-        throw new Error('useSidebarWidth must be used within SidebarProvider');
+        throw new Error("useSidebarWidth must be used within SidebarProvider");
     }
     return [context.sidebarWidth, context.setSidebarWidth];
 };
@@ -58,7 +58,7 @@ export const useSidebarWidth = (): [number, React.Dispatch<React.SetStateAction<
 export const useSidebarOpen = (): [boolean, Dispatch<SetStateAction<boolean>>] => {
     const context = useContext(SidebarOpenContext);
     if (!context) {
-        throw new Error('useSidebarOpen must be used within SidebarProvider');
+        throw new Error("useSidebarOpen must be used within SidebarProvider");
     }
     return [context.isOpen, context.setIsOpen];
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
     Card, CardContent,
     FormControlLabel, Grid, Stack, SvgIconTypeMap,
@@ -8,7 +8,7 @@ import {
 import {
     StopCircle as StopCircleIcon,
     Send as SendIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import {
     Timeline,
     TimelineConnector,
@@ -18,11 +18,14 @@ import {
     TimelineOppositeContent,
     TimelineSeparator
 } from "@mui/lab";
-
+import {OverridableComponent} from "@mui/material/OverridableComponent";
 import {Header} from "../components/Header.js";
 import {Sidebar} from "../components/Sidebar.js";
 import {useSidebarWidth} from "../hooks/useSidebarState.tsx";
-import {OverridableComponent} from "@mui/material/OverridableComponent";
+import {HealthApiService} from "../api/sdk.gen.ts";
+import {usePolling} from "../hooks/usePolling.ts";
+import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
+import {formatBytes} from "../utils/formatters.ts";
 
 export type HealthMetric = {
     label: string;
@@ -36,24 +39,17 @@ export type ActivityEntry = {
     icon: OverridableComponent<SvgIconTypeMap>;
 };
 
-const healthMetrics: HealthMetric[] = [
-    {label: 'Использование ЦПУ', value: '8%'},
-    {label: 'Память', value: '5.0 GB / 12 GB'},
-    {label: 'Статус БД Платформы', value: 'Healthy'},
-    {label: 'Статус Kafka', value: 'Healthy'},
-];
-
 const recentActivity: ActivityEntry[] = [
     {
-        user: 'Test Admin',
-        time: '21 мин назад',
-        action: 'развернул маршрут "Интеграция с БД теста" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)',
+        user: "Test Admin",
+        time: "21 мин назад",
+        action: "развернул маршрут \"Интеграция с БД теста\" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)",
         icon: SendIcon,
     },
     {
-        user: 'Test Admin',
-        time: '46 мин назад',
-        action: 'остановил маршрут "Интеграция с БД теста" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)',
+        user: "Test Admin",
+        time: "46 мин назад",
+        action: "остановил маршрут \"Интеграция с БД теста\" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)",
         icon: StopCircleIcon,
     }
 ];
@@ -61,6 +57,44 @@ const recentActivity: ActivityEntry[] = [
 export const HomePage = () => {
     const [showCurrUserActivity, setShowCurrUserActivity] = React.useState(false);
     const [sidebarWidth] = useSidebarWidth();
+
+    const { data: health, isLoading, isError } = usePolling(
+        ["basicHealth"],
+        () => HealthApiService.getBasicHealth(),
+        BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS
+    );
+
+    const healthMetrics: HealthMetric[] = [
+        {
+            label: "Использование ЦПУ",
+            value: health
+                ? `${health.data.cpuPercent.toFixed(1)}%`
+                : isLoading
+                    ? "…"
+                    : isError
+                        ? "Error"
+                        : "-",
+        },
+        {
+            label: "Память",
+            value: health
+                ? `${formatBytes(health.data.memUsedBytes)} / ${formatBytes(health.data.memTotalBytes)}`
+                : isLoading
+                    ? "…"
+                    : isError
+                        ? "Error"
+                        : "-",
+        },
+        {
+            label: "Статус БД Платформы",
+            value: health?.data.dbStatus ?? (isLoading ? "…" : isError ? "Error" : "-"),
+        },
+        {
+            label: "Статус Kafka",
+            value: health?.data.kafkaStatus ?? (isLoading ? "…" : isError ? "Error" : "-"),
+        },
+    ];
+
     return (
         <>
             <Header currPath={["Главная"]}/>
@@ -74,7 +108,7 @@ export const HomePage = () => {
                     flexGrow: 1,
                     p: 3,
                     ml: `${sidebarWidth}px`,
-                    transition: 'margin .2s'
+                    transition: "margin .2s"
                 }}
             >
                 <Grid container spacing={2}>
@@ -97,14 +131,14 @@ export const HomePage = () => {
                             <FormControlLabel
                                 control={<Switch checked={showCurrUserActivity}
                                                  onChange={e => setShowCurrUserActivity(e.target.checked)}/>}
-                                label={showCurrUserActivity ? 'Моя активность' : 'Общая активность'}
+                                label={showCurrUserActivity ? "Моя активность" : "Общая активность"}
                             />
                         </Stack>
                         <Timeline position="alternate">
                             {recentActivity.map((activity, idx) => {
                                 const DotIcon = activity.icon;
                                 return <TimelineItem key={idx}>
-                                    <TimelineOppositeContent color="primary.main" sx={{mt: 1.35, width: '100%'}}>
+                                    <TimelineOppositeContent color="primary.main" sx={{mt: 1.35, width: "100%"}}>
                                         {activity.time}
                                     </TimelineOppositeContent>
                                     <TimelineSeparator>

@@ -7,7 +7,7 @@ export const userManager = new UserManager({
     post_logout_redirect_uri: window.location.origin,
     userStore: new WebStorageStateStore({
         store: window.sessionStorage,
-        prefix: 'authorization',
+        prefix: "authorization",
     }),
     monitorSession: true, // cross-tab login/logout
 });

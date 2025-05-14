@@ -1,16 +1,15 @@
-import {defineConfig, loadEnv} from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import svgr from 'vite-plugin-svgr';
+import {ConfigEnv, defineConfig, loadEnv} from "vite";
+import react from "@vitejs/plugin-react-swc";
+import svgr from "vite-plugin-svgr";
 
-// https://vitejs.dev/config/
-export default defineConfig(({command, mode}) => {
-    const env = loadEnv(mode, process.cwd());
+export default ({mode}: ConfigEnv) => {
+    process.env = {...process.env, ...loadEnv(mode, process.cwd())};
 
-    const commonConfig = {
+    return defineConfig({
         plugins: [
             react({
                 tsDecorators: true,
-                plugins: [['@swc/plugin-styled-components', {}]]
+                plugins: [["@swc/plugin-styled-components", {}]]
             }),
             svgr({
                 svgrOptions: {
@@ -18,27 +17,17 @@ export default defineConfig(({command, mode}) => {
                 },
             }),
         ],
-        base: '/',
-    };
-
-    if (command === 'serve') {
-        return {
-            ...commonConfig,
-            server: {
-                open: false,
-                port: Number(env.VITE_PORT),
-                strictPort: true,
-                proxy: {
-                    '/api': {
-                        target: `http://${env.BACKEND_HOST}:${env.BACKEND_PORT}`,
-                        changeOrigin: true,
-                    },
+        base: "/",
+        server: {
+            open: false,
+            port: Number(process.env.VITE_PORT),
+            strictPort: true,
+            proxy: {
+                "/api": {
+                    target: `http://${process.env.VITE_BACKEND_HOST}:${process.env.VITE_BACKEND_PORT}`,
+                    changeOrigin: true,
                 },
             },
-        };
-    }
-
-    return {
-        ...commonConfig,
-    };
-});
+        },
+    });
+}

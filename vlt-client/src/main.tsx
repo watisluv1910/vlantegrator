@@ -1,5 +1,5 @@
-import {App} from './App.tsx'
-import {createRoot} from 'react-dom/client'
+import {App} from "./App.tsx"
+import {createRoot} from "react-dom/client"
 import {BrowserRouter} from "react-router-dom";
 import {AuthProvider} from "react-oidc-context";
 import {ProtectedApp} from "./components/ProtectedApp.js";
@@ -10,10 +10,10 @@ import {CssBaseline, ThemeProvider} from "@mui/material";
 import {THEME} from "./styles/muiConfig.js";
 import {SidebarProvider} from "./hooks/useSidebarState.tsx";
 
-const container = document.getElementById('root');
+const container = document.getElementById("root");
 
 if (!container) {
-    throw new Error('#root element not found');
+    throw new Error("#root element not found");
 }
 
 const root = createRoot(container);

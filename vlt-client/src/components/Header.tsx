@@ -15,7 +15,7 @@ export const Header = (props: HeaderProps) => {
 
     if (!userProfileName) {
         return (
-            <Alert variant={'error'}>
+            <Alert variant={"error"}>
                 <h1>Error, try reloading page and login again...</h1>
             </Alert>
         );
@@ -44,16 +44,16 @@ export const Header = (props: HeaderProps) => {
                         <Typography fontFamily="Madimi One, sans-serif" variant="h3" noWrap component="div">
                             lantegrator
                         </Typography>}
-                    <Box sx={{flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Breadcrumbs separator="›" color='white' aria-label="breadcrumb">
+                    <Box sx={{flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
+                        <Breadcrumbs separator="›" color="white" aria-label="breadcrumb">
                             {path.map((crumb, idx) => (
                                 <Link
                                     key={idx}
                                     underline="hover"
-                                    color={idx === path.length - 1 ? 'accent' : 'white'}
+                                    color={idx === path.length - 1 ? "accent" : "white"}
                                     href="#" // TODO:
                                     onClick={() => setPath(path.slice(0, idx + 1))}
-                                    sx={{cursor: 'pointer'}}
+                                    sx={{cursor: "pointer"}}
                                 >
                                     {crumb}
                                 </Link>
@@ -62,15 +62,15 @@ export const Header = (props: HeaderProps) => {
                     </Box>
                     <Box
                         sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
                             gap: 1,
                         }}
                     >
                         <Typography sx={{cursor: "pointer"}}>{userProfileName}</Typography>
-                        <IconButton sx={{ml: 'auto', width: 40, height: 40}}>
+                        <IconButton sx={{ml: "auto", width: 40, height: 40}}>
                             <Avatar/>
                         </IconButton>
                     </Box>

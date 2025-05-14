@@ -53,7 +53,7 @@ export const Sidebar = () => {
     });
 
     const {mode, setMode} = useColorScheme();
-    const toggleTheme = () => setMode(mode === 'dark' ? 'light' : 'dark'); // TODO: Rework
+    const toggleTheme = () => setMode(mode === "dark" ? "light" : "dark"); // TODO: Rework
 
     return (
         <>
@@ -63,15 +63,15 @@ export const Sidebar = () => {
                 sx={{
                     width: sidebarWidth,
                     flexShrink: 0,
-                    '& .MuiDrawer-paper': {
+                    "& .MuiDrawer-paper": {
                         width: sidebarWidth,
-                        boxSizing: 'border-box',
-                        overflowX: 'hidden',
-                        transition: 'width .2s'
+                        boxSizing: "border-box",
+                        overflowX: "hidden",
+                        transition: "width .2s"
                     }
                 }}
             >
-                <Toolbar sx={{justifyContent: sidebarOpen ? 'space-between' : 'center'}}>
+                <Toolbar sx={{justifyContent: sidebarOpen ? "space-between" : "center"}}>
                     {sidebarOpen && (
                         <Typography fontFamily="Madimi One, sans-serif" variant="h3" noWrap>Vlantegrator</Typography>)}
                     <IconButton color="inherit" onClick={toggleDrawer}>
@@ -84,17 +84,17 @@ export const Sidebar = () => {
                         <ListItemButton
                             key={route.text}
                             sx={{
-                                justifyContent: sidebarOpen ? 'initial' : 'center',
+                                justifyContent: sidebarOpen ? "initial" : "center",
                                 px: 2.5,
-                                height: '50px',
+                                height: "50px",
                             }}
                             onClick={action}
                         >
                             <ListItemIcon
                                 sx={{
                                     minWidth: 0,
-                                    mr: sidebarOpen ? 3 : 'auto',
-                                    justifyContent: 'center'
+                                    mr: sidebarOpen ? 3 : "auto",
+                                    justifyContent: "center"
                                 }}
                             >
                                 {route.icon}
@@ -104,16 +104,16 @@ export const Sidebar = () => {
                     ))}
                 </List>
                 <Divider/>
-                <Box sx={{position: 'absolute', bottom: 0, width: '100%', textAlign: 'center', py: 1}}>
+                <Box sx={{position: "absolute", bottom: 0, width: "100%", textAlign: "center", py: 1}}>
                     <Button onClick={toggleTheme}
                             color="inherit"
                             sx={{gap: 1, borderRadius: 2}}
                     >
-                        {mode === 'dark' ? <LightModeIcon/> : <DarkModeIcon/>}
+                        {mode === "dark" ? <LightModeIcon/> : <DarkModeIcon/>}
                         {sidebarOpen && (
                             <>
-                                <Divider orientation="vertical" flexItem sx={{mx: 1, borderColor: 'inherit'}}/>
-                                <Typography>{mode === 'dark' ? "Светлый режим" : "Тёмный режим"}</Typography>
+                                <Divider orientation="vertical" flexItem sx={{mx: 1, borderColor: "inherit"}}/>
+                                <Typography>{mode === "dark" ? "Светлый режим" : "Тёмный режим"}</Typography>
                             </>
                         )}
                     </Button>
