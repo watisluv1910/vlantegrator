@@ -18,7 +18,6 @@ import {
     Transform as TransformerAdapterIcon,
     HistoryEdu as LoggerAdapterIcon,
     Save as SaveIcon,
-    Verified as ValidateIcon,
     Handyman as BuildIcon,
     Start as StartIcon,
     StopCircle as StopIcon,
@@ -264,9 +263,6 @@ export const Integrator = () => {
                     <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", py: 1}}>
                         {menuOpen ? (
                             <>
-                                <IconButton size="small" aria-label="Валидировать структуру">
-                                    <ValidateIcon/>
-                                </IconButton>
                                 <IconButton size="small" aria-label="Сохранить маршрут">
                                     <SaveIcon/>
                                 </IconButton>

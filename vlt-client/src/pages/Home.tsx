@@ -1,14 +1,14 @@
 import React from "react";
 import {
-    Card, CardContent,
-    FormControlLabel, Grid, Stack, SvgIconTypeMap,
+    Card,
+    CardContent,
+    FormControlLabel,
+    Grid,
+    Stack,
+    SvgIconTypeMap,
     Switch,
     Typography
 } from "@mui/material";
-import {
-    StopCircle as StopCircleIcon,
-    Send as SendIcon,
-} from "@mui/icons-material";
 import {
     Timeline,
     TimelineConnector,
@@ -22,10 +22,10 @@ import {OverridableComponent} from "@mui/material/OverridableComponent";
 import {Header} from "../components/Header.js";
 import {Sidebar} from "../components/Sidebar.js";
 import {useSidebarWidth} from "../hooks/useSidebarState.tsx";
-import {HealthApiService} from "../api/sdk.gen.ts";
+import {HealthApiService, RoutesApiService} from "../api/sdk.gen.ts";
 import {usePolling} from "../hooks/usePolling.ts";
-import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
-import {formatBytes} from "../utils/formatters.ts";
+import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS, RECENT_ACTIVITY_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
+import {formatBytes, iconForAction, relativeTimeFromDates} from "../utils/transformers.ts";
 
 export type HealthMetric = {
     label: string;
@@ -33,32 +33,37 @@ export type HealthMetric = {
 };
 
 export type ActivityEntry = {
+    routeId: string;
     user: string;
     time: string;
     action: string;
     icon: OverridableComponent<SvgIconTypeMap>;
 };
 
-const recentActivity: ActivityEntry[] = [
-    {
-        user: "Test Admin",
-        time: "21 мин назад",
-        action: "развернул маршрут \"Интеграция с БД теста\" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)",
-        icon: SendIcon,
-    },
-    {
-        user: "Test Admin",
-        time: "46 мин назад",
-        action: "остановил маршрут \"Интеграция с БД теста\" (ID: 3fa85f64-5717-4562-b3fc-2c963f66afa6.59df977)",
-        icon: StopCircleIcon,
-    }
-];
-
 export const HomePage = () => {
     const [showCurrUserActivity, setShowCurrUserActivity] = React.useState(false);
     const [sidebarWidth] = useSidebarWidth();
 
-    const { data: health, isLoading, isError } = usePolling(
+    const {data: activities} = usePolling(
+        ["recentActivity", showCurrUserActivity],
+        () => RoutesApiService.getRouteUserActions({
+            query: {
+                personal: showCurrUserActivity,
+                limit: 50,
+            }
+        }),
+        RECENT_ACTIVITY_POLLING_INTERVAL_MS,
+    );
+
+    const recentActivities: ActivityEntry[] | undefined = activities?.data?.map(action => ({
+        routeId: `${action.routeId.id}.${action.routeId.versionHash}`,
+        user: action.userDisplayName,
+        time: relativeTimeFromDates(new Date(parseInt(action.attemptedAt) * 1000), new Date()),
+        action: action.action,
+        icon: iconForAction(action.action),
+    }));
+
+    const {data: health, isLoading: isHealthLoading, isError: isHealthError} = usePolling(
         ["basicHealth"],
         () => HealthApiService.getBasicHealth(),
         BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS,
@@ -69,21 +74,21 @@ export const HomePage = () => {
             label: "Использование ЦПУ",
             value: health
                 ? `${health.data.cpuPercent.toFixed(1)}%`
-                : isLoading ? "…" : isError ? "Error" : "-",
+                : isHealthLoading ? "…" : isHealthError ? "Error" : "-",
         },
         {
             label: "Память",
             value: health
                 ? `${formatBytes(health.data.memUsedBytes)} / ${formatBytes(health.data.memTotalBytes)}`
-                : isLoading ? "…" : isError ? "Error" : "-",
+                : isHealthLoading ? "…" : isHealthError ? "Error" : "-",
         },
         {
             label: "Статус БД Платформы",
-            value: health?.data.dbStatus ?? (isLoading ? "…" : isError ? "Error" : "-"),
+            value: health?.data.dbStatus ?? (isHealthLoading ? "…" : isHealthError ? "Error" : "-"),
         },
         {
             label: "Статус Kafka",
-            value: health?.data.kafkaStatus ?? (isLoading ? "…" : isError ? "Error" : "-"),
+            value: health?.data.kafkaStatus ?? (isHealthLoading ? "…" : isHealthError ? "Error" : "-"),
         },
     ];
 
@@ -91,7 +96,6 @@ export const HomePage = () => {
         <>
             <Header currPath={["Главная"]}/>
             <Sidebar/>
-
             <Stack
                 component="main"
                 direction="column"
@@ -118,7 +122,8 @@ export const HomePage = () => {
 
                 <Card>
                     <CardContent>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} paddingInline={2}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}
+                               paddingInline={2}>
                             <Typography variant="h4" color="accent">Активности</Typography>
                             <FormControlLabel
                                 control={<Switch checked={showCurrUserActivity}
@@ -127,7 +132,7 @@ export const HomePage = () => {
                             />
                         </Stack>
                         <Timeline position="alternate">
-                            {recentActivity.map((activity, idx) => {
+                            {recentActivities?.map((activity, idx) => {
                                 const DotIcon = activity.icon;
                                 return <TimelineItem key={idx}>
                                     <TimelineOppositeContent color="primary.main" sx={{mt: 1.35, width: "100%"}}>
@@ -137,10 +142,14 @@ export const HomePage = () => {
                                         <TimelineDot color="success">
                                             <DotIcon fontSize="medium"/>
                                         </TimelineDot>
-                                        {idx < recentActivity.length - 1 && <TimelineConnector/>}
+                                        {idx < recentActivities.length - 1 && <TimelineConnector/>}
                                     </TimelineSeparator>
                                     <TimelineContent>
-                                        <Typography>{`${activity.user} ${activity.action}`}</Typography>
+                                        <Typography>
+                                            {`Пользователь ${activity.user} совершил 
+                                            действие ${activity.action.toUpperCase()} 
+                                            над маршрутом с ID: ${activity.routeId}`}
+                                        </Typography>
                                     </TimelineContent>
                                 </TimelineItem>
                             })}
