@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "api:generate": "openapi --input ../openapi/integrator-api.yaml --output src/api --client axios",
+    "prepare": "npm run api:generate",
+    "predev": "npm run api:generate",
     "dev": "vite",
+    "prebuild": "npm run api:generate",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -40,6 +44,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.1.0",
+    "openapi-typescript-codegen": "^0.29.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.6",
     "typescript": "^5.8.3",
