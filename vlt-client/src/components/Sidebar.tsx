@@ -1,8 +1,6 @@
-import React from "react";
-
 import {useAuth} from "react-oidc-context";
 import {useNavigate} from "react-router-dom";
-import {MAIN_ROUTES} from "../utils/constants.jsx";
+import {MAIN_ROUTES} from "../utils/constants.js";
 import {useColorScheme} from "@mui/material/styles";
 import {
     Box,
@@ -28,7 +26,7 @@ import {
     useSidebarOpen,
     SIDEBAR_OPENED_WIDTH,
     SIDEBAR_COLLAPSED_WIDTH
-} from "../hooks/useSidebarWidth.jsx";
+} from "../hooks/useSidebarState.tsx";
 
 export const Sidebar = () => {
     const auth = useAuth();

@@ -1,14 +1,29 @@
-import React, {useState} from "react";
-import {useAuth} from "react-oidc-context";
+import {useState} from "react";
+import {AuthContextProps, useAuth} from "react-oidc-context";
 import VLogo from "../../icons/svgs/vlt_logo_min.svg";
 import {AppBar, Avatar, Box, Breadcrumbs, IconButton, Link, Toolbar, Typography} from "@mui/material";
-import {useSidebarWidth, useSidebarOpen} from "../hooks/useSidebarWidth.jsx";
+import {useSidebarWidth, useSidebarOpen} from "../hooks/useSidebarState.tsx";
+import {Alert} from "./Alert.tsx";
 
-export const Header = ({path: currPath}) => {
-    const auth = useAuth();
-    const [sidebarWidth, _setSidebarWidth] = useSidebarWidth();
-    const [sidebarOpen, _setSidebarOpen] = useSidebarOpen();
-    const [path, setPath] = useState(currPath);
+export type HeaderProps = {
+    currPath: string[];
+};
+
+export const Header = (props: HeaderProps) => {
+    const auth: AuthContextProps = useAuth();
+    const userProfileName = auth.user?.profile?.name;
+
+    if (!userProfileName) {
+        return (
+            <Alert variant={'error'}>
+                <h1>Error, try reloading page and login again...</h1>
+            </Alert>
+        );
+    }
+
+    const [sidebarWidth] = useSidebarWidth();
+    const [sidebarOpen] = useSidebarOpen();
+    const [path, setPath] = useState(props.currPath);
 
     return (
         <>
@@ -54,7 +69,7 @@ export const Header = ({path: currPath}) => {
                             gap: 1,
                         }}
                     >
-                        <Typography sx={{cursor: "pointer"}}>{auth.user.profile.name}</Typography>
+                        <Typography sx={{cursor: "pointer"}}>{userProfileName}</Typography>
                         <IconButton sx={{ml: 'auto', width: 40, height: 40}}>
                             <Avatar/>
                         </IconButton>

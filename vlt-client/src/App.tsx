@@ -1,16 +1,16 @@
 import React from "react";
 import {Route, Routes} from "react-router-dom";
-import {MAIN_ROUTES} from "./utils/constants.jsx";
-import {HomePage} from "./pages/Home";
-import {Integrator} from "./pages/Integrator.jsx";
+import {MAIN_ROUTES} from "./utils/constants.js";
+import {HomePage} from "./pages/Home.tsx";
+import {Integrator} from "./pages/Integrator.js";
 
-import {Info} from "./pages/Info";
+import {Info} from "./pages/Info.tsx";
 import '@fontsource/ubuntu';
 import '@fontsource/madimi-one';
 import '@fontsource/ubuntu/500.css';
 import '@fontsource/ubuntu/700.css';
 
-function App() {
+export const App: React.FC = () => {
     return (
         <>
             <Routes>
@@ -23,5 +23,3 @@ function App() {
         </>
     );
 }
-
-export default App;

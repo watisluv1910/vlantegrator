@@ -1,6 +1,5 @@
-import React from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {api} from "../config/api.js";
+import {api} from "../config/api.ts";
 import {useAuth} from "react-oidc-context";
 
 export const Info = () => {

@@ -1,13 +1,13 @@
-import {Header} from "../components/Header.jsx";
-import {Sidebar} from "../components/Sidebar.jsx";
-import React, {useCallback, useState} from "react";
-import {useSidebarWidth} from "../hooks/useSidebarWidth.jsx";
+import {Header} from "../components/Header.tsx";
+import {Sidebar} from "../components/Sidebar.tsx";
+import {useCallback, useState} from "react";
+import {useSidebarWidth} from "../hooks/useSidebarState.tsx";
 import {
     addEdge,
     Background,
     Controls,
     MarkerType,
-    MiniMap, Position,
+    Position,
     ReactFlow,
     useEdgesState,
     useNodesState
@@ -155,14 +155,14 @@ export const Integrator = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const onConnect = useCallback(
-        (params) => {
+        (params: any) => { // TODO
             onEdgesChange(addEdge(params, edges));
         },
         [edges, onEdgesChange]
     );
 
-    const {mode, _setMode} = useColorScheme();
-    const [colorMode, setColorMode] = useState(mode);
+    const {mode} = useColorScheme();
+    const [colorMode] = useState(mode);
 
     const [adapterConfig, setAdapterConfig] = useState({
         path: "/data",
@@ -173,7 +173,7 @@ export const Integrator = () => {
     return (
         <Box>
             <Header
-                path={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
+                currPath={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
             <Sidebar/>
             <Box style={{height: '92vh', width: `calc(100%-${sidebarWidth}px)`}}>
                 <ReactFlow
@@ -224,7 +224,7 @@ export const Integrator = () => {
                     <Select
                         multiple
                         value={adapterConfig.supportedMethods}
-                        onChange={(e) => setAdapterConfig({...adapterConfig, supportedMethods: e.target.value})}
+                        onChange={(e) => setAdapterConfig({...adapterConfig, supportedMethods: [...e.target.value]})}
                         input={<OutlinedInput placeholder="Methods"/>}
                         renderValue={(selected) => selected.join(', ')}
                         variant={"filled"}
@@ -290,7 +290,7 @@ export const Integrator = () => {
                         ) : (
                             <IconButton size="small" aria-label="Центр управления"
                                         sx={{flex: "auto", justifyContent: "center", alignItems: "center"}}>
-                                <BoltIcon color="accent"/>
+                                <BoltIcon name="controlCenterClosedIcon" sx={{ color: "accent.main" }}/>
                             </IconButton>
                         )}
                     </Box>

@@ -1,4 +1,11 @@
-export const Alert = (props) => {
+import {ReactNode} from "react";
+
+export type AlertProps = {
+    variant: 'success' | 'error';
+    children: ReactNode;
+}
+
+export const Alert = (props: AlertProps) => {
     const { variant, children } = props;
 
     let backgroundColor;

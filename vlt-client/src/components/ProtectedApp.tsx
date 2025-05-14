@@ -1,11 +1,15 @@
-import {useEffect, useState} from 'react';
-import {hasAuthParams, useAuth} from 'react-oidc-context';
+import React, {useEffect, useState} from 'react';
+import {AuthContextProps, hasAuthParams, useAuth} from 'react-oidc-context';
 import {Alert} from './Alert';
 
-export const ProtectedApp = (props) => {
+type ProtectedAppProps = {
+    children: React.ReactNode;
+};
+
+export const ProtectedApp : React.FC<ProtectedAppProps> = (props) => {
     const {children} = props;
 
-    const auth = useAuth();
+    const auth: AuthContextProps = useAuth();
     const [hasTriedSignIn, setHasTriedSignIn] = useState(false);
 
     /**

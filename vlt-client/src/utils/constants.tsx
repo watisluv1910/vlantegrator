@@ -1,4 +1,4 @@
-import React from "react";
+import {ReactElement} from "react";
 import {
     Assessment as HealthIcon,
     Description as DocIcon,
@@ -9,7 +9,14 @@ import {
     Visibility as ObservIcon
 } from "@mui/icons-material";
 
-export const MAIN_ROUTES = {
+export type Route = {
+    icon: ReactElement;
+    text: string;
+    protected: boolean;
+    path: string;
+};
+
+export const MAIN_ROUTES: Record<string, Route> = {
     home: {
         icon: <HomeIcon/>,
         text: "Главная",
