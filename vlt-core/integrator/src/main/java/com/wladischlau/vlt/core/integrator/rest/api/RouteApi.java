@@ -9,6 +9,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -164,7 +166,7 @@ public interface RouteApi {
                     "в платформе, отсортированный по времени совершения действия от нового к старому",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Список действий над маршрутами",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RouteUserActionDto.class)))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
@@ -179,6 +181,8 @@ public interface RouteApi {
     default ResponseEntity<List<RouteUserActionDto>> getRouteUserActions(
             @Parameter(required = true, schema = @Schema(description = "Возвращать только действия текущего пользователя", type = "boolean"))
             @NotNull @RequestParam(name = "personal") boolean displayPersonal,
+            @Parameter(required = true, schema = @Schema(description = "Ограничить количество возвращаемых записей", type = "integer"))
+            @Positive @RequestParam(name = "limit") int limit,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }

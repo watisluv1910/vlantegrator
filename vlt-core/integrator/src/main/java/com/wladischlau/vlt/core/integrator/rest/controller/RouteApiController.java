@@ -92,13 +92,17 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<List<RouteUserActionDto>> getRouteUserActions(boolean displayPersonal,
+    public ResponseEntity<List<RouteUserActionDto>> getRouteUserActions(boolean displayPersonal, int limit,
                                                                         JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ROUTE_USER_ACTIONS, () -> {
             var res = displayPersonal
                     ? vltDataService.findRouteUserActionsByUsername(principal.getName())
                     : vltDataService.findAllRouteUserActions();
-            var sorted = res.stream().sorted(Comparator.comparing(RouteUserAction::attemptedAt).reversed()).toList();
+
+            var sorted = res.stream()
+                    .sorted(Comparator.comparing(RouteUserAction::attemptedAt).reversed())
+                    .limit(limit)
+                    .toList();
             return ResponseEntity.ok(dtoMapper.toDtoFromRouteUserAction(sorted));
         });
     }
