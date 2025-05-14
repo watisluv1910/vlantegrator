@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +26,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         http.authorizeHttpRequests(
-                        it -> it
+                        manager -> manager
+                                .requestMatchers("/api/v1/health/basic").permitAll()
                                 .requestMatchers("/public/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.yaml").permitAll()
                                 .anyRequest().authenticated()
@@ -33,6 +36,18 @@ public class SecurityConfig {
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
                 )
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> {
+                    var config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:3000")); // TODO: Move to env
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+
+                    var source = new UrlBasedCorsConfigurationSource();
+                    source.registerCorsConfiguration("/api/**", config);
+
+                    cors.configurationSource(source);
+                })
                 .httpBasic(withDefaults());
 
         return http.build();

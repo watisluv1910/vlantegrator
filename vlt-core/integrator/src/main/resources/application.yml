@@ -49,3 +49,15 @@ docker:
   username: ${DOCKER_USERNAME}
   password: ${DOCKER_PASSWORD}
   image-registry: ${DOCKER_IMAGE_REGISTRY}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    root: INFO
+    com.wladischlau: DEBUG
