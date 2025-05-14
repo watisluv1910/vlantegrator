@@ -6,7 +6,7 @@ create type channel_kind as enum ('CHANNEL', 'GATEWAY', 'NONE');
 create type edge_type as enum ('default', 'straight', 'step', 'smoothstep', 'simplebezier');
 create type marker_type as enum ('arrow', 'arrowclosed');
 create type node_role as enum ('default', 'input', 'output', 'group');
-create type route_user_action as enum ('create','build','deploy','stop','restart','remove','delete');
+create type route_user_action as enum ('create','build','start','stop','restart','remove','delete');
 create type network_driver as enum ('bridge', 'host', 'none', 'overlay', 'ipvlan', 'macvlan');
 
 create table if not exists vlt_route
