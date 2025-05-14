@@ -61,7 +61,7 @@ export const HomePage = () => {
     const { data: health, isLoading, isError } = usePolling(
         ["basicHealth"],
         () => HealthApiService.getBasicHealth(),
-        BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS
+        BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS,
     );
 
     const healthMetrics: HealthMetric[] = [
@@ -69,21 +69,13 @@ export const HomePage = () => {
             label: "Использование ЦПУ",
             value: health
                 ? `${health.data.cpuPercent.toFixed(1)}%`
-                : isLoading
-                    ? "…"
-                    : isError
-                        ? "Error"
-                        : "-",
+                : isLoading ? "…" : isError ? "Error" : "-",
         },
         {
             label: "Память",
             value: health
                 ? `${formatBytes(health.data.memUsedBytes)} / ${formatBytes(health.data.memTotalBytes)}`
-                : isLoading
-                    ? "…"
-                    : isError
-                        ? "Error"
-                        : "-",
+                : isLoading ? "…" : isError ? "Error" : "-",
         },
         {
             label: "Статус БД Платформы",
