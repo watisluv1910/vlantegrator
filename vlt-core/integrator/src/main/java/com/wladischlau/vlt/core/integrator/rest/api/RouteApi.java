@@ -163,7 +163,7 @@ public interface RouteApi {
             description = "Получить список действий, предпринимаемых текущим или всеми пользователями над маршрутами " +
                     "в платформе, отсортированный по времени совершения действия от нового к старому",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Список действий нам маршрутами",
+                    @ApiResponse(responseCode = "200", description = "Список действий над маршрутами",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RouteIdDto.class))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
