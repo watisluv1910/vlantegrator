@@ -139,13 +139,13 @@ export const Header = (props: HeaderProps) => {
                             <ListItemIcon>
                                 <SettingsIcon fontSize="small"/>
                             </ListItemIcon>
-                            <Typography variant="subtitle2">Settings</Typography>
+                            <Typography variant="subtitle2">Настройки</Typography>
                         </MenuItem>
                         <MenuItem onClick={() => handleLogout(auth)}>
                             <ListItemIcon>
                                 <LogoutIcon fontSize="small"/>
                             </ListItemIcon>
-                            <Typography variant="subtitle2">Log Out</Typography>
+                            <Typography variant="subtitle2">Выход</Typography>
                         </MenuItem>
                     </Menu>
                 </Box>
