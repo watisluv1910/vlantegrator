@@ -123,11 +123,15 @@ export const Header = (props: HeaderProps) => {
                         slotProps={{
                             paper: {
                                 elevation: 2,
-                                sx: {mt: 1.5, minWidth: 200},
+                                sx: {mt: 2},
+                            },
+                            list: {
+                                sx: {py: 0}
                             }
                         }}
                     >
                         <MenuItem
+                            divider
                             onClick={(e) => handleCopyEvent(e, email)}
                             sx={{cursor: "copy", "&:hover": {backgroundColor: "transparent"}}}
                         >
@@ -135,7 +139,7 @@ export const Header = (props: HeaderProps) => {
                                 {email}
                             </Typography>
                         </MenuItem>
-                        <MenuItem onClick={handleSettings}>
+                        <MenuItem divider onClick={handleSettings}>
                             <ListItemIcon>
                                 <SettingsIcon fontSize="small"/>
                             </ListItemIcon>
