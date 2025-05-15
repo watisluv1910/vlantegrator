@@ -73,7 +73,10 @@ export const Sidebar = () => {
             >
                 <Toolbar sx={{justifyContent: sidebarOpen ? "space-between" : "center"}}>
                     {sidebarOpen && (
-                        <Typography fontFamily="Madimi One, sans-serif" variant="h3" noWrap>Vlantegrator</Typography>)}
+                        <Typography fontFamily="Madimi One, sans-serif" variant="h3" noWrap sx={{cursor: "default"}}>
+                            Vlantegrator
+                        </Typography>
+                    )}
                     <IconButton color="inherit" onClick={toggleDrawer}>
                         {sidebarOpen ? <ChevronLeftIcon/> : <MenuIcon/>}
                     </IconButton>
