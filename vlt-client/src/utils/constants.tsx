@@ -6,7 +6,7 @@ import {
     Home as HomeIcon,
     Route as RouteIcon,
     Settings as SettingsIcon,
-    Visibility as ObservIcon
+    Visibility as ObserveIcon
 } from "@mui/icons-material";
 
 export type Route = {
@@ -24,7 +24,7 @@ export const MAIN_ROUTES: Record<string, Route> = {
         path: "/"
     },
     observer: {
-        icon: <ObservIcon/>,
+        icon: <ObserveIcon/>,
         text: "Обозреватель",
         protected: true,
         path: "/observer"
@@ -75,5 +75,5 @@ if (!host || !port) {
 
 export const BASE_API_URL = `http://${host ?? "localhost"}:${port ?? "8080"}`;
 
-export const RECENT_ACTIVITY_POLLING_INTERVAL_MS = 10000;
-export const BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS = 10000;
+export const RECENT_ACTIVITY_POLLING_INTERVAL_MS = 13000;
+export const BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS = 8000;
