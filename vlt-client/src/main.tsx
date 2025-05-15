@@ -8,7 +8,7 @@ import {userManager} from "./config/keycloak.ts";
 import {onSignInCallback, queryClient} from "./config/config.ts";
 import {CssBaseline, ThemeProvider} from "@mui/material";
 import {THEME} from "./styles/muiConfig.js";
-import {SidebarProvider} from "./hooks/useSidebarState.tsx";
+import {MainSidebarContext} from "./hooks/sidebarContexts.tsx";
 
 const container = document.getElementById("root");
 
@@ -25,13 +25,13 @@ root.render(
                 <ThemeProvider theme={THEME}>
                     <CssBaseline>
                         <ProtectedApp>
-                            <SidebarProvider>
+                            <MainSidebarContext.SidebarProvider initialOpen={true}>
                                 <App/>
-                            </SidebarProvider>
+                            </MainSidebarContext.SidebarProvider>
                         </ProtectedApp>
                     </CssBaseline>
                 </ThemeProvider>
             </QueryClientProvider>
         </AuthProvider>
-    </BrowserRouter>,
+    </BrowserRouter>
 );

@@ -18,10 +18,10 @@ import {
     Logout as LogoutIcon,
     Settings as SettingsIcon,
 } from '@mui/icons-material';
-import {useSidebarWidth, useSidebarOpen} from "../hooks/useSidebarState.tsx";
 import {Alert} from "./Alert.tsx";
 import {THEME} from "../styles/muiConfig.ts";
 import {handleCopyEvent} from "../utils/handlers.ts";
+import {MainSidebarContext} from "../hooks/sidebarContexts.tsx";
 
 export type HeaderProps = {
     currPath: string[];
@@ -52,8 +52,8 @@ export const Header = (props: HeaderProps) => {
         );
     }
 
-    const [sidebarWidth] = useSidebarWidth();
-    const [sidebarOpen] = useSidebarOpen();
+    const [sidebarWidth] = MainSidebarContext.useSidebarWidth();
+    const [sidebarOpen] = MainSidebarContext.useSidebarOpen();
 
     const [path, setPath] = useState(props.currPath);
 

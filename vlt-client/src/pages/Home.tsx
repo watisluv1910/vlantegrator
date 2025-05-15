@@ -1,13 +1,13 @@
 import React from "react";
 import {
+    Button,
     Card,
     CardContent, Divider,
-    FormControlLabel,
     Grid,
     Stack,
     SvgIconTypeMap,
-    Switch,
-    Typography
+    Typography,
+    useTheme
 } from "@mui/material";
 import {
     Timeline,
@@ -21,12 +21,11 @@ import {
 import {OverridableComponent} from "@mui/material/OverridableComponent";
 import {Header} from "../components/Header.js";
 import {Sidebar} from "../components/Sidebar.js";
-import {useSidebarWidth} from "../hooks/useSidebarState.tsx";
 import {HealthApiService, RoutesApiService} from "../api/sdk.gen.ts";
 import {usePolling} from "../hooks/usePolling.ts";
-import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS, RECENT_ACTIVITY_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
 import {formatBytes, iconForAction, relativeTimeFromDates} from "../utils/transformers.ts";
-import {THEME} from "../styles/muiConfig.ts";
+import {MainSidebarContext} from "../hooks/sidebarContexts.tsx";
+import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS, RECENT_ACTIVITY_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
 
 export type HealthMetric = {
     label: string;
@@ -43,7 +42,8 @@ export type ActivityEntry = {
 
 export const HomePage = () => {
     const [showCurrUserActivity, setShowCurrUserActivity] = React.useState(false);
-    const [sidebarWidth] = useSidebarWidth();
+    const [sidebarWidth] = MainSidebarContext.useSidebarWidth();
+    const theme = useTheme();
 
     const {data: activities} = usePolling(
         ["recentActivity", showCurrUserActivity],
@@ -126,18 +126,14 @@ export const HomePage = () => {
                         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}
                                paddingInline={2}>
                             <Typography variant="h4" color="accent">Активности</Typography>
-                            <FormControlLabel
-                                control={<Switch checked={showCurrUserActivity}
-                                                 onChange={e => setShowCurrUserActivity(e.target.checked)}/>}
-                                label={showCurrUserActivity ? "Моя активность" : "Общая активность"}
-                            />
+                            <Button variant="outlined"
+                                    onClick={(_) => setShowCurrUserActivity(!showCurrUserActivity)}
+                            >
+                                {showCurrUserActivity ? "Моя активность" : "Общая активность"}
+                            </Button>
                         </Stack>
 
-                        <Divider variant="middle"
-                                 aria-hidden={true}
-                                 flexItem
-                                 sx={{mt: 2}}
-                        />
+                        <Divider variant="middle" aria-hidden={true} flexItem sx={{mt: 2}}/>
 
                         <Timeline position="alternate">
                             {recentActivities?.map((activity, idx) => {
@@ -147,7 +143,7 @@ export const HomePage = () => {
                                         {activity.time}
                                     </TimelineOppositeContent>
                                     <TimelineSeparator>
-                                        <TimelineDot sx={{bgcolor: THEME.palette.success.dark}}>
+                                        <TimelineDot sx={{bgcolor: theme.palette.success.dark}}>
                                             <DotIcon fontSize="medium"/>
                                         </TimelineDot>
                                         {idx < recentActivities.length - 1 && <TimelineConnector/>}

@@ -1,6 +1,6 @@
 import {useAuth} from "react-oidc-context";
 import {useNavigate} from "react-router-dom";
-import {MAIN_ROUTES} from "../utils/constants.js";
+import {MAIN_ROUTES, Route} from "../utils/constants.js";
 import {useColorScheme} from "@mui/material/styles";
 import {
     Box,
@@ -22,20 +22,24 @@ import {
     DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
 import {
-    useSidebarWidth,
-    useSidebarOpen,
-    SIDEBAR_OPENED_WIDTH,
-    SIDEBAR_COLLAPSED_WIDTH
-} from "../hooks/useSidebarState.tsx";
+    MAIN_SIDEBAR_COLLAPSED_WIDTH,
+    MAIN_SIDEBAR_OPENED_WIDTH,
+    MainSidebarContext
+} from "../hooks/sidebarContexts.tsx";
+
+type NavItem = {
+    route: Route,
+    action: () => void
+}
 
 export const Sidebar = () => {
     const auth = useAuth();
     const navigate = useNavigate();
 
-    const navItems = [];
+    const navItems: NavItem[] = [];
 
     for (let name in MAIN_ROUTES) {
-        let route = MAIN_ROUTES[name];
+        let route: Route = MAIN_ROUTES[name];
         if (auth.isAuthenticated || !route?.protected) {
             navItems.push({
                 route: route,
@@ -44,11 +48,11 @@ export const Sidebar = () => {
         }
     }
 
-    const [sidebarWidth, setSidebarWidth] = useSidebarWidth();
-    const [sidebarOpen, setSidebarOpen] = useSidebarOpen();
+    const [sidebarWidth, setSidebarWidth] = MainSidebarContext.useSidebarWidth();
+    const [sidebarOpen, setSidebarOpen] = MainSidebarContext.useSidebarOpen();
 
     const toggleDrawer = () => setSidebarOpen(prev => {
-        setSidebarWidth(!prev ? SIDEBAR_OPENED_WIDTH : SIDEBAR_COLLAPSED_WIDTH)
+        setSidebarWidth(!prev ? MAIN_SIDEBAR_OPENED_WIDTH : MAIN_SIDEBAR_COLLAPSED_WIDTH)
         return !prev;
     });
 

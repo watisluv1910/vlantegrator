@@ -1,7 +1,3 @@
-import {Header} from "../components/Header.tsx";
-import {Sidebar} from "../components/Sidebar.tsx";
-import {useCallback, useState} from "react";
-import {useSidebarWidth} from "../hooks/useSidebarState.tsx";
 import {
     addEdge,
     Background,
@@ -13,22 +9,9 @@ import {
     useNodesState
 } from "@xyflow/react";
 import {
-    Storage as JdbcAdapterIcon,
-    Http as HttpAdapterIcon,
-    Transform as TransformerAdapterIcon,
-    HistoryEdu as LoggerAdapterIcon,
-    Save as SaveIcon,
-    Handyman as BuildIcon,
-    Start as StartIcon,
-    StopCircle as StopIcon,
-    RestartAlt as RestartIcon,
-    DeleteForever as DeleteIcon,
-    Bolt as BoltIcon,
-} from "@mui/icons-material";
-import {
     Box,
-    Checkbox, Divider,
-    FormControl, IconButton,
+    Checkbox,
+    FormControl,
     ListItemText,
     MenuItem,
     OutlinedInput,
@@ -37,9 +20,20 @@ import {
     TextField,
     Typography
 } from "@mui/material";
+import {
+    Storage as JdbcAdapterIcon,
+    Http as HttpAdapterIcon,
+    Transform as TransformerAdapterIcon,
+    HistoryEdu as LoggerAdapterIcon,
+} from "@mui/icons-material";
+import {useColorScheme} from "@mui/material/styles";
+import {Header} from "../components/Header.tsx";
+import {Sidebar} from "../components/Sidebar.tsx";
+import {useCallback, useState} from "react";
+import {IntegratorSidebarContext} from "../hooks/sidebarContexts.tsx";
+import {IntegratorPowerTool} from "../components/IntegratorPowerTool.tsx";
 
 import "@xyflow/react/dist/style.css";
-import {useColorScheme} from "@mui/material/styles";
 
 const nodeDefaults = {
     sourcePosition: Position.Bottom,
@@ -145,13 +139,19 @@ const initialEdges = [
     {id: "e4", source: "transform", target: "log-transform", type: "default", markerEnd: {type: MarkerType.ArrowClosed}}
 ];
 
-export const Integrator = () => {
-    const [sidebarWidth, _] = useSidebarWidth();
+export const IntegratorPage = () => {
+    return (
+        <IntegratorSidebarContext.SidebarProvider initialOpen={true}>
+            <Integrator/>
+        </IntegratorSidebarContext.SidebarProvider>
+    )
+}
+
+const Integrator = () => {
+    const [sidebarWidth] = IntegratorSidebarContext.useSidebarWidth();
 
     const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, _setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-    const [menuOpen, setMenuOpen] = useState(false);
 
     const onConnect = useCallback(
         (params: any) => { // TODO
@@ -170,7 +170,7 @@ export const Integrator = () => {
     });
 
     return (
-        <Box>
+        <>
             <Header
                 currPath={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
             <Sidebar/>
@@ -192,15 +192,18 @@ export const Integrator = () => {
                     <Background/>
                 </ReactFlow>
             </Box>
-            <Paper elevation={3} sx={{
-                position: "fixed",
-                top: 60,
-                right: 0,
-                width: 300,
-                height: "100vh",
-                p: 2,
-                overflow: "auto"
-            }}>
+            <Paper
+                elevation={3}
+                sx={{
+                    position: "fixed",
+                    top: 60,
+                    right: 0,
+                    width: 300,
+                    height: "100vh",
+                    p: 2,
+                    overflow: "auto"
+                }}
+            >
                 <Typography variant="h6" gutterBottom>
                     HTTP Inbound Config
                 </Typography>
@@ -237,61 +240,7 @@ export const Integrator = () => {
                     </Select>
                 </FormControl>
             </Paper>
-            <Box
-                sx={{
-                    position: "fixed",
-                    bottom: 16,
-                    mr: 38,
-                    right: 16,
-                    zIndex: 1000
-                }}
-                onMouseEnter={() => setMenuOpen(true)}
-                onMouseLeave={() => setMenuOpen(false)}
-            >
-                <Box
-                    sx={{
-                        backgroundColor: "background.paper",
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: "24px",
-                        width: 48,
-                        height: menuOpen ? "auto" : 48,
-                        overflow: "hidden",
-                        transition: "height 0.3s ease"
-                    }}
-                >
-                    <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", py: 1}}>
-                        {menuOpen ? (
-                            <>
-                                <IconButton size="small" aria-label="Сохранить маршрут">
-                                    <SaveIcon/>
-                                </IconButton>
-                                <Divider sx={{width: "80%", my: 1}}/>
-                                <IconButton size="small" aria-label="Собрать образ">
-                                    <BuildIcon/>
-                                </IconButton>
-                                <IconButton size="small" aria-label="Запустить контейнер">
-                                    <StartIcon/>
-                                </IconButton>
-                                <IconButton size="small" aria-label="Остановить контейнер">
-                                    <StopIcon/>
-                                </IconButton>
-                                <IconButton size="small" aria-label="Перезапустить контейнер">
-                                    <RestartIcon/>
-                                </IconButton>
-                                <IconButton size="small" aria-label="Удалить контейнер">
-                                    <DeleteIcon/>
-                                </IconButton>
-                            </>
-                        ) : (
-                            <IconButton size="small" aria-label="Центр управления"
-                                        sx={{flex: "auto", justifyContent: "center", alignItems: "center"}}>
-                                <BoltIcon name="controlCenterClosedIcon" sx={{ color: "accent.main" }}/>
-                            </IconButton>
-                        )}
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+            <IntegratorPowerTool/>
+        </>
     )
 }
