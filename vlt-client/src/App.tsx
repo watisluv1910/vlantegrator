@@ -15,8 +15,12 @@ export const App: React.FC = () => {
             <Routes>
                 <Route path={MAIN_ROUTES.home.path}>
                     <Route index={true} element={<HomePage/>}/>
+                    <Route path={MAIN_ROUTES.observer.path} element={<HomePage/>}/>
                     <Route path={MAIN_ROUTES.integrator.path} element={<Integrator/>}/>
                     <Route path={MAIN_ROUTES.health.path} element={<HomePage/>}/>
+                    <Route path={MAIN_ROUTES.docs.path} element={<HomePage/>}/>
+                    <Route path={MAIN_ROUTES.help.path} element={<HomePage/>}/>
+                    <Route path={MAIN_ROUTES.settings.path} element={<HomePage/>}/>
                 </Route>
             </Routes>
         </>
