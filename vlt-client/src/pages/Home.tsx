@@ -1,7 +1,7 @@
 import React from "react";
 import {
     Card,
-    CardContent,
+    CardContent, Divider,
     FormControlLabel,
     Grid,
     Stack,
@@ -26,6 +26,7 @@ import {HealthApiService, RoutesApiService} from "../api/sdk.gen.ts";
 import {usePolling} from "../hooks/usePolling.ts";
 import {BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS, RECENT_ACTIVITY_POLLING_INTERVAL_MS} from "../utils/constants.tsx";
 import {formatBytes, iconForAction, relativeTimeFromDates} from "../utils/transformers.ts";
+import {THEME} from "../styles/muiConfig.ts";
 
 export type HealthMetric = {
     label: string;
@@ -131,6 +132,13 @@ export const HomePage = () => {
                                 label={showCurrUserActivity ? "Моя активность" : "Общая активность"}
                             />
                         </Stack>
+
+                        <Divider variant="middle"
+                                 aria-hidden={true}
+                                 flexItem
+                                 sx={{mt: 2}}
+                        />
+
                         <Timeline position="alternate">
                             {recentActivities?.map((activity, idx) => {
                                 const DotIcon = activity.icon;
@@ -139,7 +147,7 @@ export const HomePage = () => {
                                         {activity.time}
                                     </TimelineOppositeContent>
                                     <TimelineSeparator>
-                                        <TimelineDot color="success">
+                                        <TimelineDot sx={{bgcolor: THEME.palette.success.dark}}>
                                             <DotIcon fontSize="medium"/>
                                         </TimelineDot>
                                         {idx < recentActivities.length - 1 && <TimelineConnector/>}
