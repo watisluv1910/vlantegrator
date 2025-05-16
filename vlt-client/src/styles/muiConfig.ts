@@ -15,7 +15,7 @@ export const THEME = createTheme({
     colorSchemes: {
         light: {
             palette: {
-                background: {default: "#ffffff", paper: "#ffffff"},
+                background: {default: "#f6f6f6", paper: "#ffffff"},
                 primary: {main: "#212b36"},
                 secondary: {main: "#fa541c"},
                 warning: {main: "#ffc107", contrastText: "#212121"},

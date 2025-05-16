@@ -51,12 +51,9 @@ export const IntegratorSidebar: React.FC<PropsWithChildren> = ({children: forms}
             <IconButton
                 disableRipple
                 onClick={() => {
-                    setOpen(o => {
-                        const next = !o;
-                        setWidth(next
-                            ? INTEGRATOR_SIDEBAR_OPENED_WIDTH
-                            : INTEGRATOR_SIDEBAR_COLLAPSED_WIDTH
-                        );
+                    setOpen(open => {
+                        const next = !open;
+                        setWidth(next ? INTEGRATOR_SIDEBAR_OPENED_WIDTH : INTEGRATOR_SIDEBAR_COLLAPSED_WIDTH);
                         return next;
                     });
                 }}
