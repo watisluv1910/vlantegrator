@@ -11,7 +11,7 @@ import {
 } from "@mui/icons-material";
 
 const CLOSED_SIZE = 48;
-const ICONS_COUNT = 6;
+const ICONS_COUNT = 5;
 const ICON_AREA = ICONS_COUNT * CLOSED_SIZE;
 
 interface IntegratorPowerToolProps {
@@ -19,7 +19,7 @@ interface IntegratorPowerToolProps {
     offsetRight: number;
 }
 
-export const IntegratorPowerTool = ({ offsetRight }: IntegratorPowerToolProps) => {
+export const IntegratorPowerTool = ({offsetRight}: IntegratorPowerToolProps) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
     const theme = useTheme();
@@ -34,17 +34,18 @@ export const IntegratorPowerTool = ({ offsetRight }: IntegratorPowerToolProps) =
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [open]);
 
-    const DIVIDER_GAP = parseFloat(theme.spacing(1)) * 2;
-    const OPEN_MAX_HEIGHT = ICON_AREA + DIVIDER_GAP;
+    const DIVIDER_GAP = 0.5;
+    const OPEN_HEIGHT = ICON_AREA + DIVIDER_GAP * 2 + 16;
 
     return <Box
         ref={ref}
-        onClick={() => setOpen(state => !state)}
+        onClick={() => setOpen(true)}
         sx={{
             position: "fixed",
             bottom: 16,
             right: offsetRight + 16,
             zIndex: theme.zIndex.tooltip,
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -52,17 +53,22 @@ export const IntegratorPowerTool = ({ offsetRight }: IntegratorPowerToolProps) =
             backgroundColor: "background.paper",
             border: 1,
             borderColor: "divider",
+            borderRadius: CLOSED_SIZE,
             transition: theme.transitions.create(["height", "right"], {
                 duration: theme.transitions.duration.short,
             }),
-            borderRadius: open ? theme.shape.borderRadius * 2 : "50%",
-            overflow: "hidden",
             width: CLOSED_SIZE,
-            height: open ? OPEN_MAX_HEIGHT : CLOSED_SIZE,
+            height: open ? OPEN_HEIGHT : CLOSED_SIZE,
         }}
     >
         {open ? (
-            <>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center"
+                }}
+            >
                 <IconButton aria-label="Сохранить маршрут">
                     <SaveIcon/>
                 </IconButton>
@@ -84,7 +90,7 @@ export const IntegratorPowerTool = ({ offsetRight }: IntegratorPowerToolProps) =
                 <IconButton aria-label="Удалить контейнер">
                     <DeleteIcon/>
                 </IconButton>
-            </>
+            </Box>
         ) : (
             <IconButton aria-label="Центр управления" disableRipple>
                 <BoltIcon name="powerToolIcon" sx={{color: theme.palette.accent.main}}/>
