@@ -1,3 +1,4 @@
+import {useCallback, useState} from "react";
 import {
     addEdge,
     Background,
@@ -15,7 +16,6 @@ import {
     ListItemText,
     MenuItem,
     OutlinedInput,
-    Paper,
     Select,
     TextField,
     Typography
@@ -29,9 +29,9 @@ import {
 import {useColorScheme} from "@mui/material/styles";
 import {Header} from "../components/Header.tsx";
 import {Sidebar} from "../components/Sidebar.tsx";
-import {useCallback, useState} from "react";
 import {IntegratorSidebarContext} from "../hooks/sidebarContexts.tsx";
 import {IntegratorPowerTool} from "../components/IntegratorPowerTool.tsx";
+import {IntegratorSidebar} from "../components/IntegratorSidebar.tsx";
 
 import "@xyflow/react/dist/style.css";
 
@@ -150,18 +150,15 @@ export const IntegratorPage = () => {
 const Integrator = () => {
     const [sidebarWidth] = IntegratorSidebarContext.useSidebarWidth();
 
-    const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, _setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [nodes, , onNodesChange] = useNodesState(initialNodes);
+    const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
     const onConnect = useCallback(
-        (params: any) => { // TODO
-            onEdgesChange(addEdge(params, edges));
-        },
+        (params: any) => onEdgesChange(addEdge(params, edges)),
         [edges, onEdgesChange]
     );
 
     const {mode} = useColorScheme();
-    const [colorMode] = useState(mode);
 
     const [adapterConfig, setAdapterConfig] = useState({
         path: "/data",
@@ -171,39 +168,34 @@ const Integrator = () => {
 
     return (
         <>
-            <Header
-                currPath={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
+            <Header currPath={["Интегратор", "Маршруты", "Интеграция с БД теста", "Настройка потока"]}/>
             <Sidebar/>
-            <Box style={{height: "92vh", width: `calc(100%-${sidebarWidth}px)`}}>
+
+            <Box
+                sx={{
+                    height: "92vh",
+                    width: `calc(100%-${sidebarWidth}px)`
+                }}
+            >
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    attributionPosition={"bottom-left"}
-                    nodesDraggable={true}
-                    nodesConnectable={true}
-                    elementsSelectable={true}
-                    colorMode={colorMode}
-                    style={{width: "100%", height: "100%"}}
+                    attributionPosition={"top-left"}
+                    nodesDraggable
+                    nodesConnectable
+                    elementsSelectable
+                    colorMode={mode}
+                    style={{width: "100%", height: "100%", zIndex: -1}}
                 >
-                    <Controls position={"bottom-right"}/>
+                    <Controls position={"bottom-left"}/>
                     <Background/>
                 </ReactFlow>
             </Box>
-            <Paper
-                elevation={3}
-                sx={{
-                    position: "fixed",
-                    top: 60,
-                    right: 0,
-                    width: 300,
-                    height: "100vh",
-                    p: 2,
-                    overflow: "auto"
-                }}
-            >
+
+            <IntegratorSidebar>
                 <Typography variant="h6" gutterBottom>
                     HTTP Inbound Config
                 </Typography>
@@ -212,7 +204,9 @@ const Integrator = () => {
                     fullWidth
                     size="small"
                     value={adapterConfig.path}
-                    onChange={(e) => setAdapterConfig({...adapterConfig, path: e.target.value})}
+                    onChange={(e) =>
+                        setAdapterConfig({...adapterConfig, path: e.target.value})
+                    }
                 />
                 <Typography variant="subtitle2" sx={{mt: 2}}>Request Payload Type</Typography>
                 <TextField
@@ -226,7 +220,10 @@ const Integrator = () => {
                     <Select
                         multiple
                         value={adapterConfig.supportedMethods}
-                        onChange={(e) => setAdapterConfig({...adapterConfig, supportedMethods: [...e.target.value]})}
+                        onChange={(e) => setAdapterConfig({
+                            ...adapterConfig,
+                            supportedMethods: [...e.target.value]
+                        })}
                         input={<OutlinedInput placeholder="Methods"/>}
                         renderValue={(selected) => selected.join(", ")}
                         variant={"filled"}
@@ -239,8 +236,9 @@ const Integrator = () => {
                         ))}
                     </Select>
                 </FormControl>
-            </Paper>
-            <IntegratorPowerTool/>
+            </IntegratorSidebar>
+
+            <IntegratorPowerTool offsetRight={sidebarWidth}/>
         </>
     )
 }

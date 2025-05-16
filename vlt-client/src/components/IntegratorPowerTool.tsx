@@ -14,14 +14,19 @@ const CLOSED_SIZE = 48;
 const ICONS_COUNT = 6;
 const ICON_AREA = ICONS_COUNT * CLOSED_SIZE;
 
-export const IntegratorPowerTool = () => {
-    const [open, setOpen] = useState(false);
+interface IntegratorPowerToolProps {
+    /** How many pixels from the right edge of the right-hand sidebar */
+    offsetRight: number;
+}
 
-    const containerRef = useRef<HTMLDivElement>(null);
+export const IntegratorPowerTool = ({ offsetRight }: IntegratorPowerToolProps) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const theme = useTheme();
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (open && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+            if (open && ref.current && !ref.current.contains(e.target as Node)) {
                 setOpen(false);
             }
         };
@@ -29,18 +34,16 @@ export const IntegratorPowerTool = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [open]);
 
-    const theme = useTheme();
-
     const DIVIDER_GAP = parseFloat(theme.spacing(1)) * 2;
     const OPEN_MAX_HEIGHT = ICON_AREA + DIVIDER_GAP;
 
     return <Box
-        ref={containerRef}
+        ref={ref}
         onClick={() => setOpen(state => !state)}
         sx={{
             position: "fixed",
             bottom: 16,
-            right: 16,
+            right: offsetRight + 16,
             zIndex: theme.zIndex.tooltip,
             display: "flex",
             flexDirection: "column",
@@ -49,8 +52,8 @@ export const IntegratorPowerTool = () => {
             backgroundColor: "background.paper",
             border: 1,
             borderColor: "divider",
-            transition: theme.transitions.create(["height"], {
-                duration: theme.transitions.duration.standard,
+            transition: theme.transitions.create(["height", "right"], {
+                duration: theme.transitions.duration.short,
             }),
             borderRadius: open ? theme.shape.borderRadius * 2 : "50%",
             overflow: "hidden",
