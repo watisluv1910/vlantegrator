@@ -6,7 +6,6 @@ import {
     Home as HomeIcon,
     Route as RouteIcon,
     Settings as SettingsIcon,
-    Visibility as ObserveIcon
 } from "@mui/icons-material";
 
 export type Route = {
@@ -22,12 +21,6 @@ export const MAIN_ROUTES: Record<string, Route> = {
         text: "Главная",
         protected: true,
         path: "/"
-    },
-    observer: {
-        icon: <ObserveIcon/>,
-        text: "Обозреватель",
-        protected: true,
-        path: "/observer"
     },
     integrator: {
         icon: <RouteIcon/>,
