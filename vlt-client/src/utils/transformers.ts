@@ -59,7 +59,7 @@ export function relativeTimeFromElapsed(elapsed: number): string {
     return "";
 }
 
-export const actionIconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
+const actionIconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
     create: SaveIcon,
     delete: DeleteIcon,
     build: BuildIcon,
