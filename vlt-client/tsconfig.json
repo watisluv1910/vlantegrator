@@ -8,16 +8,19 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
       "react": [
         "node_modules/@types/react"
       ],
       "@/*": [
-        "*"
+        "src/*"
       ]
     },
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

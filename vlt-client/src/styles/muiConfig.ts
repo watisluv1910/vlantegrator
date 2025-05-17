@@ -50,4 +50,15 @@ export const THEME = createTheme({
             },
         },
     },
+    components: {
+        MuiTableRow: {
+            styleOverrides: {
+                root: {
+                    "&:last-child td": {
+                        borderBottom: 0,
+                    },
+                },
+            },
+        },
+    },
 });

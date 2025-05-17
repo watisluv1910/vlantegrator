@@ -1,6 +1,7 @@
 import {ConfigEnv, defineConfig, loadEnv} from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgr from "vite-plugin-svgr";
+import path from "node:path";
 
 export default ({mode}: ConfigEnv) => {
     process.env = {...process.env, ...loadEnv(mode, process.cwd())};
@@ -17,6 +18,11 @@ export default ({mode}: ConfigEnv) => {
                 },
             }),
         ],
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src'),
+            }
+        },
         base: "/",
         server: {
             open: false,

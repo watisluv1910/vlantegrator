@@ -22,7 +22,7 @@ export const MAIN_ROUTES: Record<string, Route> = {
         protected: true,
         path: "/"
     },
-    integrator: {
+    observer: {
         icon: <RouteIcon/>,
         text: "Маршруты",
         protected: true,
@@ -70,3 +70,5 @@ export const BASE_API_URL = `http://${host ?? "localhost"}:${port ?? "8080"}`;
 
 export const RECENT_ACTIVITY_POLLING_INTERVAL_MS = 13000;
 export const BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS = 8000;
+
+export const ROUTES_SEARCH_DEBOUNCE_MS = 800;
