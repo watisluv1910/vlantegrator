@@ -6,6 +6,7 @@ import {
     MarkerType,
     Position,
     ReactFlow,
+    ReactFlowProvider,
     useEdgesState,
     useNodesState
 } from "@xyflow/react";
@@ -141,9 +142,11 @@ const initialEdges = [
 
 export const IntegratorPage = () => {
     return (
-        <IntegratorSidebarContext.SidebarProvider initialOpen={true}>
-            <Integrator/>
-        </IntegratorSidebarContext.SidebarProvider>
+        <ReactFlowProvider>
+            <IntegratorSidebarContext.SidebarProvider initialOpen={true}>
+                <Integrator/>
+            </IntegratorSidebarContext.SidebarProvider>
+        </ReactFlowProvider>
     )
 }
 
