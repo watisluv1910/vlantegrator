@@ -160,6 +160,13 @@ public class VltRepository {
                 .fetch(VLT_ROUTE_NETWORK.ID);
     }
 
+    public void insertRouteNetwork(VltRouteNetwork routeNetwork) {
+        ctx.insertInto(VLT_ROUTE_NETWORK)
+                .set(ctx.newRecord(VLT_ROUTE_NETWORK, routeNetwork))
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
     public void addNetworksToRoute(List<UUID> networkIds, UUID routeId) {
         networkIds.forEach(networkId -> ctx.insertInto(VLT_ROUTE_NETWORKS)
                 .set(VLT_ROUTE_NETWORKS.VLT_ROUTE_ID, routeId)
@@ -200,13 +207,6 @@ public class VltRepository {
     public void deleteNodesByRouteId(UUID routeId) {
         ctx.deleteFrom(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                .execute();
-    }
-
-    public void deleteNodesFromRouteExcluding(UUID routeId, List<UUID> toExclude) {
-        ctx.deleteFrom(VLT_NODE)
-                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                .and(VLT_NODE.VLT_ROUTE_ID.notIn(toExclude))
                 .execute();
     }
 

@@ -16,7 +16,7 @@ public record CreateRouteRequestDto(
         @Schema(description = "Маппинг портов", requiredMode = Schema.RequiredMode.REQUIRED)
         String publishedPorts,
         @Schema(description = "Сети маршрута. Должны быть предварительно созданы", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<String> networks,
+        List<DockerNetworkDto> networks,
         @Schema(description = "Конфигурация среды маршрута", requiredMode = Schema.RequiredMode.REQUIRED)
         Map<String, Object> env
 ) {

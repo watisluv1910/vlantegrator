@@ -18,6 +18,6 @@ public record Route(
         String owner,
         List<Pair<@NotNull Integer, @NotNull Integer>> publishedPorts,
         Map<String, Object> env,
-        List<RouteNetwork> networks
+        List<DockerNetwork> networks
 ) {
 }

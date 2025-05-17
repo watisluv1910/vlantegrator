@@ -7,6 +7,7 @@ import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
 import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
 import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
+import com.wladischlau.vlt.core.integrator.model.DockerNetwork;
 import com.wladischlau.vlt.core.integrator.model.Node;
 import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
@@ -15,7 +16,6 @@ import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.integrator.model.RouteCacheData;
 import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import com.wladischlau.vlt.core.commons.model.RouteId;
-import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.integrator.model.SearchRoutesField;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
@@ -40,6 +40,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @SuppressWarnings("SpringTransactionalMethodCallsInspection")
 @Slf4j
@@ -84,11 +87,18 @@ public class VltDataService {
 
     @Transactional
     public RouteId createRoute(Route route) {
-        var id = repository.insertRoute(modelMapper.toJooq(route));
-        var networkNames = route.networks().stream().map(RouteNetwork::name).toList();
-        var networkIds = repository.findNetworkIdsByNames(networkNames);
-        repository.addNetworksToRoute(networkIds, id);
-        return new RouteId(id, null);
+        var routeId = repository.insertRoute(modelMapper.toJooq(route));
+
+        var networkIds = route.networks().stream()
+                .map(modelMapper::toJooq)
+                .map(it -> {
+                    repository.insertRouteNetwork(it);
+                    return it.name();
+                })
+                .collect(collectingAndThen(toList(), repository::findNetworkIdsByNames));
+
+        repository.addNetworksToRoute(networkIds, routeId);
+        return new RouteId(routeId, null);
     }
 
     @Transactional(readOnly = true)
@@ -297,20 +307,21 @@ public class VltDataService {
     }
 
     @Transactional
-    public void updateRouteNetworks(List<RouteNetwork> networks, UUID routeId) {
-        var actual = repository.findRouteNetworksByRouteId(routeId).stream()
+    public void updateRouteNetworks(List<DockerNetwork> expected, UUID routeId) {
+        var actual = modelMapper.toRouteNetworksFromJooq(repository.findRouteNetworksByRouteId(routeId));
+
+        var toAddNames = ListUtils.removeAll(expected, actual).stream()
+                .map(modelMapper::toJooq)
+                .peek(repository::insertRouteNetwork)
                 .map(VltRouteNetwork::name)
                 .toList();
 
-        var expected = networks.stream()
-                .map(RouteNetwork::name)
-                .toList();
-
-        var toAddNames = ListUtils.removeAll(expected, actual);
         var toAddIds = repository.findNetworkIdsByNames(toAddNames);
         repository.addNetworksToRoute(toAddIds, routeId);
 
-        var toRemoveNames = ListUtils.removeAll(actual, expected);
+        var toRemoveNames = ListUtils.removeAll(actual, expected).stream()
+                .map(DockerNetwork::name)
+                .toList();
         var toRemoveIds = repository.findNetworkIdsByNames(toRemoveNames);
         repository.removeNetworksFromRoute(toRemoveIds, routeId);
     }

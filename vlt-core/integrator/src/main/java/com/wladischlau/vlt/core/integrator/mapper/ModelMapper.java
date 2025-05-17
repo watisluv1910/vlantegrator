@@ -4,13 +4,13 @@ import com.wladischlau.vlt.adapters.common.AdapterType;
 import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
 import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
+import com.wladischlau.vlt.core.integrator.model.DockerNetwork;
 import com.wladischlau.vlt.core.integrator.model.Node;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
 import com.wladischlau.vlt.core.integrator.model.NodeStyle;
 import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteAction;
-import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.AdapterDirection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.ChannelKind;
@@ -120,14 +120,14 @@ public interface ModelMapper {
 
     @Mapping(target = "name", source = "name")
     @Mapping(target = "driver", expression = "java(src.driver().getLiteral())")
-    RouteNetwork toModel(VltRouteNetwork src);
+    DockerNetwork toModel(VltRouteNetwork src);
 
-    List<RouteNetwork> toRouteNetworksFromJooq(List<VltRouteNetwork> src);
+    List<DockerNetwork> toRouteNetworksFromJooq(List<VltRouteNetwork> src);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "name")
     @Mapping(target = "driver", expression = "java(NetworkDriver.lookupLiteral(src.driver()))")
-    VltRouteNetwork toJooq(RouteNetwork src);
+    VltRouteNetwork toJooq(DockerNetwork src);
 
     @Mapping(target = "id", source = "node.id")
     @Mapping(target = "name", source = "node.name")

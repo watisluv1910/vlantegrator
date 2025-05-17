@@ -22,7 +22,7 @@ public record UpdateRouteRequestDto(
         String publishedPorts,
         @Schema(description = "Сети маршрута. Должны быть предварительно созданы",
                 requiredMode = RequiredMode.REQUIRED)
-        List<String> networks,
+        List<DockerNetworkDto> networks,
         @Schema(description = "Конфигурация среды маршрута",
                 requiredMode = RequiredMode.REQUIRED)
         Map<String, Object> env

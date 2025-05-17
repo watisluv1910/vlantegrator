@@ -7,6 +7,7 @@ import com.wladischlau.vlt.core.integrator.model.Adapter;
 import com.wladischlau.vlt.core.integrator.model.Connection;
 import com.wladischlau.vlt.core.integrator.model.ConnectionFullData;
 import com.wladischlau.vlt.core.integrator.model.ConnectionStyle;
+import com.wladischlau.vlt.core.integrator.model.DockerNetwork;
 import com.wladischlau.vlt.core.integrator.model.Node;
 import com.wladischlau.vlt.core.integrator.model.NodeFullData;
 import com.wladischlau.vlt.core.integrator.model.NodePosition;
@@ -20,6 +21,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionStyleDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.DockerNetworkDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodePositionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.NodeStyleDto;
@@ -52,7 +54,7 @@ public interface DtoMapper {
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "owner", source = "checkedOwner")
     @Mapping(target = "publishedPorts", source = "request.publishedPorts", qualifiedByName = "toPublishedPortsList")
-    @Mapping(target = "networks", source = "request.networks", qualifiedByName = "toNetworksFromNames")
+    @Mapping(target = "networks", source = "request.networks")
     @Mapping(target = "env", source = "request.env")
     Route fromDto(CreateRouteRequestDto request, String checkedOwner);
 
@@ -61,7 +63,7 @@ public interface DtoMapper {
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "owner", source = "request.ownerName")
     @Mapping(target = "publishedPorts", source = "request.publishedPorts", qualifiedByName = "toPublishedPortsList")
-    @Mapping(target = "networks", source = "request.networks", qualifiedByName = "toNetworksFromNames")
+    @Mapping(target = "networks", source = "request.networks")
     @Mapping(target = "env", source = "request.env")
     Route fromDto(UpdateRouteRequestDto request, UUID id);
 
@@ -70,7 +72,7 @@ public interface DtoMapper {
     @Mapping(target = "description", source = "description")
     @Mapping(target = "owner", source = "ownerName")
     @Mapping(target = "publishedPorts", source = "publishedPorts", qualifiedByName = "toPublishedPortsList")
-    @Mapping(target = "networks", source = "networks", qualifiedByName = "toNetworksFromNames")
+    @Mapping(target = "networks", source = "networks")
     @Mapping(target = "env", source = "env")
     Route fromDto(RouteDto src);
 
@@ -79,7 +81,7 @@ public interface DtoMapper {
     @Mapping(target = "description", source = "description")
     @Mapping(target = "ownerName", source = "owner")
     @Mapping(target = "publishedPorts", source = "publishedPorts", qualifiedByName = "toPublishedPortsString")
-    @Mapping(target = "networks", source = "networks", qualifiedByName = "toNamesFromNetworks")
+    @Mapping(target = "networks", source = "networks")
     @Mapping(target = "env", source = "env")
     RouteDto toDto(Route src);
 
@@ -187,4 +189,16 @@ public interface DtoMapper {
     @Mapping(target = "dbStatus", source = "dbStatus")
     @Mapping(target = "kafkaStatus", source = "kafkaStatus")
     PlatformBasicHealthDto toDto(PlatformBasicHealth src);
+
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "driver", source = "driver")
+    DockerNetworkDto toDto(DockerNetwork src);
+
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "driver", source = "driver")
+    DockerNetwork fromDto(DockerNetworkDto src);
+
+    List<DockerNetwork> fromDtoToDockerNetworks(List<DockerNetworkDto> src);
+
+    List<DockerNetworkDto> toDtoFromDockerNetwork(List<DockerNetwork> src);
 }

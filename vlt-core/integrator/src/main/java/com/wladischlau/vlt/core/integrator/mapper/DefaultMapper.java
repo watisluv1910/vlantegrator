@@ -1,6 +1,6 @@
 package com.wladischlau.vlt.core.integrator.mapper;
 
-import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
+import com.wladischlau.vlt.core.integrator.model.DockerNetwork;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -48,12 +48,12 @@ public interface DefaultMapper {
     }
 
     @Named("toNetworksFromNames")
-    default List<RouteNetwork> toNetworksFromNames(List<String> networkNames) {
-        return networkNames.stream().map(it -> new RouteNetwork(it, null)).toList();
+    default List<DockerNetwork> toNetworksFromNames(List<String> networkNames) {
+        return networkNames.stream().map(it -> new DockerNetwork(it, null)).toList();
     }
 
     @Named("toNamesFromNetworks")
-    default List<String> toNamesFromNetworks(List<RouteNetwork> networks) {
-        return networks.stream().map(RouteNetwork::name).toList();
+    default List<String> toNamesFromNetworks(List<DockerNetwork> networks) {
+        return networks.stream().map(DockerNetwork::name).toList();
     }
 }

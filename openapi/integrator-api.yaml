@@ -10,6 +10,8 @@ servers:
 - url: http://localhost:8080
   description: Generated server url
 tags:
+- name: Docker API
+  description: Прямое взаимодействие с Docker
 - name: Routes API
   description: Операции для работы с маршрутами
 - name: Actuator
@@ -341,6 +343,89 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RouteDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/docker/networks:
+    get:
+      tags:
+      - Docker API
+      summary: Получить docker-сети
+      description: Получить список всех имеющихся docker-сетей
+      operationId: getDockerNetworks
+      responses:
+        "200":
+          description: Доступные docker-сети
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DockerNetworkDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Docker API
+      summary: Создать docker-сеть
+      description: Создать docker-сеть
+      operationId: createDockerNetwork
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DockerNetworkDto"
+        required: true
+      responses:
+        "201":
+          description: Создать docker-сеть
         "400":
           description: Некорректный запрос
           content:
@@ -849,7 +934,7 @@ components:
           type: array
           description: Сети маршрута. Должны быть предварительно созданы
           items:
-            type: string
+            $ref: "#/components/schemas/DockerNetworkDto"
         env:
           type: object
           additionalProperties:
@@ -862,6 +947,21 @@ components:
       - networks
       - ownerName
       - publishedPorts
+    DockerNetworkDto:
+      type: object
+      description: Docker-сеть
+      properties:
+        name:
+          type: string
+          description: Имя сети
+          minLength: 1
+        driver:
+          type: string
+          description: Драйвер сети
+          minLength: 1
+      required:
+      - driver
+      - name
     ConnectionDto:
       type: object
       description: Соединение узлов
@@ -1020,7 +1120,7 @@ components:
           type: array
           description: Сети маршрута. Должны быть предварительно созданы
           items:
-            type: string
+            $ref: "#/components/schemas/DockerNetworkDto"
         env:
           type: object
           additionalProperties:
@@ -1073,7 +1173,7 @@ components:
           type: array
           description: Сети маршрута. Должны быть предварительно созданы
           items:
-            type: string
+            $ref: "#/components/schemas/DockerNetworkDto"
         env:
           type: object
           additionalProperties:
