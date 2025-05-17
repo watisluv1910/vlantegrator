@@ -16,7 +16,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
+import org.jooq.Field;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -81,6 +81,25 @@ public class VltRepository {
         return ctx.selectFrom(VLT_ROUTE)
                 .where(VLT_ROUTE.ID.eq(routeId))
                 .fetchOptionalInto(VltRoute.class);
+    }
+
+    public List<VltRoute> findRoutesByIdStartsWith(String queryPrefix) {
+        Field<String> idAsText = VLT_ROUTE.ID.cast(String.class);
+        return findRoutesByFieldStartsWith(idAsText, queryPrefix);
+    }
+
+    public List<VltRoute> findRoutesByNameStartsWith(String queryPrefix) {
+        return findRoutesByFieldStartsWith(VLT_ROUTE.NAME, queryPrefix);
+    }
+
+    public List<VltRoute> findRoutesByOwnerNameStartsWith(String queryPrefix) {
+        return findRoutesByFieldStartsWith(VLT_ROUTE.OWNER_NAME, queryPrefix);
+    }
+
+    public List<VltRoute> findRoutesByFieldStartsWith(Field<String> field, String queryPrefix) {
+        return ctx.selectFrom(VLT_ROUTE)
+                .where(field.startsWith(queryPrefix))
+                .fetchInto(VltRoute.class);
     }
 
     public void updateRoute(VltRoute route) {

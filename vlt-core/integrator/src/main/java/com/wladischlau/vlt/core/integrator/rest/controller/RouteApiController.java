@@ -12,6 +12,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.SearchRoutesRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
@@ -82,6 +83,16 @@ public class RouteApiController extends ApiController implements RouteApi {
                         return new NoSuchElementException(msg);
                     });
         });
+    }
+
+    @Override
+    public ResponseEntity<List<RouteDto>> searchRoutes(SearchRoutesRequestDto request,
+                                                       JwtAuthenticationToken principal) {
+        return logRequestProcessing(SEARCH_ROUTES, () -> {
+            List<Route> routes = vltDataService.findRoutesByFieldStartsWith(request.field(), request.query());
+            var dtoList = dtoMapper.toRouteDto(routes);
+            return ResponseEntity.ok(dtoList);
+        }, "field", request.field().name(), "query", request.query());
     }
 
     @Override

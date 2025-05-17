@@ -5,6 +5,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.SearchRoutesRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +49,7 @@ public interface RouteApi {
     String CREATE_ROUTE = "createRoute";
     String GET_ALL_ROUTES = "getAllRoutes";
     String GET_ROUTE = "getRoute";
+    String SEARCH_ROUTES = "searchRoutes";
     String UPDATE_ROUTE = "updateRoute";
     String GET_ROUTE_VERSIONS = "getRouteVersions";
     String GET_ROUTE_DEFINITION = "getRouteDefinition";
@@ -90,7 +92,7 @@ public interface RouteApi {
             description = "Отдаёт информацию о всех маршрутах",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Информация о всех маршрутах",
-                            content = @Content(mediaType = "application/json")),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RouteDto.class)))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",
@@ -128,6 +130,32 @@ public interface RouteApi {
     default ResponseEntity<RouteDto> getRoute(
             @Parameter(required = true, schema = @Schema(description = "ID маршрута", type = "string", format = "uuid"))
             @NotNull @PathVariable(name = "id") UUID id,
+            JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = SEARCH_ROUTES,
+            summary = "Поиск информации о маршрутах по критерию",
+            description = "Отдаёт информацию о маршрутах, соответствующих критерию",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Информация о маршрутах, соответствующих критерию",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RouteDto.class)))),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @PostMapping(value = "v1/route/search", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<List<RouteDto>> searchRoutes(
+            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SearchRoutesRequestDto.class)))
+            @org.springframework.web.bind.annotation.RequestBody SearchRoutesRequestDto request,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }

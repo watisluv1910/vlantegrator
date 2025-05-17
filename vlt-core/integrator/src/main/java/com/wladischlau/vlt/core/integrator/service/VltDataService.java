@@ -17,9 +17,11 @@ import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteNetwork;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
+import com.wladischlau.vlt.core.integrator.model.SearchRoutesField;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionBucket;
 import com.wladischlau.vlt.core.integrator.utils.VersionHashGenerator;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
 import jakarta.annotation.PostConstruct;
@@ -91,21 +93,33 @@ public class VltDataService {
 
     @Transactional(readOnly = true)
     public List<Route> finaAllRoutes() {
-        return repository.findAllRoutes().stream()
-                .map(it -> {
-                    var networks = repository.findRouteNetworksByRouteId(it.id());
-                    return modelMapper.toModel(it, networks);
-                })
-                .toList();
+        return toRouteModels(repository.findAllRoutes());
     }
 
     @Transactional(readOnly = true)
     public Optional<Route> findRouteById(UUID id) {
-        return repository.findRouteById(id)
-                .map(it -> {
-                    var networks = repository.findRouteNetworksByRouteId(id);
-                    return modelMapper.toModel(it, networks);
-                });
+        return repository.findRouteById(id).map(this::toModel);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Route> findRoutesByFieldStartsWith(@NotNull SearchRoutesField field,
+                                                   @NotEmpty String queryPrefix) {
+        var routes = switch (field) {
+            case ID -> repository.findRoutesByIdStartsWith(queryPrefix);
+            case NAME -> repository.findRoutesByNameStartsWith(queryPrefix);
+            case OWNER -> repository.findRoutesByOwnerNameStartsWith(queryPrefix);
+        };
+
+        return toRouteModels(routes);
+    }
+
+    private List<Route> toRouteModels(List<VltRoute> routes) {
+        return routes.stream().map(this::toModel).toList();
+    }
+
+    private Route toModel(VltRoute route) {
+        var networks = repository.findRouteNetworksByRouteId(route.id());
+        return modelMapper.toModel(route, networks);
     }
 
     public Optional<RouteCacheData> findRouteCacheData(@NotNull RouteId routeId) {
