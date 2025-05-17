@@ -54,7 +54,7 @@ public interface AdapterApi {
             }
     )
     @GetMapping(value = "/v1/adapter", produces = {MediaType.APPLICATION_JSON_VALUE})
-    default ResponseEntity<List<AdapterDto>> getAdapters(JwtAuthenticationToken principal) {
+    default ResponseEntity<List<AdapterDto>> getAllAdapters(JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

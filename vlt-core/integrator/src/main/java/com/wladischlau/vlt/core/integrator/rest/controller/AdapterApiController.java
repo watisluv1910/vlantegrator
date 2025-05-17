@@ -30,7 +30,7 @@ public class AdapterApiController extends ApiController implements AdapterApi {
     }
 
     @Override
-    public ResponseEntity<List<AdapterDto>> getAdapters(JwtAuthenticationToken principal) {
+    public ResponseEntity<List<AdapterDto>> getAllAdapters(JwtAuthenticationToken principal) {
         return logRequestProcessing(GET_ALL_ADAPTERS, () -> {
             return vltDataService.findAllAdapters().stream()
                     .map(dtoMapper::toDto)
