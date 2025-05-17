@@ -33,7 +33,11 @@ paths:
         "200":
           description: Информация о всех маршрутах
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RouteDto"
         "400":
           description: Некорректный запрос
           content:
@@ -289,6 +293,54 @@ paths:
       responses:
         "202":
           description: Запрос на сборку принят
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+  /api/v1/route/search:
+    post:
+      tags:
+      - Routes API
+      summary: Поиск информации о маршрутах по критерию
+      description: "Отдаёт информацию о маршрутах, соответствующих критерию"
+      operationId: searchRoutes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRoutesRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "Информация о маршрутах, соответствующих критерию"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RouteDto"
         "400":
           description: Некорректный запрос
           content:
@@ -754,6 +806,8 @@ components:
         versionHash:
           type: string
           description: Хэш-код версии маршрута
+      required:
+      - id
     ProblemDetail:
       type: object
       properties:
@@ -942,40 +996,6 @@ components:
       required:
       - connections
       - nodes
-    UpdateRouteRequestDto:
-      type: object
-      description: Запрос на изменение конфигурации маршрута
-      properties:
-        name:
-          type: string
-          description: Имя маршрута
-        description:
-          type: string
-          description: Описание маршрута
-        ownerName:
-          type: string
-          description: Username владельца. Если пустой – владельцем маршрута становится
-            инициатор запроса
-        publishedPorts:
-          type: string
-          description: Маппинг портов
-        networks:
-          type: array
-          description: Сети маршрута. Должны быть предварительно созданы
-          items:
-            type: string
-        env:
-          type: object
-          additionalProperties:
-            type: object
-          description: Конфигурация среды маршрута
-      required:
-      - description
-      - env
-      - name
-      - networks
-      - ownerName
-      - publishedPorts
     RouteDto:
       type: object
       description: Конфигурация маршрута
@@ -1014,6 +1034,58 @@ components:
       - ownerName
       - publishedPorts
       - routeId
+    SearchRoutesRequestDto:
+      type: object
+      description: Запрос на поиск маршрутов
+      properties:
+        field:
+          type: string
+          description: "Поле, по которому производится поиск"
+          enum:
+          - ID
+          - NAME
+          - OWNER
+        query:
+          type: string
+          description: "Значение, введённое пользователем в строке поиска"
+          minLength: 1
+      required:
+      - field
+      - query
+    UpdateRouteRequestDto:
+      type: object
+      description: Запрос на изменение конфигурации маршрута
+      properties:
+        name:
+          type: string
+          description: Имя маршрута
+        description:
+          type: string
+          description: Описание маршрута
+        ownerName:
+          type: string
+          description: Username владельца. Если пустой – владельцем маршрута становится
+            инициатор запроса
+        publishedPorts:
+          type: string
+          description: Маппинг портов
+        networks:
+          type: array
+          description: Сети маршрута. Должны быть предварительно созданы
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            type: object
+          description: Конфигурация среды маршрута
+      required:
+      - description
+      - env
+      - name
+      - networks
+      - ownerName
+      - publishedPorts
     RouteUserActionDto:
       type: object
       description: Описание действия пользователя
