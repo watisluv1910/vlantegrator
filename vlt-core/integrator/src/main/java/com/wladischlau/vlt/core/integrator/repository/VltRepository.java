@@ -98,7 +98,7 @@ public class VltRepository {
 
     public List<VltRoute> findRoutesByFieldStartsWith(Field<String> field, String queryPrefix) {
         return ctx.selectFrom(VLT_ROUTE)
-                .where(field.startsWith(queryPrefix))
+                .where(field.startsWithIgnoreCase(queryPrefix.toLowerCase()))
                 .fetchInto(VltRoute.class);
     }
 
