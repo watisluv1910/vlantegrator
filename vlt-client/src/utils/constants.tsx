@@ -24,9 +24,9 @@ export const MAIN_ROUTES: Record<string, Route> = {
     },
     integrator: {
         icon: <RouteIcon/>,
-        text: "Интегратор",
+        text: "Маршруты",
         protected: true,
-        path: "/integrator"
+        path: "/routes"
     },
     health: {
         icon: <HealthIcon/>,
