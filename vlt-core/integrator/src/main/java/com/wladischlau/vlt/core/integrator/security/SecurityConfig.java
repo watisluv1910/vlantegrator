@@ -28,7 +28,11 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         manager -> manager
                                 .requestMatchers("/public/**").permitAll()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.yaml").permitAll()
+                                .requestMatchers("/swagger-ui.html",
+                                                 "/swagger-ui/**",
+                                                 "/v3/api-docs",
+                                                 "/v3/api-docs.yaml",
+                                                 "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
