@@ -22,6 +22,7 @@
         <swagger-annotations-jakarta.version>2.2.29</swagger-annotations-jakarta.version>
 
         <docker-java.version>3.5.0</docker-java.version>
+        <jgrapht.version>1.5.2</jgrapht.version>
 
         <jooq.version>3.20.3</jooq.version>
         <postgres-driver.version>42.7.5</postgres-driver.version>

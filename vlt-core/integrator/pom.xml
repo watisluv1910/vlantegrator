@@ -13,7 +13,6 @@
     <description>Модуль "Интегратор" платформы для построения межсервисных интеграций Vlantegrator</description>
 
     <properties>
-        <jgrapht.version>1.5.2</jgrapht.version>
         <jooq.generated.sources.directory>target/generated-sources/jooq</jooq.generated.sources.directory>
         <project.mainClass>com.wladischlau.vlt.core.integrator.IntegratorApplication</project.mainClass>
     </properties>
