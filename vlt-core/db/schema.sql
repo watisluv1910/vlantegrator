@@ -23,7 +23,7 @@ create table if not exists vlt_route
 create table if not exists vlt_route_user_action
 (
     id                uuid              not null primary key default pg_catalog.gen_random_uuid(),
-    vlt_route_id      uuid              not null references vlt_route,
+    vlt_route_id      uuid              not null,
     user_name         text              not null,
     user_display_name text              not null,
     action_type       route_user_action not null,
