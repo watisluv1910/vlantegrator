@@ -18,10 +18,7 @@ export interface NetworkDialogProps {
     open: boolean;
     onClose: () => void;
     onCreate: (name: string, driver: string) => Promise<void>;
-    /**
-     * Optional: initial driver value (e.g. “bridge”)
-     */
-    defaultDriver?: string;
+    defaultDriver: string;
 }
 
 const ALL_DRIVERS: string[] = [
