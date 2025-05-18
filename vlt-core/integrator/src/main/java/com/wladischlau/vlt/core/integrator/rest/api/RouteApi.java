@@ -59,9 +59,6 @@ public interface RouteApi {
     String BUILD_ROUTE = "buildRoute";
     String DEPLOY_ROUTE = "deployRoute";
     String GET_ROUTE_USER_ACTIONS = "getRouteUserActions";
-    // TODO: Move to separate controller later
-    String GET_USER_SETTINGS = "getUserSettings";
-    String UPDATE_USER_SETTINGS = "updateUserSettings";
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
@@ -377,54 +374,6 @@ public interface RouteApi {
             @NotNull @PathVariable(name = "id") UUID id,
             @Parameter(required = true, schema = @Schema(description = "Действие", type = "string"))
             @NotNull @RequestParam(name = "action") String action,
-            JwtAuthenticationToken principal) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @Operation(
-            security = @SecurityRequirement(name = "bearerAuth"),
-            operationId = GET_USER_SETTINGS,
-            summary = "Получить настройки пользователя",
-            description = "Получить настройки пользователя",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Настройки пользователя возвращены",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserSettingsDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-            }
-    )
-    @GetMapping(value = "/v1/user/settings", produces = MediaType.APPLICATION_JSON_VALUE)
-    default ResponseEntity<UserSettingsDto> getUserSettings(JwtAuthenticationToken principal) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @Operation(
-            security = @SecurityRequirement(name = "bearerAuth"),
-            operationId = UPDATE_USER_SETTINGS,
-            summary = "Обновить настройки пользователя",
-            description = "Обновить настройки пользователя",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Настройки пользователя обновлены"),
-                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "401", description = "Не авторизован",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
-            }
-    )
-    @PostMapping(value = "/v1/user/settings")
-    default ResponseEntity<Void> updateUserSettings(
-            @RequestBody(required = true, content = @Content(schema = @Schema(implementation = UserSettingsDto.class)))
-            @org.springframework.web.bind.annotation.RequestBody UserSettingsDto request,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
