@@ -138,12 +138,13 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<Void> updateRoute(UUID id, UpdateRouteRequestDto request,
                                             JwtAuthenticationToken principal) {
         return logRequestProcessing(UPDATE_ROUTE, () -> {
-            vltDataService.updateRoute(dtoMapper.fromDto(request, routeId));
             if (!canModifyRoute(principal, id)) {
                 throw new AccessDeniedException("Not allowed to modify route [id: " + id + "]");
             }
 
             vltDataService.updateRoute(dtoMapper.fromDto(request, id));
+            var action = new RouteUserAction(id, principal, RouteAction.UPDATE);
+            vltDataService.insertRouteUserAction(action);
             return ResponseEntity.ok().build();
         });
     }
@@ -188,7 +189,6 @@ public class RouteApiController extends ApiController implements RouteApi {
                 vltDataService.deleteRouteFullData(id);
             });
 
-            vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.DELETE));
             var action = new RouteUserAction(id, principal, RouteAction.DELETE);
             vltDataService.insertRouteUserAction(action);
 

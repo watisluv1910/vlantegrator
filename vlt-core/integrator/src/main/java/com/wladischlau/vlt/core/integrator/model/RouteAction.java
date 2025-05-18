@@ -11,6 +11,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public enum RouteAction {
     CREATE("create"),
+    UPDATE("update"),
     DELETE("delete"),
     BUILD("build"),
     START("start"),

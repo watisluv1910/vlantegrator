@@ -1,5 +1,6 @@
 import {
-    Save as SaveIcon,
+    AddCircleOutline as CreateIcon,
+    Edit as UpdateIcon,
     Handyman as BuildIcon,
     Start as StartIcon,
     StopCircle as StopIcon,
@@ -60,7 +61,8 @@ export function relativeTimeFromElapsed(elapsed: number): string {
 }
 
 const actionIconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
-    create: SaveIcon,
+    create: CreateIcon,
+    update: UpdateIcon,
     delete: DeleteIcon,
     build: BuildIcon,
     start: StartIcon,
