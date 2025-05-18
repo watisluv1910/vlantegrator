@@ -6,6 +6,7 @@ import {RoutesPage} from "@/pages/route/Routes.tsx";
 import {CreateRoutePage} from "@/pages/route/CreateRoute.tsx";
 import {IntegratorPage} from "@/pages/Integrator.tsx";
 import {EditRoutePage} from "@/pages/route/UpdateRoute.tsx";
+import {UserSettingsPage} from "@/pages/UserSettings.tsx";
 
 import "@fontsource/ubuntu";
 import "@fontsource/madimi-one";
@@ -25,7 +26,7 @@ export const App: React.FC = () => {
                     <Route path={MAIN_ROUTES.health.path} element={<HomePage/>}/>
                     <Route path={MAIN_ROUTES.docs.path} element={<HomePage/>}/>
                     <Route path={MAIN_ROUTES.help.path} element={<HomePage/>}/>
-                    <Route path={MAIN_ROUTES.settings.path} element={<HomePage/>}/>
+                    <Route path={MAIN_ROUTES.settings.path} element={<UserSettingsPage/>}/>
                 </Route>
             </Routes>
         </>

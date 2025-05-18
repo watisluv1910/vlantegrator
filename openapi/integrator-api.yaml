@@ -14,6 +14,8 @@ tags:
   description: Прямое взаимодействие с Docker
 - name: Routes API
   description: Операции для работы с маршрутами
+- name: User API
+  description: Управление данными пользователей
 - name: Actuator
   description: Monitor and interact
   externalDocs:
@@ -27,7 +29,7 @@ paths:
   /api/v1/user/settings:
     get:
       tags:
-      - Routes API
+      - User API
       summary: Получить настройки пользователя
       description: Получить настройки пользователя
       operationId: getUserSettings
@@ -66,7 +68,7 @@ paths:
       - bearerAuth: []
     post:
       tags:
-      - Routes API
+      - User API
       summary: Обновить настройки пользователя
       description: Обновить настройки пользователя
       operationId: updateUserSettings
