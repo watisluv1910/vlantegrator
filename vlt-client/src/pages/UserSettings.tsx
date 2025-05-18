@@ -50,6 +50,7 @@ export const UserSettingsPage: React.FC = () => {
     });
 
     const [local, setLocal] = useState<UserSettingsDto | null>(null);
+
     useEffect(() => {
         if (settings) setLocal(settings);
     }, [settings]);
@@ -70,9 +71,7 @@ export const UserSettingsPage: React.FC = () => {
                 const parsed =
                     key === "showGrid"
                         ? (e.target as HTMLInputElement).checked
-                        : key === "autosaveIntervalMs"
-                            ? Number(raw)
-                            : raw;
+                        : key === "autosaveIntervalMs" ? Number(raw) : raw;
                 const updated: UserSettingsDto = {
                     ...local,
                     editor: {...local.editor, [key]: parsed},
@@ -95,16 +94,39 @@ export const UserSettingsPage: React.FC = () => {
 
     if (isLoading || !local) {
         return (
-            <Box textAlign="center" mt={4}>
-                <CircularProgress/>
-            </Box>
+            <>
+                <Header currPath={["Настройки"]}/>
+                <Sidebar/>
+
+                <Box textAlign="center" sx={{
+                    ml: `${sidebarWidth}px`,
+                    transition: "margin .2s",
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 3,
+                }}>
+                    <CircularProgress/>
+                </Box>
+            </>
         );
     }
+
     if (isError) {
         return (
-            <Box p={3}>
-                <Alert severity="error">Не удалось загрузить настройки пользователя.</Alert>
-            </Box>
+            <>
+                <Header currPath={["Настройки"]}/>
+                <Sidebar/>
+
+                <Box sx={{
+                    ml: `${sidebarWidth}px`,
+                    transition: "margin .2s",
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 3,
+                }}>
+                    <Alert severity="error">Не удалось загрузить настройки пользователя.</Alert>
+                </Box>
+            </>
         );
     }
 
@@ -178,7 +200,7 @@ export const UserSettingsPage: React.FC = () => {
                         </FormControl>
                     </Paper>
 
-                    <Paper sx={{display: "flex", flexDirection:"column", p: 3}}>
+                    <Paper sx={{display: "flex", flexDirection: "column", p: 3}}>
                         <Typography variant="h6" align="center" gutterBottom>
                             Доступность
                         </Typography>
