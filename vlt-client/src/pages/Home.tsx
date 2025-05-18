@@ -57,7 +57,7 @@ export const HomePage = () => {
     );
 
     const recentActivities: ActivityEntry[] | undefined = activities?.data?.map(action => ({
-        routeId: `${action.routeId.id}.${action.routeId.versionHash}`,
+        routeId: `${action.routeId.id}`,
         user: action.userDisplayName,
         time: relativeTimeFromDates(new Date(parseInt(action.attemptedAt) * 1000), new Date()),
         action: action.action,

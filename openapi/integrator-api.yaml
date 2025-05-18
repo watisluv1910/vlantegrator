@@ -941,12 +941,9 @@ components:
             type: object
           description: Конфигурация среды маршрута
       required:
-      - description
       - env
       - name
       - networks
-      - ownerName
-      - publishedPorts
     DockerNetworkDto:
       type: object
       description: Docker-сеть
@@ -1180,12 +1177,9 @@ components:
             type: object
           description: Конфигурация среды маршрута
       required:
-      - description
       - env
       - name
       - networks
-      - ownerName
-      - publishedPorts
     RouteUserActionDto:
       type: object
       description: Описание действия пользователя
