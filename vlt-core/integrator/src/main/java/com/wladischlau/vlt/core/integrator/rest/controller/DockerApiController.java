@@ -1,7 +1,6 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
-import com.wladischlau.vlt.core.integrator.model.DockerNetwork;
 import com.wladischlau.vlt.core.integrator.rest.api.DockerApi;
 import com.wladischlau.vlt.core.integrator.rest.dto.DockerNetworkDto;
 import com.wladischlau.vlt.core.integrator.service.DockerService;

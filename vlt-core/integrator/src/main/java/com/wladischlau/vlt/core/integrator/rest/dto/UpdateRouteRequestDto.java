@@ -8,23 +8,18 @@ import java.util.Map;
 
 @Schema(description = "Запрос на изменение конфигурации маршрута")
 public record UpdateRouteRequestDto(
-        @Schema(description = "Имя маршрута",
-                requiredMode = RequiredMode.REQUIRED)
+        @Schema(description = "Имя маршрута", requiredMode = RequiredMode.REQUIRED)
         String name,
-        @Schema(description = "Описание маршрута",
-                requiredMode = RequiredMode.REQUIRED)
+        @Schema(description = "Описание маршрута", requiredMode = RequiredMode.NOT_REQUIRED)
         String description,
         @Schema(description = "Username владельца. Если пустой – владельцем маршрута становится инициатор запроса",
-                requiredMode = RequiredMode.REQUIRED)
+                requiredMode = RequiredMode.NOT_REQUIRED)
         String ownerName,
-        @Schema(description = "Маппинг портов",
-                requiredMode = RequiredMode.REQUIRED)
+        @Schema(description = "Маппинг портов", requiredMode = RequiredMode.NOT_REQUIRED)
         String publishedPorts,
-        @Schema(description = "Сети маршрута. Должны быть предварительно созданы",
-                requiredMode = RequiredMode.REQUIRED)
+        @Schema(description = "Сети маршрута. Должны быть предварительно созданы", requiredMode = RequiredMode.REQUIRED)
         List<DockerNetworkDto> networks,
-        @Schema(description = "Конфигурация среды маршрута",
-                requiredMode = RequiredMode.REQUIRED)
+        @Schema(description = "Конфигурация среды маршрута", requiredMode = RequiredMode.REQUIRED)
         Map<String, Object> env
 ) {
 }

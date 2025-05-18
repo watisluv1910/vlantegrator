@@ -9,11 +9,12 @@ import java.util.Map;
 public record CreateRouteRequestDto(
         @Schema(description = "Имя маршрута", requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
-        @Schema(description = "Описание маршрута", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "Описание маршрута", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String description,
-        @Schema(description = "Username владельца. Если пустой – владельцем маршрута становится инициатор запроса", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "Username владельца. Если пустой – владельцем маршрута становится инициатор запроса",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String ownerName,
-        @Schema(description = "Маппинг портов", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "Маппинг портов", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String publishedPorts,
         @Schema(description = "Сети маршрута. Должны быть предварительно созданы", requiredMode = Schema.RequiredMode.REQUIRED)
         List<DockerNetworkDto> networks,

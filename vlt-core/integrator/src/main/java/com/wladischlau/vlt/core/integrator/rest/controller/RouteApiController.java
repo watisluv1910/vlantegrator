@@ -56,7 +56,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<RouteIdDto> createRoute(CreateRouteRequestDto request,
                                                   JwtAuthenticationToken principal) {
         return logRequestProcessingWithResponse(CREATE_ROUTE, () -> {
-            var owner = Optional.ofNullable(request.ownerName()).orElse(principal.getName());
+            var owner = StringUtils.defaultIfBlank(request.ownerName(), principal.getName());
             var route = dtoMapper.fromDto(request, owner);
             var id = vltDataService.createRoute(route);
             vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.CREATE));
