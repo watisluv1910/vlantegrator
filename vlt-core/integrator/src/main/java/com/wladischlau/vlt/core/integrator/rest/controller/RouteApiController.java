@@ -30,7 +30,6 @@ import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,7 +58,8 @@ public class RouteApiController extends ApiController implements RouteApi {
             var owner = StringUtils.defaultIfBlank(request.ownerName(), principal.getName());
             var route = dtoMapper.fromDto(request, owner);
             var id = vltDataService.createRoute(route);
-            vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.CREATE));
+            var action = new RouteUserAction(id, principal, RouteAction.CREATE);
+            vltDataService.insertRouteUserAction(action);
             return ResponseEntity.status(HttpStatus.CREATED).body(dtoMapper.toDto(id));
         });
     }
@@ -135,11 +135,15 @@ public class RouteApiController extends ApiController implements RouteApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateRoute(UUID routeId, UpdateRouteRequestDto request,
+    public ResponseEntity<Void> updateRoute(UUID id, UpdateRouteRequestDto request,
                                             JwtAuthenticationToken principal) {
-        // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE, () -> {
             vltDataService.updateRoute(dtoMapper.fromDto(request, routeId));
+            if (!canModifyRoute(principal, id)) {
+                throw new AccessDeniedException("Not allowed to modify route [id: " + id + "]");
+            }
+
+            vltDataService.updateRoute(dtoMapper.fromDto(request, id));
             return ResponseEntity.ok().build();
         });
     }
@@ -149,8 +153,11 @@ public class RouteApiController extends ApiController implements RouteApi {
                                                             String versionHash,
                                                             RouteDefinitionDto request,
                                                             JwtAuthenticationToken principal) {
-        // TODO: Add owner check
         return logRequestProcessing(UPDATE_ROUTE_DEFINITION, () -> {
+            if (!canModifyRoute(principal, id)) {
+                throw new AccessDeniedException("Not allowed to modify route [id: " + id + "]");
+            }
+
             var nodes = request.nodes().stream()
                     .map(nodeDto -> vltDataService.findAdapterById(nodeDto.adapterId())
                             .map(adapter -> dtoMapper.fromDto(nodeDto, adapter))
@@ -160,6 +167,7 @@ public class RouteApiController extends ApiController implements RouteApi {
                                 return new NoSuchElementException(msg);
                             }))
                     .toList();
+
             var connections = dtoMapper.fromDtoToConnectionsFullData(request.connections());
             var routeId = new RouteId(id, versionHash);
             var newRouteId = vltDataService.updateRouteDefinition(routeId, nodes, connections);
@@ -172,7 +180,7 @@ public class RouteApiController extends ApiController implements RouteApi {
     public ResponseEntity<Void> deleteRoute(UUID id, JwtAuthenticationToken principal) {
         return logRequestProcessing(DELETE_ROUTE, () -> {
             if (!canModifyRoute(principal, id)) {
-                throw new AccessDeniedException("Not allowed to modify a desired route");
+                throw new AccessDeniedException("Not allowed to modify route [id: " + id + "]");
             }
 
             vltDataService.findRouteById(id).ifPresent(it -> {
@@ -181,6 +189,8 @@ public class RouteApiController extends ApiController implements RouteApi {
             });
 
             vltDataService.insertRouteUserAction(new RouteUserAction(id, principal, RouteAction.DELETE));
+            var action = new RouteUserAction(id, principal, RouteAction.DELETE);
+            vltDataService.insertRouteUserAction(action);
 
             return ResponseEntity.noContent().build();
         });
@@ -212,8 +222,8 @@ public class RouteApiController extends ApiController implements RouteApi {
         return logRequestProcessing(DEPLOY_ROUTE, () -> {
             var actionType = DeployActionType.valueOf(action.trim().toUpperCase());
             vltDataService.findRouteById(id).ifPresent(it -> deployerDelegate.sendDeployRequest(it, actionType));
-            var routeUserAction = new RouteUserAction(id, principal, RouteAction.fromDeployRequestType(actionType));
-            vltDataService.insertRouteUserAction(routeUserAction);
+            var routeAction = new RouteUserAction(id, principal, RouteAction.fromDeployRequestType(actionType));
+            vltDataService.insertRouteUserAction(routeAction);
             return ResponseEntity.accepted().build();
         });
     }
