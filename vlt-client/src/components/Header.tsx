@@ -18,17 +18,20 @@ import {
     Logout as LogoutIcon,
     Settings as SettingsIcon,
 } from '@mui/icons-material';
-import {Alert} from "./Alert.tsx";
-import {THEME} from "../styles/muiConfig.ts";
-import {handleCopyEvent} from "../utils/handlers.ts";
-import {MainSidebarContext} from "../hooks/sidebarContexts.tsx";
+import {Alert} from "@/components/Alert.tsx";
+import {THEME} from "@/styles/muiConfig.ts";
+import {handleCopyEvent} from "@/utils/handlers.ts";
+import {MainSidebarContext} from "@/hooks/sidebarContexts.tsx";
+import {ACCOUNT_MANAGEMENT_URL} from "@/config/keycloak.ts";
 
 export type HeaderProps = {
     currPath: string[];
 };
 
+const RENEW_AFTER_REDIRECT_FLAG: string = "renew_after_account_update";
+
 export const Header = (props: HeaderProps) => {
-    const auth: AuthContextProps = useAuth();
+    let auth: AuthContextProps = useAuth();
 
     const profile = auth.user!.profile;
     const email = profile?.email;
@@ -37,8 +40,8 @@ export const Header = (props: HeaderProps) => {
     if (!displayName) {
         return (
             <Alert variant={"error"}>
-                <h1>Error displaying user name, try reloading page and login again or refine user configuration in
-                    Keycloak</h1>
+                <h1>Имя пользователя не найдено, попробуйте обновить страницу
+                    и совершить вход или проверьте настройки пользователя в Keycloak</h1>
             </Alert>
         );
     }
@@ -46,8 +49,8 @@ export const Header = (props: HeaderProps) => {
     if (!email) {
         return (
             <Alert variant={"error"}>
-                <h1>User email not found, try reloading page and login again or refine user configuration in
-                    Keycloak</h1>
+                <h1>Электронная почта пользователя не найдена, попробуйте обновить страницу
+                    и совершить вход или проверьте настройки пользователя в Keycloak</h1>
             </Alert>
         );
     }
@@ -73,8 +76,19 @@ export const Header = (props: HeaderProps) => {
         authProps.signoutRedirect().then(_ => console.log("Logout successful"));
     };
 
+    React.useEffect(() => {
+        if (sessionStorage.getItem(RENEW_AFTER_REDIRECT_FLAG)) {
+            sessionStorage.removeItem(RENEW_AFTER_REDIRECT_FLAG);
+            auth
+                .removeUser()
+                .then(() => auth.signinRedirect())
+                .catch((err) => console.error("Silent renew failed", err));
+        }
+    }, [auth]);
+
     const handleSettings = () => {
-        handleMenuClose();
+        sessionStorage.setItem(RENEW_AFTER_REDIRECT_FLAG, "1");
+        window.location.href = ACCOUNT_MANAGEMENT_URL;
     };
 
     return (

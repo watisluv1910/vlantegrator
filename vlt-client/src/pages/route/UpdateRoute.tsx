@@ -85,7 +85,7 @@ export const EditRoutePage: React.FC = () => {
 
     return (
         <>
-            <Header currPath={["Маршруты", "Редактирование"]}/>
+            <Header currPath={["Маршруты", `${route?.name}`, "Редактирование"]}/>
             <Sidebar/>
 
             <Box
