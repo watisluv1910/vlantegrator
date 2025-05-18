@@ -14,6 +14,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.SearchRoutesRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UserSettingsDto;
 import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
@@ -225,6 +226,25 @@ public class RouteApiController extends ApiController implements RouteApi {
             var routeAction = new RouteUserAction(id, principal, RouteAction.fromDeployRequestType(actionType));
             vltDataService.insertRouteUserAction(routeAction);
             return ResponseEntity.accepted().build();
+        });
+    }
+
+    @Override
+    public ResponseEntity<UserSettingsDto> getUserSettings(JwtAuthenticationToken principal) {
+        return logRequestProcessing(GET_USER_SETTINGS, () -> {
+            var username = principal.getName();
+            var settings = vltDataService.findUserSettings(username);
+            var dto = dtoMapper.toDto(settings);
+            return ResponseEntity.ok(dto);
+        });
+    }
+
+    @Override
+    public ResponseEntity<Void> updateUserSettings(UserSettingsDto request, JwtAuthenticationToken principal) {
+        return logRequestProcessing(UPDATE_USER_SETTINGS, () -> {
+            var username = principal.getName();
+            vltDataService.updateUserSettings(username, dtoMapper.fromDto(request));
+            return ResponseEntity.ok().build();
         });
     }
 

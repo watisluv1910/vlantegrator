@@ -18,6 +18,7 @@ import com.wladischlau.vlt.core.integrator.model.RouteDefinition;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
 import com.wladischlau.vlt.core.integrator.model.SearchRoutesField;
+import com.wladischlau.vlt.core.integrator.model.UserSettings;
 import com.wladischlau.vlt.core.integrator.repository.VltRepository;
 import com.wladischlau.vlt.core.integrator.utils.VersionBucket;
 import com.wladischlau.vlt.core.integrator.utils.VersionHashGenerator;
@@ -333,6 +334,19 @@ public class VltDataService {
         repository.deleteRoute(routeId);
 
         dropFromCache(routeId);
+    }
+
+    @Transactional
+    public UserSettings findUserSettings(@NotEmpty String username) {
+        var settings = repository.findUserSettings(username)
+                .orElse(repository.createDefaultUserSettings(username));
+
+        return modelMapper.toModel(settings);
+    }
+
+    @Transactional
+    public void updateUserSettings(@NotEmpty String username, UserSettings userSettings) {
+        repository.updateUserSettings(modelMapper.toJooq(userSettings, username));
     }
 
     private Optional<RouteCacheData> getFromCache(UUID routeId, String versionHash) {

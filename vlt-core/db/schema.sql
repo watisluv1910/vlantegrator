@@ -1,6 +1,7 @@
 create schema if not exists "$DB_SCHEMA";
 set search_path to "$DB_SCHEMA";
 
+-- Routes
 create type adapter_direction as enum ('OUTBOUND', 'INBOUND', 'COMMON');
 create type channel_kind as enum ('CHANNEL', 'GATEWAY', 'NONE');
 create type edge_type as enum ('default', 'straight', 'step', 'smoothstep', 'simplebezier');
@@ -8,6 +9,19 @@ create type marker_type as enum ('arrow', 'arrowclosed');
 create type node_role as enum ('default', 'input', 'output', 'group');
 create type route_user_action as enum ('create', 'update', 'build', 'start', 'stop', 'restart', 'remove', 'delete');
 create type network_driver as enum ('bridge', 'host', 'none', 'overlay', 'ipvlan', 'macvlan');
+
+-- Settings
+create type theme as enum ('light', 'dark', 'system');
+create type viewport_position as enum ('origin', 'center', 'bottom');
+
+create or replace function trigger_refresh_updated_at()
+    returns trigger as
+'
+    begin
+        new.updated_at = clock_timestamp();
+        return new;
+    end;
+' language plpgsql;
 
 create table if not exists vlt_route
 (
@@ -31,6 +45,24 @@ create table if not exists vlt_route_user_action
 );
 
 create index if not exists vlt_route_user_action_vlt_route_idx on vlt_route_user_action (vlt_route_id);
+
+create table if not exists vlt_user_settings
+(
+    username             text              not null primary key,
+    show_grid            boolean           not null default true,
+    default_position     viewport_position not null default 'origin',
+    autosave_interval_ms bigint            not null default -1, -- Defaults to disabled
+    disable_animations   boolean           not null default false,
+    high_contrast        boolean           not null default false,
+    created_at           timestamptz       not null default clock_timestamp(),
+    updated_at           timestamptz
+);
+
+create trigger refresh_updated_at_on_vlt_user_settings
+    before update
+    on vlt_user_settings
+    for each row
+execute procedure trigger_refresh_updated_at();
 
 create table if not exists vlt_adapter
 (

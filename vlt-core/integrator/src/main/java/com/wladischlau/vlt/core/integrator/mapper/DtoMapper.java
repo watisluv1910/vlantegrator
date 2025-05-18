@@ -17,6 +17,7 @@ import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteCacheData;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
+import com.wladischlau.vlt.core.integrator.model.UserSettings;
 import com.wladischlau.vlt.core.integrator.rest.dto.AdapterDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.ConnectionStyleDto;
@@ -30,6 +31,9 @@ import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UserAccessibilitySettingsDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UserEditorSettingsDto;
+import com.wladischlau.vlt.core.integrator.rest.dto.UserSettingsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -201,4 +205,30 @@ public interface DtoMapper {
     List<DockerNetwork> fromDtoToDockerNetworks(List<DockerNetworkDto> src);
 
     List<DockerNetworkDto> toDtoFromDockerNetwork(List<DockerNetwork> src);
+
+    @Mapping(target = "editor", source = "editorSettings")
+    @Mapping(target = "accessibility", source = "accessibilitySettings")
+    UserSettingsDto toDto(UserSettings src);
+
+    @Mapping(target = "editorSettings", source = "editor")
+    @Mapping(target = "accessibilitySettings", source = "accessibility")
+    UserSettings fromDto(UserSettingsDto src);
+
+    @Mapping(target = "showGrid", source = "showGrid")
+    @Mapping(target = "defaultViewportPosition", source = "defaultViewportPosition")
+    @Mapping(target = "autosaveIntervalMs", source = "autosaveIntervalMs")
+    UserEditorSettingsDto toUserEditorSettingsDto(UserSettings.EditorSettings src);
+
+    @Mapping(target = "showGrid", source = "showGrid")
+    @Mapping(target = "defaultViewportPosition", source = "defaultViewportPosition")
+    @Mapping(target = "autosaveIntervalMs", source = "autosaveIntervalMs")
+    UserSettings.EditorSettings fromUserEditorSettingsDto(UserEditorSettingsDto src);
+
+    @Mapping(target = "disableAnimations", source = "disableAnimations")
+    @Mapping(target = "enableHighContrast", source = "enableHighContrast")
+    UserAccessibilitySettingsDto toUserAccessibilitySettingsDto(UserSettings.AccessibilitySettings src);
+
+    @Mapping(target = "disableAnimations", source = "disableAnimations")
+    @Mapping(target = "enableHighContrast", source = "enableHighContrast")
+    UserSettings.AccessibilitySettings fromUserAccessibilitySettingsDto(UserSettings.AccessibilitySettings src);
 }

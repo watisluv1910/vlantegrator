@@ -12,6 +12,7 @@ import com.wladischlau.vlt.core.integrator.model.Route;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.integrator.model.RouteAction;
 import com.wladischlau.vlt.core.integrator.model.RouteUserAction;
+import com.wladischlau.vlt.core.integrator.model.UserSettings;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.AdapterDirection;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.ChannelKind;
 import com.wladischlau.vlt.core.jooq.vlt_repo.enums.NetworkDriver;
@@ -24,6 +25,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltUserSettings;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -187,4 +189,27 @@ public interface ModelMapper {
     @Mapping(target = "animated", source = "style.animated")
     @Mapping(target = "focusable", source = "style.focusable")
     VltNodeConnectionStyle toJooq(ConnectionStyle style, UUID connectionId);
+
+    @Mapping(target = "editorSettings", expression = "java(toEditorSettingsModel(src))")
+    @Mapping(target = "accessibilitySettings", expression = "java(toAccessibilitySettingsModel(src))")
+    UserSettings toModel(VltUserSettings src);
+
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "username", source = "username")
+    @Mapping(target = "showGrid", source = "settings.editorSettings.showGrid")
+    @Mapping(target = "defaultPosition", expression = "java(ViewportPosition.lookupLiteral(settings.editorSettings().defaultViewportPosition()))")
+    @Mapping(target = "autosaveIntervalMs", source = "settings.editorSettings.autosaveIntervalMs")
+    @Mapping(target = "disableAnimations", source = "settings.accessibilitySettings.disableAnimations")
+    @Mapping(target = "highContrast", source = "settings.accessibilitySettings.enableHighContrast")
+    VltUserSettings toJooq(UserSettings settings, String username);
+
+    @Mapping(target = "showGrid", source = "showGrid")
+    @Mapping(target = "defaultViewportPosition", expression = "java(src.defaultPosition().getLiteral())")
+    @Mapping(target = "autosaveIntervalMs", source = "autosaveIntervalMs")
+    UserSettings.EditorSettings toEditorSettingsModel(VltUserSettings src);
+
+    @Mapping(target = "disableAnimations", source = "disableAnimations")
+    @Mapping(target = "enableHighContrast", source = "highContrast")
+    UserSettings.AccessibilitySettings toAccessibilitySettingsModel(VltUserSettings src);
 }

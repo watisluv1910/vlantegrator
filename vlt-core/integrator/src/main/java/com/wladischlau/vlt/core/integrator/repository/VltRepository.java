@@ -13,6 +13,7 @@ import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltNodeStyle;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRoute;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteNetwork;
 import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltRouteUserAction;
+import com.wladischlau.vlt.core.jooq.vlt_repo.tables.pojos.VltUserSettings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -234,18 +235,6 @@ public class VltRepository {
                 .execute();
     }
 
-    public void deleteNodeStylesFromRouteExcluding(UUID routeId,
-                                                   List<UUID> toExcludeNodesIds) {
-        ctx.deleteFrom(VLT_NODE_STYLE)
-                .where(VLT_NODE_STYLE.VLT_NODE_ID.in(
-                        ctx.select(VLT_NODE.ID)
-                                .from(VLT_NODE)
-                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                                .and(VLT_NODE.ID.notIn(toExcludeNodesIds))
-                ))
-                .execute();
-    }
-
     public void upsertNodePosition(VltNodePosition position) {
         ctx.insertInto(VLT_NODE_POSITION)
                 .set(ctx.newRecord(VLT_NODE_POSITION, position))
@@ -269,18 +258,6 @@ public class VltRepository {
                         ctx.select(VLT_NODE.ID)
                                 .from(VLT_NODE)
                                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))))
-                .execute();
-    }
-
-    public void deleteNodePositionsFromRouteExcluding(UUID routeId,
-                                                      List<UUID> toExcludeNodesIds) {
-        ctx.deleteFrom(VLT_NODE_POSITION)
-                .where(VLT_NODE_POSITION.VLT_NODE_ID.in(
-                        ctx.select(VLT_NODE.ID)
-                                .from(VLT_NODE)
-                                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                                .and(VLT_NODE.ID.notIn(toExcludeNodesIds)))
-                )
                 .execute();
     }
 
@@ -308,19 +285,6 @@ public class VltRepository {
         var subStep = ctx.select(VLT_NODE.ID)
                 .from(VLT_NODE)
                 .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId));
-
-        ctx.deleteFrom(VLT_NODE_CONNECTION)
-                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
-                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))
-                .execute();
-    }
-
-    public void deleteNodeConnectionsFromRouteExcludingNodes(UUID routeId,
-                                                             List<UUID> toExcludeNodesIds) {
-        var subStep = ctx.select(VLT_NODE.ID)
-                .from(VLT_NODE)
-                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                .and(VLT_NODE.ID.notIn(toExcludeNodesIds));
 
         ctx.deleteFrom(VLT_NODE_CONNECTION)
                 .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
@@ -361,19 +325,24 @@ public class VltRepository {
                 .execute();
     }
 
-    public void deleteNodeConnectionStylesFromRouteExcludingNodes(UUID routeId,
-                                                                  List<UUID> toExcludeNodeIds) {
-        var subStep = ctx.select(VLT_NODE.ID)
-                .from(VLT_NODE)
-                .where(VLT_NODE.VLT_ROUTE_ID.eq(routeId))
-                .and(VLT_NODE.ID.notIn(toExcludeNodeIds));
+    public Optional<VltUserSettings> findUserSettings(String username) {
+        return ctx.selectFrom(VLT_USER_SETTINGS)
+                .where(VLT_USER_SETTINGS.USERNAME.eq(username))
+                .fetchOptionalInto(VltUserSettings.class);
+    }
 
-        ctx.deleteFrom(VLT_NODE_CONNECTION_STYLE)
-                .where(VLT_NODE_CONNECTION_STYLE.VLT_NODE_CONNECTION_ID.in(
-                        ctx.select(VLT_NODE_CONNECTION.ID)
-                                .from(VLT_NODE_CONNECTION)
-                                .where(VLT_NODE_CONNECTION.SOURCE_ID.in(subStep))
-                                .or(VLT_NODE_CONNECTION.TARGET_ID.in(subStep))))
+    public VltUserSettings createDefaultUserSettings(String username) {
+        return ctx.insertInto(VLT_USER_SETTINGS)
+                .set(VLT_USER_SETTINGS.USERNAME, username)
+                .onDuplicateKeyIgnore()
+                .returningResult(VLT_USER_SETTINGS)
+                .fetchOneInto(VltUserSettings.class);
+    }
+
+    public void updateUserSettings(VltUserSettings settings) {
+        ctx.update(VLT_USER_SETTINGS)
+                .set(ctx.newRecord(VLT_USER_SETTINGS, settings))
+                .where(VLT_USER_SETTINGS.USERNAME.eq(settings.username()))
                 .execute();
     }
 }

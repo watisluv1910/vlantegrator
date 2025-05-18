@@ -24,6 +24,87 @@ tags:
 - name: Adapters API
   description: Операции для работы с адаптерами маршрутов
 paths:
+  /api/v1/user/settings:
+    get:
+      tags:
+      - Routes API
+      summary: Получить настройки пользователя
+      description: Получить настройки пользователя
+      operationId: getUserSettings
+      responses:
+        "200":
+          description: Настройки пользователя возвращены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettingsDto"
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Routes API
+      summary: Обновить настройки пользователя
+      description: Обновить настройки пользователя
+      operationId: updateUserSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSettingsDto"
+        required: true
+      responses:
+        "200":
+          description: Настройки пользователя обновлены
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
   /api/v1/route:
     get:
       tags:
@@ -880,19 +961,6 @@ paths:
                 type: object
 components:
   schemas:
-    RouteIdDto:
-      type: object
-      description: Полный идентификатор маршрута
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: ID маршрута
-        versionHash:
-          type: string
-          description: Хэш-код версии маршрута
-      required:
-      - id
     ProblemDetail:
       type: object
       properties:
@@ -913,6 +981,64 @@ components:
           type: object
           additionalProperties:
             type: object
+    UserAccessibilitySettingsDto:
+      type: object
+      description: Пользовательские настройки accessibility
+      properties:
+        disableAnimations:
+          type: boolean
+          description: Выключить анимации
+        enableHighContrast:
+          type: boolean
+          description: Включить режим высокой контрастности
+      required:
+      - disableAnimations
+      - enableHighContrast
+    UserEditorSettingsDto:
+      type: object
+      description: Пользовательские настройки редактора маршрутов
+      properties:
+        showGrid:
+          type: boolean
+          description: Показывать ли сетку в редакторе маршрута
+        defaultViewportPosition:
+          type: string
+          description: Позиция камеры по-умолчанию в редакторе маршрута
+        autosaveIntervalMs:
+          type: integer
+          format: int64
+          description: "Интервал в Мс, через который определение маршрута будет со\
+            храняться автоматически. -1 для отключения"
+      required:
+      - autosaveIntervalMs
+      - defaultViewportPosition
+      - showGrid
+    UserSettingsDto:
+      type: object
+      description: Пользовательские настройки. Не влияют на работу всей платформы
+      properties:
+        editor:
+          $ref: "#/components/schemas/UserEditorSettingsDto"
+          description: Настройки редактора маршрутов
+        accessibility:
+          $ref: "#/components/schemas/UserAccessibilitySettingsDto"
+          description: Настройки редактора accessibility
+      required:
+      - accessibility
+      - editor
+    RouteIdDto:
+      type: object
+      description: Полный идентификатор маршрута
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID маршрута
+        versionHash:
+          type: string
+          description: Хэш-код версии маршрута
+      required:
+      - id
     CreateRouteRequestDto:
       type: object
       description: Запрос на создание маршрута
