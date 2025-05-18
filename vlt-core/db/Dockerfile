@@ -11,4 +11,7 @@ RUN apk add --no-cache bash \
 
 FROM postgres:17.4
 
+RUN rm -rf /var/lib/postgresql/data/*
+VOLUME /var/lib/postgresql/data
+
 COPY --from=build schema_ready.sql /docker-entrypoint-initdb.d/10_schema.sql
