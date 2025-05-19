@@ -7,6 +7,7 @@ import {
     Route as RouteIcon,
     Settings as SettingsIcon,
 } from "@mui/icons-material";
+import {Position} from "@xyflow/react";
 
 export type Route = {
     icon: ReactElement;
@@ -72,3 +73,14 @@ export const RECENT_ACTIVITY_POLLING_INTERVAL_MS = 13000;
 export const BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS = 8000;
 
 export const ROUTES_SEARCH_DEBOUNCE_MS = 800;
+
+// Настройки редактора маршрутов
+
+export const SNAP_SIZE: [number, number] = [20, 20];
+export const ADAPTER_PREVIEW_SIZE = 48;
+
+export const FLOW_NODE_DEFAULT_SIZE = 60;
+export const FLOW_NODE_DEFAULTS = {
+    sourcePosition: Position.Bottom,
+    targetPosition: Position.Top,
+};

@@ -1,231 +1,199 @@
 import React, {useCallback, useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import {
     addEdge,
     Background,
-    Controls, Edge,
+    BackgroundVariant,
+    Connection,
+    Controls,
+    Edge,
     MarkerType,
-    Position,
+    Node,
+    OnSelectionChangeParams,
     ReactFlow,
     ReactFlowProvider,
-    Node,
-    Connection,
     useEdgesState,
     useNodesState,
-    useReactFlow,
-    useOnSelectionChange, OnSelectionChangeParams
+    useOnSelectionChange,
+    useReactFlow
 } from "@xyflow/react";
+import {useQuery} from "@tanstack/react-query";
 import {
+    Alert,
     Box,
-    Checkbox, Divider,
+    Checkbox,
+    Divider,
     FormControl,
     IconButton,
     InputLabel,
     ListItemText,
     MenuItem,
-    OutlinedInput, Paper,
+    OutlinedInput,
+    Paper,
     Select,
     SelectChangeEvent,
-    TextField, Tooltip,
-    Typography, useTheme
+    TextField,
+    Theme,
+    Tooltip,
+    Typography,
+    useTheme
 } from "@mui/material";
-import {
-    Storage as JdbcAdapterIcon,
-    Http as HttpAdapterIcon,
-    Transform as TransformerAdapterIcon,
-    HistoryEdu as LoggerAdapterIcon,
-} from "@mui/icons-material";
 import {useColorScheme} from "@mui/material/styles";
-import {AdaptersApiService} from "@/api/sdk.gen.ts";
-import {AdapterDto} from "@/api/types.gen.ts";
+import {AdaptersApiService, RoutesApiService} from "@/api/sdk.gen.ts";
+import {AdapterDto, ConnectionDto, NodeDto, RouteDefinitionDto, RouteDto} from "@/api/types.gen.ts";
 import {adapterIconMap} from "@/utils/adapterUtils.ts";
 import {Header} from "@/components/Header.tsx";
 import {Sidebar} from "@/components/Sidebar.tsx";
-import {IntegratorSidebarContext} from "@/hooks/sidebarContexts.tsx";
+import {IntegratorSidebarContext, MainSidebarContext} from "@/hooks/sidebarContexts.tsx";
 import {IntegratorSidebar} from "@/components/IntegratorSidebar.tsx";
 import {IntegratorPowerTool} from "@/components/IntegratorPowerTool.tsx";
 
 import "@xyflow/react/dist/style.css";
+import {ADAPTER_PREVIEW_SIZE, FLOW_NODE_DEFAULTS, SNAP_SIZE} from "@/utils/constants.tsx";
+import {handleAddNode} from "@/utils/handlers.tsx";
 
 type AdaptersGroupBy = "type" | "direction" | "channelKind";
 
-const nodeDefaults = {
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-};
-
-const initialNodes: Node[] = [
-    {
-        id: "http-inbound",
-        type: "default",
-        data: {
-            label: (
-                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
-                    <HttpAdapterIcon fontSize="large"/>
-                    <Typography>HTTP Inbound Gateway</Typography>
-                </Box>
-            )
-        },
-        position: {x: 250, y: 0},
-        style: {width: 180, height: 100, borderRadius: 16},
-        targetPosition: Position.Bottom,
-    },
-    {
-        id: "transform",
-        type: "default",
-        data: {
-            label: (
-                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
-                    <TransformerAdapterIcon fontSize="large"/>
-                    <Typography>Transformer</Typography>
-                </Box>
-            )
-        },
-        position: {x: 250, y: 140},
-        style: {width: 140, height: 80, borderRadius: 16},
-        ...nodeDefaults,
-    },
-    {
-        id: "log-http",
-        type: "default",
-        data: {
-            label: (
-                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
-                    <LoggerAdapterIcon fontSize="large"/>
-                    <Typography>Logger</Typography>
-                </Box>
-            )
-        },
-        position: {x: 100, y: 140},
-        style: {width: 100, height: 80, borderRadius: 16},
-        ...nodeDefaults,
-    },
-    {
-        id: "log-transform",
-        type: "default",
-        data: {
-            label: (
-                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
-                    <LoggerAdapterIcon fontSize="large"/>
-                    <Typography>Logger</Typography>
-                </Box>
-            )
-        },
-        position: {x: 400, y: 260},
-        style: {width: 100, height: 80, borderRadius: 16},
-        ...nodeDefaults,
-    },
-    {
-        id: "jdbc-outbound",
-        type: "default",
-        data: {
-            label: (
-                <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 1}}>
-                    <JdbcAdapterIcon fontSize="large"/>
-                    <Typography>JDBC Outbound Gateway</Typography>
-                </Box>
-            )
-        },
-        position: {x: 250, y: 280},
-        style: {width: 200, height: 100, borderRadius: 16},
-        ...nodeDefaults,
-    }
-];
-
-const initialEdges = [
-    {
-        id: "e1",
-        source: "http-inbound",
-        target: "transform",
-        type: "default",
-        markerEnd: {type: MarkerType.ArrowClosed},
-        animated: true
-    },
-    {id: "e2", source: "http-inbound", target: "log-http", type: "default", markerEnd: {type: MarkerType.ArrowClosed}},
-    {
-        id: "e3",
-        source: "transform",
-        target: "jdbc-outbound",
-        type: "default",
-        markerEnd: {type: MarkerType.ArrowClosed},
-        animated: true
-    },
-    {id: "e4", source: "transform", target: "log-transform", type: "default", markerEnd: {type: MarkerType.ArrowClosed}}
-];
-
-const ADAPTER_PREVIEW_SIZE = 48;
-
 export const IntegratorPage: React.FC = () => {
+    const {id} = useParams<{ id: string }>();
+
+    if (!id) return (
+        <Alert severity="error">
+            <Typography>Ошибка при получении данных маршрута. Проверьте корректность URL</Typography>
+        </Alert>
+    );
+
     return (
         <IntegratorSidebarContext.SidebarProvider initialOpen>
             <ReactFlowProvider>
-                <Integrator/>
+                <Integrator routeId={id}/>
             </ReactFlowProvider>
         </IntegratorSidebarContext.SidebarProvider>
     )
+};
+
+interface IntegratorProps {
+    routeId: string,
 }
 
-const Integrator: React.FC = () => {
-    const theme = useTheme();
+const extractNodes = (
+    routeDefinition: RouteDefinitionDto,
+    adapters: AdapterDto[]
+): Node[] => {
+    return routeDefinition.nodes.map((node: NodeDto): Node | null => {
+        let adapter = adapters.find(a => a.id == node.adapterId);
+
+        if (adapter === undefined) {
+            console.error(`Adapter with id: ${node.adapterId} not found for node: ${JSON.stringify(node)}`);
+            return null;
+        }
+
+        let Icon = adapterIconMap[adapter.type];
+        return ({
+            id: node.id,
+            type: node.style.type,
+            data: {
+                adapter: adapter,
+                label: (
+                    <Tooltip key={adapter.id} title={adapter.displayName}>
+                        <Icon sx={{width: "100%", height: "100%"}}/>
+                    </Tooltip>
+                ),
+            },
+            position: {x: node.position.x, y: node.position.y},
+            style: {
+                ...node.style.config,
+            },
+            ...FLOW_NODE_DEFAULTS
+        });
+    }).filter(it => it != null);
+};
+
+const extractEdges = (routeDefinition: RouteDefinitionDto): Edge[] => {
+    return routeDefinition.connections.map((connection: ConnectionDto): Edge => ({
+        id: connection.id,
+        source: connection.sourceId,
+        target: connection.targetId,
+        type: connection.style.type,
+        markerStart: {type: MarkerType[connection.style.startMarkerType as keyof typeof MarkerType]},
+        markerEnd: {type: MarkerType[connection.style.endMarkerType as keyof typeof MarkerType]},
+        focusable: connection.style.focusable,
+        animated: connection.style.animated,
+    }));
+};
+
+const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
+    const theme: Theme = useTheme();
     const {mode} = useColorScheme();
-    const [sidebarWidth] = IntegratorSidebarContext.useSidebarWidth();
+    const [mainSidebarWidth] = MainSidebarContext.useSidebarWidth();
+    const [integratorSidebarWidth] = IntegratorSidebarContext.useSidebarWidth();
 
     const reactFlow = useReactFlow();
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges);
+
+    const [isShiftPressed, setIsShiftPressed] = useState(false);
+
+    const {
+        data: adapters,
+        isLoading: isLoadingAdapters,
+        isError: isErrorAdapters,
+        error: errorAdapters,
+    } = useQuery<AdapterDto[], Error>({
+        queryKey: ["adapters"],
+        queryFn: () => AdaptersApiService.getAllAdapters()
+            .then(r => r.data),
+    });
+
+    const {
+        data: route,
+        isLoading: isLoadingRoute,
+        isError: isErrorRoute,
+        error: errorRoute,
+    } = useQuery<RouteDto, Error>({
+        queryKey: ["route", routeId],
+        queryFn: (): Promise<RouteDto> => RoutesApiService.getRoute({path: {id: routeId}})
+            .then(r => r.data),
+        enabled: !!routeId,
+    });
+
+    const {
+        data: routeDefinition,
+        isLoading: isLoadingDef,
+        isError: isErrorDef,
+        error: errorDef,
+    } = useQuery({
+        queryKey: ["routeDefinition", routeId, route?.routeId.versionHash],
+        queryFn: () => RoutesApiService.getRouteDefinition({
+            path: {id: routeId, versionHash: route!.routeId.versionHash!},
+        }).then(r => r.data),
+        enabled: Boolean(routeId) && Boolean(route?.routeId.versionHash)
+    });
+
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+    useEffect(() => {
+        if (adapters && routeDefinition) {
+            setNodes(extractNodes(routeDefinition, adapters));
+            setEdges(extractEdges(routeDefinition));
+        }
+    }, [adapters, routeDefinition, setNodes, setEdges]);
 
     const [selection, setSelection] = useState<Array<Node | Edge>>([]);
 
     const onSelectionChange = useCallback(
-        (elements: OnSelectionChangeParams) => setSelection([...elements.edges, ...elements.nodes]),
+        (elements: OnSelectionChangeParams): void => setSelection([...elements.edges, ...elements.nodes]),
         []
     );
 
     useOnSelectionChange({onChange: onSelectionChange});
 
-    const [adapters, setAdapters] = useState<AdapterDto[]>([]);
     const [groupBy, setGroupBy] = useState<AdaptersGroupBy>("type");
 
-    useEffect(() => {
-        AdaptersApiService.getAllAdapters()
-            .then(r => setAdapters(r.data))
-            .catch(console.error);
-    }, []);
-
-    const buckets = adapters.reduce<Record<string, AdapterDto[]>>((acc, a) => {
+    const buckets = (adapters || []).reduce<Record<string, AdapterDto[]>>((acc, a) => {
         const key = (a as any)[groupBy] as string;
         (acc[key] ??= []).push(a);
         return acc;
     }, {});
-
-    const handleAddAdapter = (a: AdapterDto) => {
-        const {x: panX, y: panY, zoom} = reactFlow.getViewport();
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-
-        const graphX = (centerX - panX) / zoom;
-        const graphY = (centerY - panY) / zoom;
-
-        const Icon = adapterIconMap[a.type];
-
-        const newNode: Node = {
-            id: crypto.randomUUID(),
-            type: "default",
-            data: {
-                label: (
-                    <Box sx={{textAlign: "center"}}>
-                        <Icon fontSize="small"/>
-                        <Typography variant="caption">{a.displayName}</Typography>
-                    </Box>
-                ),
-            },
-            position: {x: graphX, y: graphY},
-            style: {borderRadius: 16, width: 120, height: 60},
-            sourcePosition: Position.Bottom,
-            targetPosition: Position.Top,
-        };
-
-        setNodes(nds => [...nds, newNode]);
-    };
 
     const onConnect = useCallback(
         (params: Edge | Connection) => setEdges(es => addEdge(params, es)),
@@ -239,32 +207,71 @@ const Integrator: React.FC = () => {
         supportedMethods: ["POST"]
     });
 
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') {
+                setIsShiftPressed(true);
+            }
+        };
+        const onKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') {
+                setIsShiftPressed(false);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+        };
+    }, []);
+
+    // Проверка на загрузку данных маршрута, должна происходить после инициализации всех хуков
+    if (isLoadingAdapters || isLoadingRoute || isLoadingDef) {
+        return <Typography>Загрузка…</Typography>;
+    }
+    if (isErrorAdapters) {
+        return <Alert severity="error">{errorAdapters!.message}</Alert>;
+    }
+    if (isErrorRoute) {
+        return <Alert severity="error">{errorRoute!.message}</Alert>;
+    }
+    if (isErrorDef) {
+        return <Alert severity="error">{errorDef!.message}</Alert>;
+    }
+
     return (
         <>
-            <Header currPath={["Маршруты", "Редактор"]}/>
+            <Header currPath={["Маршруты", route?.name ?? "…", "Редактор"]}/>
             <Sidebar/>
 
-            <Box sx={{height: "92vh", width: `calc(100% - ${sidebarWidth}px)`, transition: "margin .2s"}}>
+            <Box sx={{height: "92vh", width: `calc(100% - ${integratorSidebarWidth}px)`, transition: "margin .2s"}}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
+                    minZoom={0.2}
+                    maxZoom={4}
                     fitView
+                    fitViewOptions={{padding: 0.5}}
                     elementsSelectable
                     elevateEdgesOnSelect
                     elevateNodesOnSelect
                     multiSelectionKeyCode="none"
+                    snapToGrid={isShiftPressed}
+                    snapGrid={SNAP_SIZE}
                     colorMode={mode}
                     proOptions={{hideAttribution: true}}
                     style={{width: "100%", height: "100%", zIndex: -1}}
                 >
+                    <Background variant={BackgroundVariant.Dots}/> {/* TODO: Move to user settings */}
                     <Controls
                         position="center-right"
                         orientation="vertical"
                     />
-                    <Background/>
                 </ReactFlow>
             </Box>
 
@@ -293,7 +300,7 @@ const Integrator: React.FC = () => {
                             </Select>
                         </FormControl>
 
-                        {Object.entries(buckets).map(([bucket, list]: [string, AdapterDto[]]): React.JSX.Element => (
+                        {Object.entries(buckets).map(([bucket, list]: [string, AdapterDto[]]) => (
                             <>
                                 <Paper key={bucket}
                                        elevation={1}
@@ -306,12 +313,12 @@ const Integrator: React.FC = () => {
                                     <Typography variant="subtitle1">{bucket}</Typography>
                                     <Divider sx={{my: 1}} variant="fullWidth"/>
                                     <Box sx={{display: "flex", flexWrap: "wrap", gap: 1}}>
-                                        {list.map(a => {
-                                            let AdapterIcon = adapterIconMap[a.type];
+                                        {list.map(adapter => {
+                                            let AdapterIcon = adapterIconMap[adapter.type];
                                             return (
-                                                <Tooltip key={a.id} title={a.displayName}>
+                                                <Tooltip key={adapter.id} title={adapter.displayName}>
                                                     <IconButton
-                                                        onClick={() => handleAddAdapter(a)}
+                                                        onClick={() => handleAddNode(reactFlow, adapter, setNodes)}
                                                         // @ts-ignore
                                                         color="accent"
                                                         sx={{
@@ -377,7 +384,24 @@ const Integrator: React.FC = () => {
                 )}
             </IntegratorSidebar>
 
-            <IntegratorPowerTool offsetRight={sidebarWidth}/>
+            <IntegratorPowerTool offsetRight={integratorSidebarWidth}/>
+
+            {isShiftPressed && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: 12,
+                        left: `calc(16px + ${mainSidebarWidth}px)`,
+                        padding: '4px 8px',
+                        background: 'rgba(0,0,0,0.5)',
+                        color: 'white',
+                        borderRadius: 4,
+                        fontSize: 12
+                    }}
+                >
+                    Привязка к сетке {SNAP_SIZE[0]}×{SNAP_SIZE[1]}
+                </Box>
+            )}
         </>
     );
 };

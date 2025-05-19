@@ -1095,6 +1095,10 @@ components:
       type: object
       description: Соединение узлов
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Идентификатор соединения
         sourceId:
           type: string
           format: uuid
@@ -1107,6 +1111,7 @@ components:
           $ref: "#/components/schemas/ConnectionStyleDto"
           description: Стили соединения
       required:
+      - id
       - sourceId
       - style
       - targetId

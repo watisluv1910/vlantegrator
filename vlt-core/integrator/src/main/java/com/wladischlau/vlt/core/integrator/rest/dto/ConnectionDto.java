@@ -6,6 +6,8 @@ import java.util.UUID;
 
 @Schema(description = "Соединение узлов")
 public record ConnectionDto(
+        @Schema(description = "Идентификатор соединения", requiredMode = Schema.RequiredMode.REQUIRED)
+        UUID id,
         @Schema(description = "Идентификатор узла-источника", requiredMode = Schema.RequiredMode.REQUIRED)
         UUID sourceId,
         @Schema(description = "Идентификатор узла-цели", requiredMode = Schema.RequiredMode.REQUIRED)

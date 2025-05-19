@@ -151,10 +151,12 @@ public interface DtoMapper {
     @Mapping(target = "zIndex", source = "zIndex")
     NodePositionDto toDto(NodePosition src);
 
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "fromNodeId", source = "sourceId")
     @Mapping(target = "toNodeId", source = "targetId")
     Connection fromDto(ConnectionDto src);
 
+    @Mapping(target = "id", source = "connection.id")
     @Mapping(target = "sourceId", source = "connection.fromNodeId")
     @Mapping(target = "targetId", source = "connection.toNodeId")
     @Mapping(target = "style", source = "style")
@@ -166,6 +168,7 @@ public interface DtoMapper {
 
     List<ConnectionFullData> fromDtoToConnectionsFullData(List<ConnectionDto> src);
 
+    @Mapping(target = "id", source = "connection.id")
     @Mapping(target = "sourceId", source = "connection.fromNodeId")
     @Mapping(target = "targetId", source = "connection.toNodeId")
     @Mapping(target = "style", source = "style")

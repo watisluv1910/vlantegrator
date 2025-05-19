@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 import {Alert} from "@/components/Alert.tsx";
 import {THEME} from "@/styles/muiConfig.ts";
-import {handleCopyEvent} from "@/utils/handlers.ts";
+import {handleCopyEvent} from "@/utils/handlers.tsx";
 import {MainSidebarContext} from "@/hooks/sidebarContexts.tsx";
 import {ACCOUNT_MANAGEMENT_URL} from "@/config/keycloak.ts";
 
