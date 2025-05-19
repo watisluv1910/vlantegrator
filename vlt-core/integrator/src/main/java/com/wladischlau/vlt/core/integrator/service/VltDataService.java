@@ -41,7 +41,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -57,6 +56,8 @@ public class VltDataService {
     private final VersionHashGenerator routeHashGen;
     private final ModelMapper modelMapper;
 
+    private static final List<String> HIDDEN_ADAPTER_NAMES = List.of("divider");
+
     private final ConcurrentMap<UUID, VersionBucket> routeCache = new ConcurrentHashMap<>();
 
     @PostConstruct
@@ -69,6 +70,12 @@ public class VltDataService {
 
     public List<Adapter> findAllAdapters() {
         return modelMapper.toAdaptersFromJooq(repository.findAllAdapters());
+    }
+
+    public List<Adapter> findInteractableAdapters() {
+        return findAllAdapters().stream()
+                .filter(it -> !HIDDEN_ADAPTER_NAMES.contains(it.name()))
+                .toList();
     }
 
     public Optional<Adapter> findAdapterById(@NotNull UUID id) {

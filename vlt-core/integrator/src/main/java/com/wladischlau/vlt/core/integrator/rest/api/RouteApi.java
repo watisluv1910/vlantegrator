@@ -7,7 +7,6 @@ import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.SearchRoutesRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
-import com.wladischlau.vlt.core.integrator.rest.dto.UserSettingsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -168,7 +167,7 @@ public interface RouteApi {
             description = "Получить версии маршрута, структура которых хранится в кэше",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Список версий",
-                            content = @Content(mediaType = "application/json")),
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
                     @ApiResponse(responseCode = "400", description = "Некорректный запрос",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
                     @ApiResponse(responseCode = "401", description = "Не авторизован",

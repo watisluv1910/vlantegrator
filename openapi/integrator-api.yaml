@@ -695,7 +695,11 @@ paths:
         "200":
           description: Список версий
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         "400":
           description: Некорректный запрос
           content:
