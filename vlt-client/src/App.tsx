@@ -23,7 +23,7 @@ export const App: React.FC = () => {
                     <Route path={MAIN_ROUTES.observer.path} element={<RoutesPage/>}/>
                     <Route path="/routes/create" element={<CreateRoutePage/>}/>
                     <Route path="/routes/:id/edit" element={<EditRoutePage/>}/>
-                    <Route path="/routes/:id/definition/:versionHash" element={<IntegratorPage/>}/>
+                    <Route path="/routes/:id/definition" element={<IntegratorPage/>}/>
                     <Route path={MAIN_ROUTES.health.path} element={<PlatformStatePage/>}/>
                     <Route path={MAIN_ROUTES.docs.path} element={<HomePage/>}/>
                     <Route path={MAIN_ROUTES.help.path} element={<HomePage/>}/>
