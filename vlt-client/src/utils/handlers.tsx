@@ -33,6 +33,7 @@ export const handleAddNode = (
         id: crypto.randomUUID(),
         type: "default",
         data: {
+            config: {},
             adapter: adapter,
             label: (
                 <Tooltip key={adapter.id} title={adapter.displayName}>

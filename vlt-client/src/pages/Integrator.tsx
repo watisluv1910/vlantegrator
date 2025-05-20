@@ -21,18 +21,14 @@ import {useQuery} from "@tanstack/react-query";
 import {
     Alert,
     Box,
-    Checkbox,
     Divider,
     FormControl,
     IconButton,
     InputLabel,
-    ListItemText,
     MenuItem,
-    OutlinedInput,
     Paper,
     Select,
     SelectChangeEvent,
-    TextField,
     Theme,
     Tooltip,
     Typography,
@@ -51,6 +47,8 @@ import {IntegratorPowerTool} from "@/components/IntegratorPowerTool.tsx";
 import "@xyflow/react/dist/style.css";
 import {ADAPTER_PREVIEW_SIZE, FLOW_NODE_DEFAULTS, SNAP_SIZE} from "@/utils/constants.tsx";
 import {handleAddNode} from "@/utils/handlers.tsx";
+import {EdgeConfigPanel} from "@/components/EdgeConfigPanel.tsx";
+import {NodeConfigPanel} from "@/components/NodeConfigPanel.tsx";
 
 type AdaptersGroupBy = "type" | "direction" | "channelKind";
 
@@ -93,6 +91,7 @@ const extractNodes = (
             id: node.id,
             type: node.style.type,
             data: {
+                config: node.config,
                 adapter: adapter,
                 label: (
                     <Tooltip key={adapter.id} title={adapter.displayName}>
@@ -200,13 +199,6 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
         [],
     );
 
-    // TODO: Delete
-    const [adapterConfig, setAdapterConfig] = useState({
-        path: "/data",
-        requestPayloadType: "java.lang.String",
-        supportedMethods: ["POST"]
-    });
-
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Shift') {
@@ -243,7 +235,7 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
 
     return (
         <>
-            <Header currPath={["Маршруты", route?.name ?? "…", "Редактор"]}/>
+            <Header currPath={["Маршруты", route?.name ?? "…", "Редактор структуры"]}/>
             <Sidebar/>
 
             <Box sx={{height: "92vh", width: `calc(100% - ${integratorSidebarWidth}px)`, transition: "margin .2s"}}>
@@ -276,13 +268,12 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
             </Box>
 
             <IntegratorSidebar>
-                {selection.length === 0 ? (
-                    <Box>
+                {selection.length !== 1 ? (
+                    <Box sx={{mt: 1}}>
                         <Typography
                             variant="h4"
                             color={theme.palette.accent.main}
                             gutterBottom
-                            sx={{mt: 1}}
                         >
                             Адаптеры
                         </Typography>
@@ -301,86 +292,48 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
                         </FormControl>
 
                         {Object.entries(buckets).map(([bucket, list]: [string, AdapterDto[]]) => (
-                            <>
-                                <Paper key={bucket}
-                                       elevation={1}
-                                       sx={{
-                                           p: 2,
-                                           mb: 2,
-                                           borderRadius: 1,
-                                       }}
-                                >
-                                    <Typography variant="subtitle1">{bucket}</Typography>
-                                    <Divider sx={{my: 1}} variant="fullWidth"/>
-                                    <Box sx={{display: "flex", flexWrap: "wrap", gap: 1}}>
-                                        {list.map(adapter => {
-                                            let AdapterIcon = adapterIconMap[adapter.type];
-                                            return (
-                                                <Tooltip key={adapter.id} title={adapter.displayName}>
-                                                    <IconButton
-                                                        onClick={() => handleAddNode(reactFlow, adapter, setNodes)}
-                                                        // @ts-ignore
-                                                        color="accent"
-                                                        sx={{
-                                                            width: ADAPTER_PREVIEW_SIZE,
-                                                            aspectRatio: "1/1",
-                                                            border: theme => `1px solid ${theme.palette.divider}`,
-                                                            backgroundColor: `${theme.palette.primary.light}`,
-                                                        }}
-                                                    >
-                                                        <AdapterIcon/>
-                                                    </IconButton>
-                                                </Tooltip>
-                                            );
-                                        })}
-                                    </Box>
-                                </Paper>
-                            </>
+                            <Paper key={bucket}
+                                   elevation={1}
+                                   sx={{
+                                       p: 2,
+                                       mb: 2,
+                                       borderRadius: 1,
+                                   }}
+                            >
+                                <Typography variant="subtitle1">{bucket}</Typography>
+                                <Divider sx={{my: 1}} variant="fullWidth"/>
+                                <Box sx={{display: "flex", flexWrap: "wrap", gap: 1}}>
+                                    {list.map(adapter => {
+                                        let AdapterIcon = adapterIconMap[adapter.type];
+                                        return (
+                                            <Tooltip key={adapter.id} title={adapter.displayName}>
+                                                <IconButton
+                                                    onClick={() => handleAddNode(reactFlow, adapter, setNodes)}
+                                                    // @ts-ignore
+                                                    color="accent"
+                                                    sx={{
+                                                        width: ADAPTER_PREVIEW_SIZE,
+                                                        aspectRatio: "1/1",
+                                                        border: theme => `1px solid ${theme.palette.divider}`,
+                                                        backgroundColor: `${theme.palette.primary.light}`,
+                                                    }}
+                                                >
+                                                    <AdapterIcon/>
+                                                </IconButton>
+                                            </Tooltip>
+                                        );
+                                    })}
+                                </Box>
+                            </Paper>
                         ))}
                     </Box>
                 ) : (
-                    <>
-                        <Typography variant="h6" gutterBottom>
-                            HTTP Inbound Config
-                        </Typography>
-                        <Typography variant="subtitle2">Path</Typography>
-                        <TextField
-                            fullWidth
-                            size="small"
-                            value={adapterConfig.path}
-                            onChange={(e) =>
-                                setAdapterConfig({...adapterConfig, path: e.target.value})
-                            }
-                        />
-                        <Typography variant="subtitle2" sx={{mt: 2}}>Request Payload Type</Typography>
-                        <TextField
-                            fullWidth
-                            size="small"
-                            value={adapterConfig.requestPayloadType}
-                            onChange={(e) => setAdapterConfig({...adapterConfig, requestPayloadType: e.target.value})}
-                        />
-                        <Typography variant="subtitle2" sx={{mt: 2}}>Supported Methods</Typography>
-                        <FormControl fullWidth size="small">
-                            <Select
-                                multiple
-                                value={adapterConfig.supportedMethods}
-                                onChange={(e) => setAdapterConfig({
-                                    ...adapterConfig,
-                                    supportedMethods: [...e.target.value]
-                                })}
-                                input={<OutlinedInput placeholder="Methods"/>}
-                                renderValue={(selected) => selected.join(", ")}
-                                variant={"filled"}
-                            >
-                                {["GET", "POST", "PUT", "DELETE"].map((method) => (
-                                    <MenuItem key={method} value={method}>
-                                        <Checkbox checked={adapterConfig.supportedMethods.includes(method)}/>
-                                        <ListItemText primary={method}/>
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </>
+                    (() => {
+                        const sel: Node | Edge = selection[0];
+                        return "source" in sel
+                            ? <EdgeConfigPanel key={sel.id} edgeId={sel.id} edges={edges} setEdges={setEdges}/>
+                            : <NodeConfigPanel key={sel.id} node={sel} setNodes={setNodes}/>
+                    })()
                 )}
             </IntegratorSidebar>
 
@@ -393,10 +346,12 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
                         bottom: 12,
                         left: `calc(16px + ${mainSidebarWidth}px)`,
                         padding: '4px 8px',
-                        background: 'rgba(0,0,0,0.5)',
                         color: 'white',
+                        opacity: 0.5,
+                        background: theme.palette.common.black,
                         borderRadius: 4,
-                        fontSize: 12
+                        fontSize: 12,
+                        cursor: 'default'
                     }}
                 >
                     Привязка к сетке {SNAP_SIZE[0]}×{SNAP_SIZE[1]}

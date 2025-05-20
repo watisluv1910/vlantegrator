@@ -1,6 +1,6 @@
-import {createTheme} from "@mui/material";
+import {createTheme, Theme} from "@mui/material";
 
-export const THEME = createTheme({
+export const THEME: Theme = createTheme({
     cssVariables: {colorSchemeSelector: "class"},
     defaultColorScheme: "light",
     typography: {
@@ -57,6 +57,13 @@ export const THEME = createTheme({
                     "&:last-child td": {
                         borderBottom: 0,
                     },
+                },
+            },
+        },
+        MuiFormControl: {
+            styleOverrides: {
+                root: {
+                    marginTop: '8px',
                 },
             },
         },
