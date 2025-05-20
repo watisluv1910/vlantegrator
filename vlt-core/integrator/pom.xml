@@ -110,6 +110,11 @@
             <artifactId>jsonschema-module-jakarta-validation</artifactId>
             <version>${jsonschema-generator.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-swagger-2</artifactId>
+            <version>${jsonschema-generator.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jgrapht</groupId>
@@ -351,6 +356,9 @@
                                 <option>NOT_NULLABLE_FIELD_IS_REQUIRED</option>
                                 <option>INCLUDE_PATTERN_EXPRESSIONS</option>
                             </options>
+                        </module>
+                        <module>
+                            <name>Swagger2</name>
                         </module>
                         <module>
                             <className>
