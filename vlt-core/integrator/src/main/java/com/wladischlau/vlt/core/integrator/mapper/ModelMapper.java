@@ -176,16 +176,16 @@ public interface ModelMapper {
     VltNodeConnection toJooq(Connection src);
 
     @Mapping(target = "type", expression = "java(src.type().getLiteral())")
-    @Mapping(target = "startMarkerType", expression = "java(src.markerStartType().getLiteral())")
-    @Mapping(target = "endMarkerType", expression = "java(src.markerEndType().getLiteral())")
+    @Mapping(target = "startMarkerType", source = "src.markerStartType")
+    @Mapping(target = "endMarkerType", source = "src.markerEndType")
     @Mapping(target = "animated", source = "animated")
     @Mapping(target = "focusable", source = "focusable")
     ConnectionStyle toModel(VltNodeConnectionStyle src);
 
     @Mapping(target = "vltNodeConnectionId", source = "connectionId")
     @Mapping(target = "type", expression = "java(EdgeType.lookupLiteral(style.type()))")
-    @Mapping(target = "markerStartType", expression = "java(MarkerType.lookupLiteral(style.startMarkerType()))")
-    @Mapping(target = "markerEndType", expression = "java(MarkerType.lookupLiteral(style.endMarkerType()))")
+    @Mapping(target = "markerStartType", source = "style.startMarkerType")
+    @Mapping(target = "markerEndType", source = "style.endMarkerType")
     @Mapping(target = "animated", source = "style.animated")
     @Mapping(target = "focusable", source = "style.focusable")
     VltNodeConnectionStyle toJooq(ConnectionStyle style, UUID connectionId);

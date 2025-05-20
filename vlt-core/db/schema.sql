@@ -5,7 +5,6 @@ set search_path to "$DB_SCHEMA";
 create type adapter_direction as enum ('OUTBOUND', 'INBOUND', 'COMMON');
 create type channel_kind as enum ('CHANNEL', 'GATEWAY', 'NONE');
 create type edge_type as enum ('default', 'straight', 'step', 'smoothstep', 'simplebezier');
-create type marker_type as enum ('arrow', 'arrowclosed');
 create type node_role as enum ('default', 'input', 'output', 'group');
 create type route_user_action as enum ('create', 'update', 'build', 'start', 'stop', 'restart', 'remove', 'delete');
 create type network_driver as enum ('bridge', 'host', 'none', 'overlay', 'ipvlan', 'macvlan');
@@ -113,12 +112,12 @@ create table if not exists vlt_node_connection
 
 create table if not exists vlt_node_connection_style
 (
-    vlt_node_connection_id uuid        not null primary key references vlt_node_connection,
-    type                   edge_type   not null default 'default',
-    marker_start_type      marker_type not null default 'arrow',
-    marker_end_type        marker_type not null default 'arrowclosed',
-    animated               boolean     not null default false,
-    focusable              boolean     not null default false
+    vlt_node_connection_id uuid      not null primary key references vlt_node_connection,
+    type                   edge_type not null default 'default',
+    marker_start_type      text,
+    marker_end_type        text,
+    animated               boolean   not null default false,
+    focusable              boolean   not null default false
 );
 
 create table if not exists vlt_route_network
