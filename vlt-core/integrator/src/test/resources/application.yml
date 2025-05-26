@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: integrator
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KC_HOST}:8180/realms/vlt
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${VLT_CORE_DB_HOST:localhost}:${VLT_CORE_DB_PORT:5433}/vlt_repo
+    username: ${VLT_CORE_DB_USER:admin}
+    password: ${VLT_CORE_DB_PASSWORD:admin}
+  jooq:
+    sql-dialect: postgres
+  kafka:
+    bootstrap-servers: localhost:9091,localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    consumer:
+      group-id: integrator
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.wladischlau.vlt.*"
+    listener:
+      concurrency: ${KAFKA_LISTENER_CONCURRENCY} # До KAFKA_LISTENER_CONCURRENCY потоков на топик
+
+server:
+  port: 8080
+
+springdoc:
+  show-actuator: true
+
+api:
+  version: 1.0.0
+  description: API платформы Vlantegrator
+
+vlt:
+  version-hash-length: 12
+  route-cache-max-size: 10
+
+docker:
+  host: ${DOCKER_HOST}
+  username: ${DOCKER_USERNAME}
+  password: ${DOCKER_PASSWORD}
+  image-registry: ${DOCKER_IMAGE_REGISTRY}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    root: INFO
+    com.wladischlau: DEBUG
