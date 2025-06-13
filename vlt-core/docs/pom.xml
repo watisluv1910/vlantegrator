@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.wladischlau.vlt.core</groupId>
+        <artifactId>vlt-core</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <artifactId>docs</artifactId>
+    <packaging>jar</packaging>
+    <name>docs</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <addResources>true</addResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-dokka</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/static/docs</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/integrator/target/dokka</directory>
+                                    <targetPath>integrator</targetPath>
+                                </resource>
+                                <resource>
+                                    <directory>${project.parent.basedir}/builder/target/dokka</directory>
+                                    <targetPath>builder</targetPath>
+                                </resource>
+                                <resource>
+                                    <directory>${project.parent.basedir}/deployer/target/dokka</directory>
+                                    <targetPath>deployer</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

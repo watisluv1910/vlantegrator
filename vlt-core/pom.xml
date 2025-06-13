@@ -19,6 +19,7 @@
         <spring-kafka.version>3.3.4</spring-kafka.version>
         <spring-dotenv.version>4.0.0</spring-dotenv.version>
         <springdoc-openapi-starter.version>2.8.6</springdoc-openapi-starter.version>
+        <dokka.version>2.0.0</dokka.version>
         <swagger-annotations-jakarta.version>2.2.29</swagger-annotations-jakarta.version>
 
         <docker-java.version>3.5.0</docker-java.version>
@@ -53,6 +54,7 @@
         <module>integrator</module>
         <module>builder</module>
         <module>deployer</module>
+        <module>docs</module>
     </modules>
 
     <dependencyManagement>
@@ -118,6 +120,35 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <inherited>false</inherited>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dokkaPlugins>
+                        <plugin>
+                            <groupId>org.jetbrains.dokka</groupId>
+                            <artifactId>kotlin-as-java-plugin</artifactId>
+                            <version>${dokka.version}</version>
+                        </plugin>
+                    </dokkaPlugins>
+                    <documentedVisibilities>
+                        <visibility>PUBLIC</visibility>
+                        <visibility>PACKAGE</visibility>
+                        <visibility>PROTECTED</visibility>
+                        <visibility>PRIVATE</visibility>
+                    </documentedVisibilities>
+                </configuration>
             </plugin>
         </plugins>
     </build>
