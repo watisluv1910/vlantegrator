@@ -69,6 +69,29 @@ if (!host || !port) {
 
 export const BASE_API_URL = `http://${host ?? "localhost"}:${port ?? "8080"}`;
 
+export const DOCS: { label: string; url: string }[] = [
+    {
+        label: "🌐 GitHub – Репозиторий Vlantegrator",
+        url: "https://github.com/watisluv1910/vlantegrator",
+    },
+    {
+        label: "📘 Integrator API – Swagger UI",
+        url: `${BASE_API_URL}/swagger-ui/index.html`,
+    },
+    {
+        label: "📄 Dokka – Модуль Integrator",
+        url: `http://${host ?? "localhost"}:8079/docs/integrator/index.html`,
+    },
+    {
+        label: "📄 Dokka – Модуль Builder",
+        url: `http://${host ?? "localhost"}:8079/docs/builder/index.html`,
+    },
+    {
+        label: "📄 Dokka – Модуль Deployer",
+        url: `http://${host ?? "localhost"}:8079/docs/deployer/index.html`,
+    },
+];
+
 export const RECENT_ACTIVITY_POLLING_INTERVAL_MS = 13000;
 export const BASIC_PLATFORM_HEALTH_POLLING_INTERVAL_MS = 8000;
 
