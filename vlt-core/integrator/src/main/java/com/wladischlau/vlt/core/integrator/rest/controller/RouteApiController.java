@@ -1,6 +1,7 @@
 package com.wladischlau.vlt.core.integrator.rest.controller;
 
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
+import com.wladischlau.vlt.core.commons.model.ContainerStatus;
 import com.wladischlau.vlt.core.commons.model.RouteId;
 import com.wladischlau.vlt.core.commons.model.DeployActionType;
 import com.wladischlau.vlt.core.integrator.mapper.DtoMapper;
@@ -15,6 +16,7 @@ import com.wladischlau.vlt.core.integrator.rest.dto.RouteUserActionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.SearchRoutesRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.UpdateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.service.DeployerDelegate;
+import com.wladischlau.vlt.core.integrator.service.DockerService;
 import com.wladischlau.vlt.core.integrator.service.RouteBuildService;
 import com.wladischlau.vlt.core.integrator.service.VltDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,15 +41,17 @@ import java.util.stream.Collectors;
 public class RouteApiController extends ApiController implements RouteApi {
 
     private final VltDataService vltDataService;
+    private final DockerService dockerService;
     private final RouteBuildService routeBuildService;
     private final DeployerDelegate deployerDelegate;
 
     public RouteApiController(DtoMapper dtoMapper,
-                              VltDataService vltDataService,
+                              VltDataService vltDataService, DockerService dockerService,
                               RouteBuildService routeBuildService,
                               DeployerDelegate deployerDelegate) {
         super(dtoMapper);
         this.vltDataService = vltDataService;
+        this.dockerService = dockerService;
         this.routeBuildService = routeBuildService;
         this.deployerDelegate = deployerDelegate;
     }
@@ -225,6 +230,15 @@ public class RouteApiController extends ApiController implements RouteApi {
             var routeAction = new RouteUserAction(id, principal, RouteAction.fromDeployRequestType(actionType));
             vltDataService.insertRouteUserAction(routeAction);
             return ResponseEntity.accepted().build();
+        });
+    }
+
+    @Override
+    public ResponseEntity<Map<String, ContainerStatus>> getRoutesStatus(List<RouteIdDto> routeIds, JwtAuthenticationToken principal) {
+        return logRequestProcessing(GET_ROUTES_STATUS, () -> {
+            var ids = dtoMapper.fromRouteIdDto(routeIds);
+            var res = dockerService.getRouteStatuses(ids);
+            return ResponseEntity.ok(res);
         });
     }
 

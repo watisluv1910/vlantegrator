@@ -1,6 +1,7 @@
 package com.wladischlau.vlt.core.integrator.rest.api;
 
 import com.wladischlau.vlt.core.commons.dto.RouteIdDto;
+import com.wladischlau.vlt.core.commons.model.ContainerStatus;
 import com.wladischlau.vlt.core.integrator.rest.dto.CreateRouteRequestDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDefinitionDto;
 import com.wladischlau.vlt.core.integrator.rest.dto.RouteDto;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "Routes API", description = "Операции для работы с маршрутами")
@@ -58,6 +60,7 @@ public interface RouteApi {
     String BUILD_ROUTE = "buildRoute";
     String DEPLOY_ROUTE = "deployRoute";
     String GET_ROUTE_USER_ACTIONS = "getRouteUserActions";
+    String GET_ROUTES_STATUS = "getRoutesStatus";
 
     @Operation(
             security = @SecurityRequirement(name = "bearerAuth"),
@@ -373,6 +376,32 @@ public interface RouteApi {
             @NotNull @PathVariable(name = "id") UUID id,
             @Parameter(required = true, schema = @Schema(description = "Действие", type = "string"))
             @NotNull @RequestParam(name = "action") String action,
+            JwtAuthenticationToken principal) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(
+            security = @SecurityRequirement(name = "bearerAuth"),
+            operationId = GET_ROUTES_STATUS,
+            summary = "Поиск статуса маршрутов",
+            description = "Отдаёт статусы развёртывания маршрутов по их идентификаторам",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Информация о статусе маршрутов",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректный запрос",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "401", description = "Не авторизован",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+                    @ApiResponse(responseCode = "500", description = "Ошибка сервера",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))),
+            }
+    )
+    @PostMapping(value = "v1/route/status", produces = {MediaType.APPLICATION_JSON_VALUE})
+    default ResponseEntity<Map<String, ContainerStatus>> getRoutesStatus(
+            @RequestBody(required = true, content = @Content(array = @ArraySchema(schema = @Schema(implementation = RouteIdDto.class))))
+            @org.springframework.web.bind.annotation.RequestBody List<RouteIdDto> routeIds,
             JwtAuthenticationToken principal) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }

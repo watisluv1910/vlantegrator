@@ -95,6 +95,8 @@ public interface DtoMapper {
     @Mapping(target = "versionHash", source = "versionHash")
     RouteId fromDto(RouteIdDto src);
 
+    List<RouteId> fromRouteIdDto(List<RouteIdDto> src);
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "versionHash", source = "versionHash")
     RouteIdDto toDto(RouteId src);

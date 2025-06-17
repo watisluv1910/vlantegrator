@@ -155,6 +155,17 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
     });
 
     const {
+        data: routeStatuses,
+        isLoading: isLoadingStatus,
+        isError: isErrorStatus,
+    } = useQuery({
+        queryKey: ["routeStatus", routeId],
+        queryFn: () => RoutesApiService.getRoutesStatus({body: [{id: routeId, versionHash: route!.routeId.versionHash!}]})
+            .then(r => r.data),
+        enabled: !!routeId,
+    });
+
+    const {
         data: routeDefinition,
         isLoading: isLoadingDef,
         isError: isErrorDef,
@@ -338,6 +349,24 @@ const Integrator: React.FC<IntegratorProps> = ({routeId}: IntegratorProps) => {
             </IntegratorSidebar>
 
             <IntegratorPowerTool offsetRight={integratorSidebarWidth}/>
+
+            <Box
+                sx={{
+                    position: 'absolute',
+                    bottom: 12,
+                    right: integratorSidebarWidth + 180, // чуть левее от PowerTool
+                    backgroundColor: theme.palette.mode === 'dark'
+                        ? theme.palette.grey[800]
+                        : theme.palette.grey[200],
+                    borderRadius: 2,
+                    padding: '6px 12px',
+                    fontSize: 14,
+                    color: theme.palette.text.primary,
+                    boxShadow: 1,
+                }}
+            >
+                Статус: {isLoadingStatus ? "загрузка..." : isErrorStatus ? "ошибка" : routeStatuses?.[routeId + "." + route!.routeId.versionHash!]}
+            </Box>
 
             {isShiftPressed && (
                 <Box

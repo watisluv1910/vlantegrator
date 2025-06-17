@@ -404,6 +404,54 @@ paths:
                 $ref: "#/components/schemas/ProblemDetail"
       security:
       - bearerAuth: []
+  /api/v1/route/status:
+    post:
+      tags:
+      - Routes API
+      summary: Поиск статуса маршрутов
+      description: Отдаёт статусы развёртывания маршрутов по их идентификаторам
+      operationId: getRoutesStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/RouteIdDto"
+        required: true
+      responses:
+        "200":
+          description: Информация о статусе маршрутов
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+      security:
+      - bearerAuth: []
   /api/v1/route/search:
     post:
       tags:
